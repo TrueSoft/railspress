@@ -1,0 +1,8 @@
+module Railspress
+  class Usermeta < ApplicationRecord
+    self.primary_key = :umeta_id
+    self.table_name = self.prefix_table_name('usermeta')
+
+    belongs_to :user
+  end
+end
