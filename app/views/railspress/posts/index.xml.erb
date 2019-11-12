@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<truesoft-app>
+  <%= content_tag :posts do %>
+    <% @posts.each do |post| %>
+      <%= content_tag :article, id: post.id do %>
+        <%= content_tag :'post-date', I18n.l(post.post_date, format: '%e %b %Y'), datetime: post.post_date.strftime('%F') %>
+        <%= content_tag :'post-title', post.post_title, url: show_post_url(slug: post.post_name), path: show_post_path(slug: post.post_name) %>
+        <% extended_entry_info = get_extended(post.post_content)
+           if post.post_excerpt.blank?
+             excerpt = extended_entry_info[:main]
+           else
+             excerpt = post.post_excerpt
+           end
+        %>
+        <%= content_tag :'post-content', 'read-more': (extended_entry_info[:extended].blank? ? nil : true) do %>
+          <![CDATA[<%= excerpt.html_safe %>]]>
+        <% end %>
+      <% end %>
+    <% end %>
+  <% end %>
+  <% if @posts.total_pages > 1 %>
+    <%= tag :pagination, current: @posts.current_page, total: @posts.total_pages, offset: @posts.offset, per_page: @posts.per_page %>
+  <% end %>
+</truesoft-app>

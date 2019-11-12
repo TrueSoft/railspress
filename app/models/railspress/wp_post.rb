@@ -8,7 +8,7 @@ module Railspress
     after_save :save_relationships
 
     scope :published, -> { where(post_status: "publish") }
-    scope :descending, -> { order(post_date: :desc, id: :desc) } # TODO it was { order(post_modified: :desc, id: :desc) }
+    scope :descending, -> { order(post_date: :desc, id: :desc) } # TODO era { order(post_modified: :desc, id: :desc) }
     scope :recent, -> (count = 10) { descending.limit(count) }
 
     has_many :relationships, foreign_key: :object_id

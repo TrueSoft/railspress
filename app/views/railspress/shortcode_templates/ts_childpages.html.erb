@@ -1,0 +1,13 @@
+<%
+  # normalize attribute keys, lowercase
+  ts_atts = @attributes.transform_keys!(&:downcase)
+  # override default attributes with user attributes
+  ts_atts = {sort_column: 'menu_order', sort_order: 'asc', no_content: false }.merge(ts_atts)
+  childpages = get_children({post_parent: @attributes[:page].id, post_type: 'page', post_status: 'publish', orderby: ts_atts[:sort_column], order: ts_atts[:sort_order].to_sym}).values
+%>
+
+<%= @content %>
+
+<% unless childpages.empty? %>
+  <%= content_tag :div, childpages.each.map {|copil| output_page_as_card(copil, ts_atts[:no_content] == 'true')}.join.html_safe, class: 'row'  %>
+<% end %>

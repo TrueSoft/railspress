@@ -1,0 +1,49 @@
+en:
+
+  date:
+    formats:
+      default: "%d-%m-%Y"
+      short: "%d %b"
+      long: "%d %B %Y"
+    #      only_day: "%e"
+
+    day_names: [Sunday, Monday, Tuesday, Wednesday, Thursday, Friday, Saturday]
+    abbr_day_names: [Sun, Mon, Tue, Wed, Thu, Fri, Sat]
+
+    month_names: [~, January, February, March, April, May, June, July, August, September, October, November, December]
+    abbr_month_names: [~, Jan, Feb, Mar, Apr, May, Jun, Jul, Aug, Sep, Oct, Nov, Dec]
+  #    order: [ :day, :month, :year ]
+
+  railspress:
+    embed:
+      continue_reading_html: "Continue reading <span class=\"screen-reader-text\">%{title}</span>"
+    option:
+      index:
+        title: "Options"
+      new:
+        title: "Add option"
+    pages:
+      show:
+        not_found: "The page with the name '%{slug}' is not found!"
+        no_public: "The page with the name '%{slug}' is not available!"
+        read_more: "Read more"
+    post:
+      index:
+        more: "Read more"
+      show:
+        created_at_html: "Created at <time datetime=\"%{iso_date}\">%{date}</time>"
+        next: "Next"
+        prev: "Previous"
+        tags: "Tags"
+
+        not_found: "The post with the name '%{slug}' is not found!"
+        id_not_found: "The post with the id '%{id}' is not found!"
+    tag:
+      not_found: "The tag '%{slug}' is not found!"
+    invalid_term: "Empty Term."
+    invalid_taxonomy: "Invalid taxonomy."
+    invalid_taxonomy_s: "Invalid taxonomy: %{s}."
+
+    layouts:
+      footer:
+        powered_by: "Proudly powered by %{provider}"
