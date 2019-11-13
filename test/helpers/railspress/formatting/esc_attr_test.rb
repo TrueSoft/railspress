@@ -2,6 +2,7 @@ require 'test_helper'
 
 class EscAttrTest < ActionView::TestCase
   include Railspress::FormattingHelper
+  include Railspress::KsesHelper
   include Railspress::OptionsHelper
   include Railspress::Plugin
   include CGI::Util

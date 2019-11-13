@@ -3,6 +3,7 @@ require 'test_helper'
 class EscUrlTest < ActionView::TestCase
   include Railspress::FormattingHelper
   include Railspress::Functions
+  include Railspress::KsesHelper
   include Railspress::Plugin
 
   test "spaces" do
@@ -47,7 +48,7 @@ class EscUrlTest < ActionView::TestCase
   # TODO  assert_equal 'http://баба.org/баба', esc_url( 'баба.org/баба' )
   end
 
-# TODO ...
+  # TODO tests from esc_url
 
   # test "invalid characters" do
   #   assert_empty esc_url_raw('"^<>{}`')

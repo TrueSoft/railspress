@@ -5,7 +5,7 @@ module Railspress
     include Engine.routes.url_helpers
 
     test "should get index" do
-      get options_index_url
+      get options_url
       assert_response :success
     end
 

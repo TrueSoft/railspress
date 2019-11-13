@@ -1,0 +1,4 @@
+permalink:
+  option_name: permalink_structure
+  option_value: /%postname%/
+  autoload: 'yes'
