@@ -7,11 +7,17 @@ module Railspress
         home_page_id = helpers.get_option('page_on_front')
         unless home_page_id.blank?
           @page = Railspress::Page.where(post_type: 'page', id: home_page_id, post_status: 'publish').first
-          # ---- Get the translated version if it is the case
-          @page = helpers.get_translated_page @page, params[:language] || I18n.default_locale.to_s
+          if Railspress.multi_language
+            # ---- Get the translated version if it is the case
+            @page = helpers.get_translated_page @page, params[:language] || I18n.default_locale.to_s
+          end
         end
       end
-      @latest_posts = Railspress::Post.published.descending.joins(:languages).where(default_filter).first(2)
+      if Railspress.multi_language
+        @latest_posts = Railspress::Post.published.descending.joins(:languages).where(default_filter).first(2)
+      else
+        @latest_posts = Railspress::Post.published.descending.where(default_filter).first(2)
+      end
     end
 
     def show
@@ -40,12 +46,14 @@ module Railspress
           return
         end
         orig_page_id = @page.id
-        @page = helpers.get_translated_page @page, params[:language] || I18n.default_locale.to_s
-        if orig_page_id != @page.id
-          parsed_locale = params[:language] || I18n.default_locale.to_s
-          logger.info "Redirecting to translated version (#{@page.post_name}/#{parsed_locale})"
-          redirect_to show_page_path(helpers.get_page_uri(@page), language: parsed_locale == I18n.default_locale.to_s ? nil : params[:language])
-          return
+        if Railspress.multi_language
+          @page = helpers.get_translated_page @page, params[:language] || I18n.default_locale.to_s
+          if orig_page_id != @page.id
+            parsed_locale = params[:language] || I18n.default_locale.to_s
+            logger.info "Redirecting to translated version (#{@page.post_name}/#{parsed_locale})"
+            redirect_to show_page_path(helpers.get_page_uri(@page), language: parsed_locale == I18n.default_locale.to_s ? nil : params[:language])
+            return
+          end
         end
         @is_revision = params[:rev] && params[:token] == helpers.ts_token(params[:rev])
         if @is_revision
@@ -78,9 +86,13 @@ module Railspress
     private
 
     def default_filter
-      parsed_locale = params[:language] || I18n.default_locale
-      tt_id = Railspress::Language.joins(:term).where(Railspress::Term.table_name => {slug: parsed_locale}).pluck(:term_taxonomy_id)
-      {Railspress::Taxonomy.table_name => {term_id: tt_id.empty? ? 0 : tt_id.first }}
+      if Railspress.multi_language
+        parsed_locale = params[:language] || I18n.default_locale
+        tt_id = Railspress::Language.joins(:term).where(Railspress::Term.table_name => {slug: parsed_locale}).pluck(:term_taxonomy_id)
+        {Railspress::Taxonomy.table_name => {term_id: tt_id.empty? ? 0 : tt_id.first }}
+      else
+        {}
+      end
     end
   end
 end
