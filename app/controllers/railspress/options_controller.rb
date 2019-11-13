@@ -19,18 +19,51 @@ module Railspress
     def create
       @option = Railspress::Option.new model_params
       if @option.save
-        @option.create_activity :create, owner: current_user, parameters: {option_name: @option.option_name, option_value: @option.option_value}
-        redirect_to({action: :index}, notice: "Salvarea a fost efectuata cu succes.")
+        # ch_migr @option.create_activity :create, owner: current_user, parameters: {option_name: @option.option_name, option_value: @option.option_value}
+        redirect_to({action: :index}, notice: t('railspress.option.create.save'))
       else
         @options = get_display_options
         @options << @option # if @option.new_record?
-        @breadcrumb[t('railspress.option.new.title')] = nil
+        @breadcrumb[t('railspress.option.new.title')] = nil if @breadcrumb # TODO implement breadcrumb
         render action: :index
       end
     rescue ActiveRecord::RecordNotUnique
-      flash.now[:error] = "Optiunea cu numele #{@option.option_name} exista deja."
+      flash.now[:error] = t('railspress.option.create.error_not_unique', name: @option.option_name)
       @options = get_display_options
       render action: :index
+    end
+
+    def edit
+      @options = get_display_options
+      @option = Railspress::Option.find(params[:id])
+      render action: :index
+    rescue ActiveRecord::RecordNotFound
+      flash[:error] = t('railspress.option.edit.error_not_found')
+      redirect_to action: :index
+    end
+
+    def update
+      @option = Railspress::Option.find(params[:id])
+      if @option.update_attributes(model_params)
+        flash[:notice] = t('railspress.option.update.save')
+        # ch_migr  @option.create_activity :update, owner: current_user, parameters: {option_name: @option.option_name, option_value: @option.option_value}
+        redirect_to action: :index
+      else
+        @options = get_display_options
+        render action: :index
+      end
+    end
+
+    def destroy
+      @option = Railspress::Option.find(params[:id])
+      # ch_migr  @option.create_activity :destroy, owner: current_user, parameters: {option_name: @option.option_name, option_value: @option.option_value}
+      if @option.destroy
+        redirect_to({action: :index}, notice: t('railspress.option.destroy'))
+      else
+        @options = get_display_options
+        @option = Railspress::Option.new
+        render action: :index
+      end
     end
 
     private
@@ -39,14 +72,14 @@ module Railspress
       opts = []
       opts += Railspress::Option.where(option_name: READONLY_OPTIONS).to_a
       opts += Railspress::Option.where(option_name: EDITABLE_OPTIONS).to_a
-      readonly_simple = []#Rails.configuration.TS_READONLY_OPTIONS.reject {|on| on.index('*')}
-      readonly_wildcards = []#Rails.configuration.TS_READONLY_OPTIONS.select {|on| on.index('*')}
+      readonly_simple = Railspress.TS_READONLY_OPTIONS.reject {|on| on.index('*')}
+      readonly_wildcards = Railspress.TS_READONLY_OPTIONS.select {|on| on.index('*')}
       opts += Railspress::Option.where(option_name: readonly_simple).to_a
       readonly_wildcards.each do |opt_name|
         opts += Railspress::Option.where('option_name LIKE ?', opt_name.gsub(/\*/, '%')).to_a
       end
-      editable_simple = []# Rails.configuration.TS_EDITABLE_OPTIONS.reject {|on| on.index('*')}
-      editable_wildcards = []#Rails.configuration.TS_EDITABLE_OPTIONS.select {|on| on.index('*')}
+      editable_simple = Railspress.TS_EDITABLE_OPTIONS.reject {|on| on.index('*')}
+      editable_wildcards = Railspress.TS_EDITABLE_OPTIONS.select {|on| on.index('*')}
       opts += Railspress::Option.where(option_name: editable_simple).to_a
       editable_wildcards.each do |opt_name|
         opts += Railspress::Option.where('option_name LIKE ?', opt_name.gsub(/\*/, '%')).to_a
@@ -59,7 +92,7 @@ module Railspress
     end
 
     def model_params
-      params.require(:railspress_option).permit([:option_id, :option_name, :option_value, :autoload])
+      params.require(:option).permit([:option_id, :option_name, :option_value, :autoload])
     end
 
   end
