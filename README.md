@@ -1,8 +1,18 @@
-# Railspress
+![Railspress](https://truesoft.ro/railspress/railspress-logo.png)
+
 Shows Wordpress posts in a Ruby on Rails application.
 
+## Features
+
+- Displays the pages, posts and menus from a WordPress site using the rails layouts
+- Works for multi-language sites also
+- Configure additionally options using the same WordPress table
+- 2 custom shortcodes:
+  - `ts_revisions` - shows the page revisions for website visitors
+  - `ts_childpages` - displays links of the child pages into the parent page
+
 ## Usage
-How to use my plugin.
+How to use the engine
 
 ## Installation
 Add this line to your application's Gemfile:
@@ -22,7 +32,14 @@ $ gem install railspress
 ```
 
 ## Contributing
+
 Contribution directions go here.
+
+## Sponsors
+
+Support this project:
+
+[![PayPal](https://www.paypalobjects.com/webstatic/en_US/i/buttons/pp-acceptance-medium.png)](https://paypal.me/ibogdank/10eur)
 
 ## License
 The gem is available as open source under the terms of the [MIT License](https://opensource.org/licenses/MIT).
