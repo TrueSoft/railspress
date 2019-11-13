@@ -15,7 +15,7 @@ module Railspress::WpDbHelper
 # @return string escaped
   def _real_escape(string)
     string
-    #TODO continue
+    # TODO implement wp-db.php _real_escape()
     #     if ( $this->dbh ) {
     #     if ( $this->use_mysqli ) {
     #         $escaped = mysqli_real_escape_string( $this->dbh, $string );

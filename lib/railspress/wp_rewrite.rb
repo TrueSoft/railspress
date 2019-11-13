@@ -330,7 +330,7 @@ module Railspress
     #
     # @return array Array of page URIs as first element and attachment URIs as second element.
     def page_uri_index
-      # TODO implement ...
+      # TODO implement class-wp-rewrite.php page_uri_index
     end
 
     # Retrieves all of the rewrite rules for pages.
@@ -343,7 +343,7 @@ module Railspress
       generate_rewrite_rules( get_page_permastruct(), EP_PAGES, true, true, false, false )
     end
 
-    # TODO get_date_permastruct
+    # TODO implement class-wp-rewrite.php get_date_permastruct
     # ...
 
     # Retrieves the permalink structure for categories.
@@ -380,8 +380,7 @@ module Railspress
       false
     end
 
-    # TODO get_author_permastruct
-    # TODO get_search_permastruct
+    # TODO implement class-wp-rewrite.php get_author_permastruct, get_search_permastruct
 
     # Retrieves the page permalink structure.
     #
@@ -402,8 +401,7 @@ module Railspress
       @page_structure = @root + '%pagename%'
     end
 
-    # TODO get_feed_permastruct
-    # TODO get_comment_feed_permastruct
+    # TODO implement class-wp-rewrite.php get_feed_permastruct, get_comment_feed_permastruct
 
     # Sets up the object's properties.
     #
@@ -419,6 +417,9 @@ module Railspress
         @permalink_structure = get_option( 'permalink_structure' )
       rescue Mysql2::Error::ConnectionError
         warn("[WARN] couldn't connect to database. Skipping Railspress::GLOBAL::wp_rewrite::permalink_structure initialization")
+        @permalink_structure = '/%postname%'
+      end
+      if @permalink_structure == false && Rails.env.test?
         @permalink_structure = '/%postname%'
       end
       @front               = @permalink_structure[0, @permalink_structure.index('%')]

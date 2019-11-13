@@ -424,7 +424,7 @@ module Railspress
     end
     # Adds the necessary rewrite rules for the post type.
     def add_rewrite_rules
-      # TODO continue add_rewrite_rules()
+      # TODO implement class-wp-post-type.php add_rewrite_rules()
     end
 
     # Registers the post type meta box if a custom callback was specified.
@@ -453,7 +453,7 @@ module Railspress
 
     # Removes any rewrite rules, permastructs, and rules for the post type.
     def remove_rewrite_rules
-      # TODO continue remove_rewrite_rules()
+      # TODO implement class-wp-post-type.php remove_rewrite_rules()
     end
 
     # Unregisters the post type meta box if a custom callback was specified.
