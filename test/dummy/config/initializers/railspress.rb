@@ -5,4 +5,7 @@ Railspress.setup do |config|
   config.WP_CONTENT_DIR = "https://blog.truesoft.ro/wp-content" # ABSPATH + 'wp-content'
   config.WP_POST_REVISIONS = true
 
+  config.TS_READONLY_OPTIONS = %w(theme_mods_twentynineteen)
+  config.TS_EDITABLE_OPTIONS = %w(my_option other_option with_prefix_*)
+
 end
