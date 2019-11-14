@@ -45,12 +45,12 @@ module Railspress::MediaHelper
   #                               (like inserting into an editor). Default nil.
   # @return [array] Width and height of what the result image should resize to.
   def image_constrain_size_for_editor(width, height, size = 'medium', context = nil )
-    # TODO global $content_width;
+    # global $content_width; TODO content_width
 
     _wp_additional_image_sizes = wp_get_additional_image_sizes
 
     if context.nil?
-      context =  'display' # TODO is_admin() ? 'edit' : 'display'
+      context =  is_admin ? 'edit' : 'display'
     end
 
     if size.is_a? Array
@@ -70,9 +70,9 @@ module Railspress::MediaHelper
     elsif size == 'medium_large'
       max_width = get_option('medium_large_size_w').to_i
       max_height = get_option('medium_large_size_h').to_i
-      # if ( intval( $content_width ) > 0 ) { TODO content_width
-      #     $max_width = min( intval( $content_width ), $max_width );
-      # }
+      # if content_width.to_i > 0
+      #     max_width = [content_width.to_i, max_width].min
+      # end
     elsif size == 'large'
       # We're inserting a large size image into the editor. If it's a really
       # big image we'll scale it down to fit reasonably within the editor
@@ -80,14 +80,14 @@ module Railspress::MediaHelper
       # can resize it in the editor if they wish.
       max_width = get_option('large_size_w').to_i
       max_height = get_option('large_size_h').to_i
-      # if ( intval( $content_width ) > 0 ) { TODO content_width
+      # if ( intval( $content_width ) > 0 ) {
       #     $max_width = min( intval( $content_width ), $max_width );
       # }
     elsif !_wp_additional_image_sizes.blank? && _wp_additional_image_sizes[size]
       max_width = _wp_additional_image_sizes[size]['width'].to_i
       max_height = _wp_additional_image_sizes[size]['height'].to_i
       # Only in admin. Assume that theme authors know what they're doing.
-      # if ( intval( $content_width ) > 0 && 'edit' === $context ) { TODO
+      # if ( intval( $content_width ) > 0 && 'edit' === $context ) {
       # $max_width = min( intval( $content_width ), $max_width );
       # }
     else # $size == 'full' has no constraint
@@ -448,6 +448,22 @@ end
     end
   end
 
+  # Get the attachment path relative to the upload directory.
+  #
+  # @param [string] file Attachment file name.
+  # @return [string] Attachment path relative to the upload directory.
+  def _wp_get_attachment_relative_path( file )
+    dirname = File.dirname( file )
+    return '' if dirname == '.'
+
+    if dirname.include? 'wp-content/uploads'
+      # Get the directory name relative to the upload directory (back compat for pre-2.7 uploads)
+      dirname = dirname[dirname.index('wp-content/uploads') + 18 .. -1]
+      dirname.gsub!(/^\//, '')
+    end
+    dirname
+  end
+
   # Returns a filtered list of WP-supported audio formats.
   #
   # @return [Array] Supported audio formats.
@@ -482,19 +498,20 @@ end
     # get a thumbnail or intermediate image if there is one
     image = image_downsize( attachment_id, size )
     if !image
-      src = false
+      if icon
+        src = wp_mime_type_icon(attachment_id)
+        if src
+          # This filter is documented in wp-includes/post.php
+          icon_dir = apply_filters('icon_dir', Railspress.ABSPATH + Railspress.WPINC + '/images/media')
 
-      if icon && src = wp_mime_type_icon(attachment_id )
-        # This filter is documented in wp-includes/post.php
-        icon_dir = apply_filters( 'icon_dir', Rails.application.secrets.ABSPATH + Rails.application.secrets.WPINC + '/images/media' )
-
-        src_file = icon_dir + '/' + wp_basename( src )
-        width, height  = getimagesize( src_file )
+          src_file = icon_dir + '/' + wp_basename(src)
+          width, height = Dimensions.dimensions(src_file)
+          if width && height
+            image = [src, width, height]
+          end
+        end
       end
 
-      if src && width && height
-        image = [ src, width, height ]
-      end
     end
     # Filters the image src result.
     apply_filters( 'wp_get_attachment_image_src', image, attachment_id, size, icon)
