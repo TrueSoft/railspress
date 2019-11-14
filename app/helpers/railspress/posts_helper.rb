@@ -218,11 +218,11 @@ module Railspress::PostsHelper
   # @return WP_Post_Type|null WP_Post_Type object if it exists, null otherwise.
   def get_post_type_object(post_type)
 
-    if !( post_type.is_a?(Numeric) || post_type.is_a?(FalseClass) || post_type.is_a?(TrueClass)) || GLOBAL.wp_post_types[ post_type ].blank?
+    if !( post_type.is_a?(Numeric) || post_type.is_a?(FalseClass) || post_type.is_a?(TrueClass)) || Railspress.GLOBAL.wp_post_types[ post_type ].blank?
         return nil
     end
 
-    GLOBAL.wp_post_types[post_type]
+    Railspress.GLOBAL.wp_post_types[post_type]
   end
 
 
@@ -243,7 +243,7 @@ module Railspress::PostsHelper
   def get_post_types(args = {}, output = 'names', operator = 'and')
     field = ( 'names' == output ) ? 'name' : false
 
-    wp_filter_object_list(GLOBAL.wp_post_types, args, operator, field)
+    wp_filter_object_list(Railspress.GLOBAL.wp_post_types, args, operator, field)
   end
 
   # Check a post type's support for a given feature.
@@ -254,7 +254,7 @@ module Railspress::PostsHelper
   # @param [string] feature   The feature being checked.
   # @return bool Whether the post type supports the given feature.
   def post_type_supports(post_type, feature)
-    !GLOBAL._wp_post_type_features[post_type][feature].nil?
+    !Railspress.GLOBAL._wp_post_type_features[post_type][feature].nil?
   end
 
   # Retrieves an array of the latest posts, or posts matching the given criteria.
@@ -589,5 +589,108 @@ module Railspress::PostsHelper
     wp_attachment_is('image', post)
   end
 
+  # Retrieve the icon for a MIME type.
+  #
+  # @param [string|int] mime MIME type or attachment ID.
+  # @return string|false Icon, false otherwise.
+  def wp_mime_type_icon(mime = 0)
+      icon = nil
+      # if ( ! is_numeric( mime ) ) {
+      #     icon = wp_cache_get( "mime_type_icon_$mime" )
+      # }
+
+      post_id = 0
+      if icon.blank?
+        post_mimes = []
+        # TODO continue
+        # if ( is_numeric( $mime ) ) {
+        #     $mime = (int) $mime;
+        # if ( $post = get_post( $mime ) ) {
+        #     $post_id = (int) $post->ID;
+        # $file    = get_attached_file( $post_id );
+        # $ext     = preg_replace( '/^.+?\.([^.]+)$/', '$1', $file );
+        # if ( ! empty( $ext ) ) {
+        #     $post_mimes[] = $ext;
+        # if ( $ext_type = wp_ext2type( $ext ) ) {
+        #     $post_mimes[] = $ext_type;
+        # }
+        # }
+        # $mime = $post->post_mime_type;
+        # } else {
+        #     $mime = 0;
+        # }
+        # } else {
+        #     $post_mimes[] = $mime;
+        # }
+        #
+        # $icon_files = wp_cache_get( 'icon_files' );
+        #
+        # if ( ! is_array( $icon_files ) ) {
+        #     # Filters the icon directory path.
+        #     $icon_dir = apply_filters( 'icon_dir', ABSPATH + WPINC + '/images/media' );
+        #
+        # # Filters the icon directory URI.
+        # $icon_dir_uri = apply_filters( 'icon_dir_uri', includes_url( 'images/media' ) );
+        #
+        # # Filters the list of icon directory URIs.
+        # $dirs       = apply_filters( 'icon_dirs', array( $icon_dir => $icon_dir_uri ) );
+        # $icon_files = array();
+        # while ( $dirs ) {
+        #     $keys = array_keys( $dirs );
+        # $dir  = array_shift( $keys );
+        # $uri  = array_shift( $dirs );
+        # if ( $dh = opendir( $dir ) ) {
+        #     while ( false !== $file = readdir( $dh ) ) {
+        #         $file = wp_basename( $file );
+        #     if ( substr( $file, 0, 1 ) == '.' ) {
+        #         continue;
+        #     }
+        #     if ( ! in_array( strtolower( substr( $file, -4 ) ), array( '.png', '.gif', '.jpg' ) ) ) {
+        #         if ( is_dir( "$dir/$file" ) ) {
+        #             $dirs[ "$dir/$file" ] = "$uri/$file";
+        #         }
+        #         continue;
+        #         }
+        #         $icon_files[ "$dir/$file" ] = "$uri/$file";
+        #         }
+        #         closedir( $dh );
+        #         }
+        #         }
+        #         wp_cache_add( 'icon_files', $icon_files, 'default', 600 );
+        #         }
+        #
+        #         types = []
+        #         # Icon wp_basename - extension = MIME wildcard.
+        #         foreach ( $icon_files as $file => $uri ) {
+        #             $types[ preg_replace( '/^([^.]*).*$/', '$1', wp_basename( $file ) ) ] =& $icon_files[ $file ];
+        #         }
+        #
+        #         if ( ! empty( $mime ) ) {
+        #             $post_mimes[] = substr( $mime, 0, strpos( $mime, '/' ) );
+        #         $post_mimes[] = substr( $mime, strpos( $mime, '/' ) + 1 );
+        #         $post_mimes[] = str_replace( '/', '_', $mime );
+        #         }
+        #
+        #         $matches            = wp_match_mime_types( array_keys( $types ), $post_mimes );
+        #         $matches['default'] = array( 'default' );
+        #
+        #         foreach ( $matches as $match => $wilds ) {
+        #             foreach ( $wilds as $wild ) {
+        #             if ( ! isset( $types[ $wild ] ) ) {
+        #             continue;
+        #         }
+        #
+        #         $icon = $types[ $wild ];
+        #         if ( ! is_numeric( $mime ) ) {
+        #             wp_cache_add( "mime_type_icon_$mime", $icon );
+        #         }
+        #         break 2;
+        #         }
+        #         }
+        end
+
+        # Filters the mime type icon.
+        apply_filters( 'wp_mime_type_icon', icon, mime, post_id )
+        end
 
 end

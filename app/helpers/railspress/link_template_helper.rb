@@ -27,7 +27,7 @@ module Railspress::LinkTemplateHelper
   #                            for use in the filter. Default empty string.
   # @return string The URL with the trailing slash appended or stripped.
   def user_trailingslashit(string, type_of_url = '')
-    if GLOBAL.wp_rewrite.use_trailing_slashes
+    if Railspress.GLOBAL.wp_rewrite.use_trailing_slashes
       string = trailingslashit(string)
     else
       string = untrailingslashit(string)
@@ -118,7 +118,7 @@ module Railspress::LinkTemplateHelper
 
     return post if post.is_a? Railspress::WP_Error # is_wp_error( post )
 
-    post_link = GLOBAL.wp_rewrite.get_extra_permastruct( post.post_type )
+    post_link = Railspress.GLOBAL.wp_rewrite.get_extra_permastruct( post.post_type )
 
     slug = post.post_name
 
@@ -175,7 +175,7 @@ module Railspress::LinkTemplateHelper
     # global $wp_rewrite
     # post = get_post( post )
     draft_or_pending = ['draft', 'pending', 'auto-draft'].include?(post.post_status)
-    link = GLOBAL.wp_rewrite.get_page_permastruct
+    link = Railspress.GLOBAL.wp_rewrite.get_page_permastruct
 
     if !link.blank? && ((!post.post_status.blank? && !draft_or_pending) || sample)
       unless leavename
@@ -221,7 +221,7 @@ module Railspress::LinkTemplateHelper
   def get_home_url(blog_id = nil, path = '', scheme = nil)
     orig_scheme = scheme
 
-    if blog_id.blank? || true # !is_multisite()
+    if blog_id.blank? || !is_multisite
       url = get_option('home')
     else
       switch_to_blog(blog_id)
@@ -238,7 +238,7 @@ module Railspress::LinkTemplateHelper
     #   end
     # end
 
-    # TODO url = set_url_scheme(url, scheme)
+    url = set_url_scheme(url, scheme)
 
     if !path.blank? && path.is_a?(String)
       url += '/' + path.gsub(/^\//, '')
@@ -247,5 +247,163 @@ module Railspress::LinkTemplateHelper
     # Filters the home URL.
     apply_filters('home_url', url, path, orig_scheme, blog_id)
   end
+
+  # Retrieves the URL for the current site where WordPress application files
+  # (e.g. wp-blog-header.php or the wp-admin/ folder) are accessible.
+  #
+  # Returns the 'site_url' option with the appropriate protocol, 'https' if
+  # is_ssl() and 'http' otherwise. If $scheme is 'http' or 'https', is_ssl() is
+  # overridden.
+  #
+  # @param [string] path   Optional. Path relative to the site URL. Default empty.
+  # @param [string] scheme Optional. Scheme to give the site URL context. See set_url_scheme().
+  # @return [string] Site URL link with optional path appended.
+  def site_url(path = '', scheme = nil )
+    get_site_url(nil, path, scheme )
+  end
+
+  # Retrieves the URL for a given site where WordPress application files
+  # (e.g. wp-blog-header.php or the wp-admin/ folder) are accessible.
+  #
+  # Returns the 'site_url' option with the appropriate protocol, 'https' if
+  # is_ssl() and 'http' otherwise. If `$scheme` is 'http' or 'https',
+  # `is_ssl()` is overridden.
+  #
+  # @param [int]    blog_id Optional. Site ID. Default null (current site).
+  # @param [string] path    Optional. Path relative to the site URL. Default empty.
+  # @param [string] scheme  Optional. Scheme to give the site URL context. Accepts
+  #                         'http', 'https', 'login', 'login_post', 'admin', or
+  #                         'relative'. Default null.
+  # @return string Site URL link with optional path appended.
+  def get_site_url(blog_id = nil, path = '', scheme = nil )
+    if  blog_id.blank? || !is_multisite
+      url = get_option('siteurl')
+    else
+      switch_to_blog blog_id
+      url = get_option('siteurl')
+      restore_current_blog
+    end
+
+    url = set_url_scheme(url, scheme )
+
+    url += '/' + path.gsub(/^\//, '') if path.is_a?(String)
+
+    # Filters the site URL.
+    #
+    # @param string      $url     The complete site URL including scheme and path.
+    # @param string      $path    Path relative to the site URL. Blank string if no path is specified.
+    # @param string|null $scheme  Scheme to give the site URL context. Accepts 'http', 'https', 'login',
+    #                             'login_post', 'admin', 'relative' or null.
+    # @param int|null    $blog_id Site ID, or null for the current site.
+    apply_filters( 'site_url', url, path, scheme, blog_id )
+  end
+
+  # Retrieves the URL to the admin area for the current site.
+  #
+  # @since 2.6.0
+  #
+  # @param [string] path   Optional path relative to the admin URL.
+  # @param [string] scheme The scheme to use. Default is 'admin', which obeys force_ssl_admin() and is_ssl().
+  #                       'http' or 'https' can be passed to force those schemes.
+  # @return [string] Admin URL link with optional path appended.
+  def admin_url( path = '', scheme = 'admin' )
+    get_admin_url( nil, path, scheme)
+  end
+
+  # Retrieves the URL to the admin area for a given site.
+  #
+  # @param [int]    blog_id Optional. Site ID. Default null (current site).
+  # @param [string] path    Optional. Path relative to the admin URL. Default empty.
+  # @param [string] scheme  Optional. The scheme to use. Accepts 'http' or 'https',
+  #                         to force those schemes. Default 'admin', which obeys
+  #                         force_ssl_admin() and is_ssl().
+  # @return [string] Admin URL link with optional path appended.
+  def get_admin_url(blog_id = nil, path = '', scheme = 'admin')
+    url = get_site_url(blog_id, 'wp-admin/', scheme )
+
+    url += path.gsub(/^\//, '') if path.is_a?(String)
+
+    # Filters the admin area URL.
+    #
+    # @param [string]   url     The complete admin area URL including scheme and path.
+    # @param [string]   path    Path relative to the admin area URL. Blank string if no path is specified.
+    # @param [int|null] blog_id Site ID, or null for the current site.
+    apply_filters('admin_url', url, path, blog_id)
+  end
+
+  # Retrieves the URL to the includes directory.
+  #
+  # @since 2.6.0
+  #
+  # @param [string] path   Optional. Path relative to the includes URL. Default empty.
+  # @param [string] scheme Optional. Scheme to give the includes URL context. Accepts
+  #                        'http', 'https', or 'relative'. Default null.
+  # @return [string] Includes URL link with optional path appended.
+  def includes_url( path = '', scheme = nil )
+    url = site_url( '/' + Railspress.WPINC + '/', scheme )
+
+    url += path.gsub(/^\//, '') if path.is_a? String
+
+    # Filters the URL to the includes directory.
+    #
+    # @param string $url  The complete URL to the includes directory including scheme and path.
+    # @param string $path Path relative to the URL to the wp-includes directory. Blank string
+    #                     if no path is specified.
+    apply_filters('includes_url', url, path )
+  end
+
+  # Retrieves the URL to the content directory.
+  #
+  # @param [string] path Optional. Path relative to the content URL. Default empty.
+  # @return string Content URL link with optional path appended.
+  def content_url(path = '')
+    url = set_url_scheme( Railspress.WP_CONTENT_URL )
+
+    url += '/' + path.gsub(/^\//, '') if path.is_a? String
+
+    # Filters the URL to the content directory.
+    apply_filters( 'content_url', url, path )
+  end
+
+  # Sets the scheme for a URL.
+  #
+  # @param [string]      url    Absolute URL that includes a scheme
+  # @param [string|null] scheme Optional. Scheme to give $url. Currently 'http', 'https', 'login',
+  #                             'login_post', 'admin', 'relative', 'rest', 'rpc', or null. Default null.
+  # @return [string] url URL with chosen scheme.
+  def set_url_scheme(url, scheme = nil )
+    orig_scheme = scheme
+
+    if scheme.blank?
+      scheme = is_ssl ? 'https' : 'http'
+    elsif scheme == 'admin' || scheme == 'login' || scheme == 'login_post' || scheme == 'rpc'
+      scheme = is_ssl || force_ssl_admin() ? 'https' : 'http'
+    elsif scheme != 'http' && scheme != 'https' && scheme != 'relative'
+    scheme = is_ssl ? 'https' : 'http';
+    end
+
+    url.strip!
+    url = 'http:' + url if url.start_with?('//')
+
+    if 'relative' == scheme
+      url = url.gsub(/^\w+:\/\/[^\/]*/, '').lstrip
+      if url != '' && url[0] == '/'
+        url = '/' + ltrim( url, "/ \t\n\r\0\x0B" )
+      end
+    else
+      url = url.gsub(/^\w+:\/\//, scheme + '://')
+    end
+
+    # Filters the resulting URL after setting the scheme.
+    #
+    # @since 3.4.0
+    #
+    # @param string      $url         The complete URL including scheme and path.
+    # @param string      $scheme      Scheme applied to the URL. One of 'http', 'https', or 'relative'.
+    # @param string|null $orig_scheme Scheme requested for the URL. One of 'http', 'https', 'login',
+    #                                 'login_post', 'admin', 'relative', 'rest', 'rpc', or null.
+    apply_filters( 'set_url_scheme', url, scheme, orig_scheme )
+  end
+
 
 end
