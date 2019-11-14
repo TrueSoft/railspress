@@ -265,10 +265,11 @@ module Railspress::NavMenuHelper
     if ( :ARRAY_A == args['output'] )
       items = wp_list_sort(
           items, {args['output_key'] => 'ASC' }
-      );
-      $i     = 1;
-      # TODO foreach ( $items as $k => $item ) {
-      #   $items[ $k ].{$args['output_key']} = $i++
+      )
+      # TODO continue
+      # i     = 1
+      # foreach ( $items as $k => $item ) {
+      #   $items[ $k ].{$args['output_key']} = i++
       # }
     end
 

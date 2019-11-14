@@ -95,19 +95,20 @@ module Railspress::PostTemplateHelper
   	title = post.post_title || ''
 	  id    = post.id || 0
 
-    unless true # TODO implement is_admin from load.php
+    unless is_admin
       if !post.post_password.blank?
         # Filters the text prepended to the post title for protected posts.
         #
         # The filter is only applied on the front end.
-        protected_title_format = apply_filters('protected_title_format', __('Protected: %s'), post)
-        title = sprintf(protected_title_format, title)
+        protected_title_format = apply_filters('protected_title_format', 'railspress.post.show.title_protected', post)
+        title = t(protected_title_format, title: title)
       elsif 'private' == post.post_status
         # Filters the text prepended to the post title of private posts.
         #
         # The filter is only applied on the front end.
-        private_title_format = apply_filters('private_title_format', __('Private: %s'), post)
+        private_title_format = apply_filters('private_title_format', 'railspress.post.show.title_private', post)
         title = sprintf(private_title_format, title)
+        title = t(private_title_format, title: title)
       end
     end
 
@@ -182,7 +183,7 @@ module Railspress::PostTemplateHelper
 
 
     classes << "post-#{post.ID}"
-    classes << post.post_type # TODO unless is_admin()
+    classes << post.post_type unless is_admin
 
     classes << 'type-' + post.post_type
     classes << 'status-' + post.post_status

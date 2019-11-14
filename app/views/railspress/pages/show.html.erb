@@ -8,7 +8,7 @@
         end %>
       <%= if @is_revision
             content_tag :h4, class: 'revision-parent px-2 text-muted' do
-              "Arhiva din #{I18n.l(@page.post_date, format: @revision_post_date_title_format)} pentru #{link_to(@main_post.post_title, show_page_path(get_page_uri(@main_post)))}".html_safe
+              t('railspress.shortcodes.revisions.title_html', date: I18n.l(@page.post_date, format: @revision_post_date_title_format), post: link_to(@main_post.post_title, show_page_path(get_page_uri(@main_post))))
             end
           end %>
 

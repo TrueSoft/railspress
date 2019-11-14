@@ -448,7 +448,7 @@ module Railspress
 
     # Removes the features support for the post type.
     def remove_supports
-      Railspress::GLOBAL._wp_post_type_features.delete self.name
+      Railspress.GLOBAL._wp_post_type_features.delete self.name
     end
 
     # Removes any rewrite rules, permastructs, and rules for the post type.

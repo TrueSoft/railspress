@@ -96,7 +96,7 @@ module Railspress::RevisionHelper
   # @param [WP_Post] post The post object.
   # @return [int] The number of revisions to keep.
   def wp_revisions_to_keep(post)
-    num = !defined?(Rails.application.secrets.WP_POST_REVISIONS) || Rails.application.secrets.WP_POST_REVISIONS
+    num = !defined?(Railspress.WP_POST_REVISIONS) || Railspress.WP_POST_REVISIONS
 
     if num == true || 'true'.eql?(num)
       num = -1
