@@ -12,20 +12,12 @@ module Railspress
 
     def by_year
       @year = params[:year].to_i
-      if params[:orig_id] && !(@post = Railspress::Post.published.where(guid: 'http://www.tursib.ro/news/' + params[:orig_id]).first).nil?
-        @post_prev, @post_next = neighbours(@post)
-        @breadcrumb = {t('railspress.post.index.title') => posts_path}
-        @breadcrumb[@post.post_date.year] = news_of_year_path(year: @post.post_date.year) unless @post.post_date.year == Date.current.year
-        @breadcrumb[@post.post_title] = nil
-        render action: :show
+      if Railspress.multi_language
+        @posts = Railspress::Post.published.descending.joins(:languages).where(default_filter).where('post_date >= ? and post_date < ?', DateTime.new(@year).beginning_of_year, DateTime.new(@year + 1).beginning_of_year).paginate(page: params[:page]).order(post_date: :desc)
       else
-        if Railspress.multi_language
-          @posts = Railspress::Post.published.descending.joins(:languages).where(default_filter).where('post_date >= ? and post_date < ?', DateTime.new(@year).beginning_of_year, DateTime.new(@year + 1).beginning_of_year).paginate(page: params[:page]).order(post_date: :desc)
-        else
-          @posts = Railspress::Post.published.descending.where(default_filter).where('post_date >= ? and post_date < ?', DateTime.new(@year).beginning_of_year, DateTime.new(@year + 1).beginning_of_year).paginate(page: params[:page]).order(post_date: :desc)
-        end
-        render action: :index
+        @posts = Railspress::Post.published.descending.where(default_filter).where('post_date >= ? and post_date < ?', DateTime.new(@year).beginning_of_year, DateTime.new(@year + 1).beginning_of_year).paginate(page: params[:page]).order(post_date: :desc)
       end
+      render action: :index
     end
 
     def by_month
