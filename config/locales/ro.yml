@@ -22,8 +22,16 @@ ro:
         title: "Opțiuni"
       new:
         title: "Adăugare opțiune"
+      create:
+        save: "Opțiunea a fost salvată cu succes."
+        error_not_unique: "Opțiunea cu numele %{name} există deja."
+      edit:
+        error_not_found: "Opțiunea nu este validă"
+      update:
+        save: "Modificarile au fost salvate."
       delete:
         title: "Ștergere opțiune"
+      destroy: "Inregistrarea a fost ștearsă."
     pages:
       show:
         not_found: "Pagina numele '%{slug}' nu este gasită!"
@@ -31,9 +39,11 @@ ro:
         read_more: "Mai multe detalii"
     post:
       index:
-        title: "Posts"
+        title: "Articole"
         more: "Citește mai mult"
       show:
+        title_protected: "Protected: %{title}"
+        title_private: "Private: %{title}"
         created_at_html: "Publicat la <time datetime=\"%{iso_date}\">%{date}</time>"
         next: "Anunțul următor"
         prev: "Anunțul anterior"
@@ -47,7 +57,40 @@ ro:
     invalid_taxonomy: "Taxonomie invalidă."
     invalid_taxonomy_s: "Taxonomie invalidă: %{s}."
 
+    shortcodes:
+      revisions:
+        title_html: "Arhiva din %{date} pentru %{post}"
+
     layouts:
       footer:
         powered_by: "Proudly powered by %{provider}"
 
+  activerecord:
+    errors:
+      template:
+        header:
+          one: "Acest %{model} nu a putut fi salvat: o eroare"
+          other: "Acest %{model} nu a putut fi salvat: %{count} erori."
+        body: "Încearcă să corectezi urmatoarele câmpuri:"
+      messages:
+        inclusion: "nu este inclus în listă"
+        exclusion: "este rezervat"
+        invalid: "este invalid"
+        confirmation: "nu este confirmat"
+        accepted: "trebuie confirmate"
+        empty: "nu poate fi gol"
+        blank: "nu poate fi gol"
+        too_long: "este prea lung (se pot folosi maximum %{count} caractere)"
+        too_short: "este prea scurt (minimum de caractere este %{count})"
+        wrong_length: "nu are lungimea corectă (trebuie să aibă %{count} caractere)"
+        taken: "este deja folosit"
+        not_a_number: "nu este un număr"
+        not_an_integer: "trebuie sa fie un număr intreg"
+        greater_than: "trebuie să fie mai mare decât %{count}"
+        greater_than_or_equal_to: "trebuie să fie mai mare sau egal cu %{count}"
+        equal_to: "trebuie să fie egal cu %{count}"
+        less_than: "trebuie să fie mai mic decât %{count}"
+        less_than_or_equal_to: "trebuie să fie mai mic sau egal cu %{count}"
+        odd: "trebuie să fie par"
+        even: "trebuie să fie impar"
+        record_invalid: "Validare nereușită %{errors}"
