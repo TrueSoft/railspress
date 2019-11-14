@@ -7,8 +7,8 @@ module Railspress::OptionsHelper
 
   def option_is_editable_ts(option_name)
     return true if EDITABLE_OPTIONS.include?(option_name.to_s)
-    editable_simple = []#Rails.configuration.TS_EDITABLE_OPTIONS.reject {|on| on.index('*')}
-    editable_wildcards = []#Rails.configuration.TS_EDITABLE_OPTIONS.select {|on| on.index('*')}
+    editable_simple = Railspress.TS_EDITABLE_OPTIONS.reject {|on| on.index('*')}
+    editable_wildcards = Railspress.TS_EDITABLE_OPTIONS.select {|on| on.index('*')}
     return true if editable_simple.include?(option_name.to_s)
     editable_wildcards.each do |opt_name|
       return true if option_name.to_s =~ Regexp.new(opt_name.gsub(/\*/, '.*'))
@@ -17,8 +17,8 @@ module Railspress::OptionsHelper
   end
 
   def option_is_deletable_ts(option_name)
-    editable_simple = []#Rails.configuration.TS_EDITABLE_OPTIONS.reject {|on| on.index('*')}
-    editable_wildcards = []#Rails.configuration.TS_EDITABLE_OPTIONS.select {|on| on.index('*')}
+    editable_simple = Railspress.TS_EDITABLE_OPTIONS.reject {|on| on.index('*')}
+    editable_wildcards = Railspress.TS_EDITABLE_OPTIONS.select {|on| on.index('*')}
     return true if editable_simple.include?(option_name.to_s)
     editable_wildcards.each do |opt_name|
       return true if option_name.to_s =~ Regexp.new(opt_name.gsub(/\*/, '.*'))
