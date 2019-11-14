@@ -1,0 +1,38 @@
+<header id="masthead" class="site-header">
+
+  <div class="site-branding-container">
+    <div class="site-branding">
+      <% if has_custom_logo %>
+        <div class="site-logo"><%= the_custom_logo.html_safe %></div>
+      <% end %>
+      <p class="site-title"><%= link_to get_option('blogname'), esc_url(home_url('/')), rel: 'home' %></p>
+      <%= content_tag :p, get_option('blogdescription', ''), class: 'site-description' %>
+
+      <% if true || has_nav_menu('menu-1') %>
+        <nav id="site-navigation" class="main-navigation" aria-label="Top Menu">
+          <%= nav_menu_args = {menu_class: 'main-menu',
+                               container: 'div',
+                               container_class: 'menu-top-menu-container',
+                               depth: 3,
+          }
+              nav_menu_args[:theme_location] = 'menu-1'
+              wp_nav_menu(nav_menu_args) %>
+        </nav><!-- #site-navigation -->
+      <% end %>
+      <% if false && has_nav_menu('social') %>
+        <%# TODO social menu %>
+      <% end %>
+    </div><!-- .site-branding -->
+
+  </div><!-- .site-branding-container -->
+
+  <% if false # is_singular() && twentynineteen_can_show_post_thumbnail() %>
+    <div class="site-featured-image">
+      <%#
+        twentynineteen_post_thumbnail();
+				the_post();
+        # div.entry-header
+      %>
+    </div>
+  <% end %>
+</header><!-- #masthead -->

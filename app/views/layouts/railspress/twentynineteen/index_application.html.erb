@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <%= content_tag :title, "TwentyNineteen theme" %>
+  <%= csrf_meta_tags %>
+  <%= csp_meta_tag %>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <%= stylesheet_link_tag    'application', media: 'all' %>
+  <link rel='stylesheet' id='twentynineteen-style-css'  href='https://blog.truesoft.ro/wp-content/themes/twentynineteen/style.css?ver=1.4' type='text/css' media='all' />
+  <%= javascript_include_tag 'application' %>
+</head>
+
+<body>
+<div id="page" class="site">
+
+  <%= render 'layouts/railspress/twentynineteen/header' %>
+
+  <div id="content" class="site-content">
+    <section id="primary" class="content-area">
+      <main id="main" class="site-main">
+        <%= yield %>
+      </main>
+    </section>
+  </div>
+
+  <%= render 'layouts/railspress/twentynineteen/footer' %>
+
+</div>
+</body>
+</html>
