@@ -6,6 +6,7 @@
 module Railspress::PostsHelper
   include Railspress::Functions
   include Railspress::Plugin
+  include Railspress::LoadHelper
 
   # Retrieve attached file path based on attachment ID.
   #

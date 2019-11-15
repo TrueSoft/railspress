@@ -34,7 +34,7 @@ module Railspress
         output += '<p class="card-text">' + (excerpt || 'NO EXCERPT') + '</p>' # TODO fix NO EXCERPT
       end
 
-      output += '<a href="' + Rails.application.routes.url_helpers.show_page_path(get_page_uri(page)) + '" class="btn btn-primary pull-right">'
+      output += '<a href="' + (get_page_uri(page)) + '" class="btn btn-primary pull-right">'
       output += t('railspress.pages.show.read_more') + '&hellip;'
       output += '</a>'
 
