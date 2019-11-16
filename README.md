@@ -1,9 +1,9 @@
 ![Railspress](https://truesoft.ro/railspress/railspress-logo.png)
 
-> Shows Wordpress posts in a Ruby on Rails application.
+> Shows WordPress posts in a Ruby on Rails application.
 
 Ever wanted to have a CMS using Ruby on Rails? With Railspress you can have of all 
-advantages of Wordpress editing pages and posts, but you can display them in a Rails 
+advantages of WordPress editing pages and posts, but you can display them in a Rails 
 layout.
 
 ## Features
