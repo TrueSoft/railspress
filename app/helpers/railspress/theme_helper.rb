@@ -64,7 +64,7 @@ module Railspress::ThemeHelper
   def get_stylesheet_directory_uri
     stylesheet         = URI::escape(get_stylesheet).gsub('%2F', '/')
     theme_root_uri     = get_theme_root_uri( stylesheet )
-    stylesheet_dir_uri = "$theme_root_uri/$stylesheet"
+    stylesheet_dir_uri = "#{theme_root_uri}/#{stylesheet}"
 
     # Filters the stylesheet directory URI.
     apply_filters( 'stylesheet_directory_uri', stylesheet_dir_uri, stylesheet, theme_root_uri )

@@ -187,8 +187,8 @@ module Railspress::Functions
     # $uploads = apply_filters( 'upload_dir', $cache[ $key ] );
     uploads = apply_filters('upload_dir', _wp_upload_dir(time))
 
-    # if ( $create_dir ) {
-    #     $path = $uploads['path'];
+    if create_dir # TS_INFO create dir not implemented
+         path = uploads[:path]
     #
     # if ( array_key_exists( $path, $tested_paths ) ) {
     #     $uploads['error'] = $tested_paths[ $path ];
@@ -206,9 +206,9 @@ module Railspress::Functions
     #         );
     #     }
     #
-    #     # TODO $tested_paths[ $path ] = $uploads['error'];
+    #     $tested_paths[ $path ] = $uploads['error'];
     # }
-    # }
+    end
 
     uploads
   end
@@ -225,18 +225,18 @@ module Railspress::Functions
     upload_path = get_option('upload_path', '').strip
 
     if upload_path.blank? || 'wp-content/uploads' == upload_path
-      dir = Rails.application.secrets.WP_CONTENT_DIR + '/uploads'
-    elsif upload_path.include? Rails.application.secrets.ABSPATH
+      dir = Railspress.WP_CONTENT_DIR + '/uploads'
+    elsif upload_path.include? Railspress.ABSPATH
       # $dir is absolute, $upload_path is (maybe) relative to ABSPATH
-      dir = path_join(Rails.application.secrets.ABSPATH, upload_path)
+      dir = path_join(Railspress.ABSPATH, upload_path)
     else
       dir = upload_path
     end
 
     url = get_option( 'upload_url_path' )
-    unless url.blank?
-      if upload_path.blank? ||  'wp-content/uploads'==upload_path ||  upload_path==dir
-        url = Rails.application.secrets.WP_CONTENT_URL + '/uploads'
+    unless url == false
+      if upload_path.blank? || 'wp-content/uploads' == upload_path || upload_path == dir
+        url = Railspress.WP_CONTENT_URL + '/uploads'
       else
         url = trailingslashit( siteurl ) + upload_path
       end
@@ -244,15 +244,15 @@ module Railspress::Functions
 
     # Honor the value of UPLOADS. This happens as long as ms-files rewriting is disabled.
     # We also sometimes obey UPLOADS when rewriting is enabled -- see the next block.
-    if defined?(Rails.application.secrets.UPLOADS) && ! ( false && is_multisite() && get_site_option( 'ms_files_rewriting' ) )
-      dir = Rails.application.secrets.ABSPATH + Rails.application.secrets.UPLOADS
-      url = trailingslashit(siteurl) + Rails.application.secrets.UPLOADS
+    if defined?(Railspress.UPLOADS) && !Railspress.UPLOADS.nil? && ! ( is_multisite && get_site_option( 'ms_files_rewriting' ) )
+      dir = Railspress.ABSPATH + Railspress.UPLOADS
+      url = trailingslashit(siteurl) + Railspress.UPLOADS
     end
 
     # If multisite (and if not the main site in a post-MU network)
-    if  false && is_multisite() && ! ( is_main_network() && is_main_site() && defined( 'MULTISITE' ) )
-      # TODO multisite not implemented
-    end
+    # if is_multisite && ! ( is_main_network() && is_main_site() && defined( 'MULTISITE' ) )
+    #   # TS_INFO: multisite not implemented
+    # end
 
     basedir = dir
     baseurl = url
@@ -503,6 +503,26 @@ module Railspress::Functions
     util.output
   end
 
+
+  # Whether to force SSL used for the Administration Screens.
+  #
+  # @param [string|bool] $force Optional. Whether to force SSL in admin screens. Default null.
+  # @return [bool] True if forced, false if not forced.
+  def force_ssl_admin(force = nil)
+    # TS_INFO: true always
+    #	static forced = false
+    #
+    #	unless force.nil?
+    #		old_forced = forced
+    #		forced     = force
+    #		return old_forced
+    #	end
+    #
+    #	forced
+    true
+  end
+
+
   # Retrieve a list of protocols to allow in HTML attributes.
   #
   # @see wp_kses()
@@ -515,7 +535,7 @@ module Railspress::Functions
   #                  'mms', 'rtsp', 'svn', 'tel', 'fax', 'xmpp', 'webcal', and 'urn'. This covers
   #                  all common link protocols, except for 'javascript' which should not be
   #                  allowed for untrusted users.
-  def wp_allowed_protocols()
+  def wp_allowed_protocols
     # TODO static $
     protocols = []
 

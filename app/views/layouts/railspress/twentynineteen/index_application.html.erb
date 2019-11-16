@@ -6,7 +6,7 @@
   <%= csp_meta_tag %>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <%= stylesheet_link_tag    'application', media: 'all' %>
-  <link rel='stylesheet' id='twentynineteen-style-css'  href='https://blog.truesoft.ro/wp-content/themes/twentynineteen/style.css?ver=1.4' type='text/css' media='all' />
+  <link rel='stylesheet' id='twentynineteen-style-css'  href='<%= get_bloginfo('stylesheet_url') %>' type='text/css' media='all' />
   <%= javascript_include_tag 'application' %>
 </head>
 
