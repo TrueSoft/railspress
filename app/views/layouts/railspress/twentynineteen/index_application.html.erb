@@ -6,7 +6,10 @@
   <%= csp_meta_tag %>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <%= stylesheet_link_tag    'application', media: 'all' %>
+  <link rel='stylesheet' id='wp-block-library-css'  href='<%= includes_url('css/dist/block-library/style.min.css') %>' type='text/css' media='all' />
+  <link rel='stylesheet' id='wp-block-library-theme-css'  href='<%= includes_url('css/dist/block-library/theme.min.css') %>' type='text/css' media='all' />
   <link rel='stylesheet' id='twentynineteen-style-css'  href='<%= get_bloginfo('stylesheet_url') %>' type='text/css' media='all' />
+  <link rel='stylesheet' id='twentynineteen-print-style-css'  href='<%= get_stylesheet_directory_uri %>/print.css' type='text/css' media='all' />
   <%= javascript_include_tag 'application' %>
 </head>
 

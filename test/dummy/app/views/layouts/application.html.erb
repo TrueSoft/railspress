@@ -1,19 +1,22 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>Dummy</title>
+    <title>Dummy theme</title>
     <%= csrf_meta_tags %>
     <%= csp_meta_tag %>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <%= stylesheet_link_tag    'application', media: 'all' %>
-    <link rel='stylesheet' id='twentynineteen-style-css'  href='https://blog.truesoft.ro/wp-content/themes/twentynineteen/style.css?ver=1.4' type='text/css' media='all' />
+    <link rel='stylesheet' id='wp-block-library-css'  href='<%= includes_url('css/dist/block-library/style.min.css') %>' type='text/css' media='all' />
+    <link rel='stylesheet' id='wp-block-library-theme-css'  href='<%= includes_url('css/dist/block-library/theme.min.css') %>' type='text/css' media='all' />
     <%= javascript_include_tag 'application' %>
   </head>
 
   <body>
 <div id="page" class="site">
 
-  <%= render 'layouts/railspress/twentynineteen/header' %>
+  <%= render 'layouts/header' %>
+
+  <%= bootstrap_flash %>
 
   <div id="content" class="site-content">
     <section id="primary" class="content-area">
@@ -23,7 +26,14 @@
     </section>
   </div>
 
-  <%= render 'layouts/railspress/twentynineteen/footer' %>
+  <footer class="site-footer">
+    <div class="site-info">
+      <% blog_info = get_bloginfo('name') %>
+      <% unless blog_info.blank? %>
+        <%= link_to bloginfo('name'), esc_url(home_url('/')), class: 'site-name', rel: 'home' %>,
+      <% end %>
+    </div>
+  </footer>
 
 </div>
   </body>
