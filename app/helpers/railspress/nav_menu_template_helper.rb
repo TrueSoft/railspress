@@ -62,7 +62,7 @@ module Railspress::NavMenuTemplateHelper
         theme_location:   '',
     }
 
-    args = wp_parse_args(args, defaults )
+    args = Railspress::Functions.wp_parse_args(args, defaults )
 
     unless ['preserve', 'discard'].include?(args[:item_spacing])
       # invalid value, fall back to default.

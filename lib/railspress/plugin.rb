@@ -47,27 +47,27 @@ module Railspress::Plugin
   # @return The filtered value after all hooked functions are applied to it.
   def apply_filters(tag, value, *args)
     # global wp_filter         Stores all of the filters.
-    wp_filter = {}
     # global wp_current_filter Stores the list of current filters with the current one last.
-    wp_current_filter = []
-    if wp_filter['all']
-      wp_current_filter << tag
+    if Railspress.GLOBAL.wp_filter['all']
+      Railspress.GLOBAL.wp_current_filter << tag
       # TODO see plugin.php function
       _wp_call_all_hook(args) # TODO all args?
     end
-    unless wp_filter[tag]
-      if wp_filter['all']
-        wp_current_filter.pop
+    unless Railspress.GLOBAL.wp_filter[tag]
+      if Railspress.GLOBAL.wp_filter['all']
+        Railspress.GLOBAL.wp_current_filter.pop
       end
       return value
     end
-    unless wp_filter['all']
-      wp_current_filter << tag
+    unless Railspress.GLOBAL.wp_filter['all']
+      Railspress.GLOBAL.wp_current_filter << tag
     end
-    filtered = wp_filter[tag].apply_filters(value, args) # TODO args with value?
-    wp_current_filter.pop
+    filtered = Railspress.GLOBAL.wp_filter[tag].apply_filters(value, args) # TODO args with value?
+    Railspress.GLOBAL.wp_current_filter.pop
     filtered
   end
+
+  module_function :apply_filters
 
   # Execute functions hooked on a specific filter hook, specifying arguments in an array.
   #
@@ -84,26 +84,26 @@ module Railspress::Plugin
     # global $wp_filter, $wp_current_filter;
 
     # Do 'all' actions first
-    if ( isset( Railspress::GLOBAL.wp_filter['all'] ) )
-      Railspress::GLOBAL.wp_current_filter << tag
+    if ( isset( Railspress.GLOBAL.wp_filter['all'] ) )
+      Railspress.GLOBAL.wp_current_filter << tag
       all_args            = func_get_args()
       _wp_call_all_hook(all_args )
     end
 
-    if (!isset(Railspress::GLOBAL.wp_filter[$tag]))
-      if (isset(Railspress::GLOBAL.wp_filter['all']))
-        array_pop(Railspress::GLOBAL.wp_current_filter)
+    if (!isset(Railspress.GLOBAL.wp_filter[$tag]))
+      if (isset(Railspress.GLOBAL.wp_filter['all']))
+        array_pop(Railspress.GLOBAL.wp_current_filter)
       end
       return $args[0]
     end
 
-    if (!isset(Railspress::GLOBAL.wp_filter['all']))
-      Railspress::GLOBAL.wp_current_filter << tag
+    if (!isset(Railspress.GLOBAL.wp_filter['all']))
+      Railspress.GLOBAL.wp_current_filter << tag
     end
 
-    filtered = Railspress::GLOBAL.wp_filter[tag].apply_filters(args[0], args)
+    filtered = Railspress.GLOBAL.wp_filter[tag].apply_filters(args[0], args)
 
-    array_pop(Railspress::GLOBAL.wp_current_filter)
+    array_pop(Railspress.GLOBAL.wp_current_filter)
 
     return filtered
   end
@@ -146,7 +146,7 @@ module Railspress::Plugin
   # @param [string] tag     The name of the action to be executed.
   # @param [mixed]  arg,... Optional. Additional arguments which are passed on to the
   #                         functions hooked to the action. Default empty.
-  def do_action(tag, arg = '' )
+  def do_action(tag, *arg )
     # global $wp_filter, $wp_actions, $wp_current_filter
     # TODO continue
   end

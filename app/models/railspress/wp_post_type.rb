@@ -287,7 +287,7 @@ module Railspress
     #
     # @param [array|string] args Array or string of arguments for registering a post type.
     def set_props(args)
-      args = wp_parse_args args
+      args = Functions.wp_parse_args args
 
       # Filters the arguments for registering a post type.
       args = apply_filters('register_post_type_args', args, @name)
@@ -363,7 +363,7 @@ module Railspress
         args['_edit_link'] = ''
       end
 
-      @cap = Railspress.get_post_type_capabilities(args)
+      @cap = Railspress::PostsHelper.get_post_type_capabilities(args)
       args.delete 'capabilities'
 
       if args['capability_type'].is_a? Array
@@ -379,19 +379,12 @@ module Railspress
       end
 
       # TODO continue
-      # if ( false !== $args['rewrite'] && ( is_admin() || '' != get_option( 'permalink_structure' ) ) ) {
-      #         if ( ! is_array( $args['rewrite'] ) ) {
-      #             $args['rewrite'] = array();
-      #         }
-      #         if ( empty( $args['rewrite']['slug'] ) ) {
-      #             $args['rewrite']['slug'] = $this->name;
-      #         }
-      #         if ( ! isset( $args['rewrite']['with_front'] ) ) {
-      #             $args['rewrite']['with_front'] = true;
-      #         }
-      #         if ( ! isset( $args['rewrite']['pages'] ) ) {
-      #             $args['rewrite']['pages'] = true;
-      #         }
+      # if ( false != $args['rewrite'] && ( is_admin() || !get_option( 'permalink_structure' ).blank? ) )
+      #         args['rewrite'] ||= {}
+      #         args['rewrite']['slug'] = @name if args['rewrite']['slug'].blank?
+      #         args['rewrite']['with_front'] = true if args['rewrite']['with_front'].blank?
+      #         args['rewrite']['pages'] = true if args['rewrite']['pages'] .blank?
+      #
       #         if ( ! isset( $args['rewrite']['feeds'] ) || ! $args['has_archive'] ) {
       #             $args['rewrite']['feeds'] = (bool) $args['has_archive'];
       #         }
@@ -402,26 +395,27 @@ module Railspress
       #                 $args['rewrite']['ep_mask'] = EP_PERMALINK;
       #             }
       #        }
-      # }
+      # end
 
       args.each_pair do |property_name, property_value|
         self.send(property_name + '=', property_value)
       end
 
-      @labels = Railspress.get_post_type_labels(self)
+      @labels = Railspress::PostsHelper.get_post_type_labels(self)
       @label = @labels['name']
     end
 
     # Sets the features support for the post type.
     def add_supports
       if !self.supports.empty?
-          Railspress.add_post_type_support(self.name, self.supports)
+        Railspress::PostsHelper.add_post_type_support(self.name, self.supports)
           self.supports = nil
       elsif false != self.supports
         # Add default features.
-        Railspress.add_post_type_support(self.name, [ 'title', 'editor' ])
+        Railspress::PostsHelper.add_post_type_support(self.name, [ 'title', 'editor' ])
       end
     end
+
     # Adds the necessary rewrite rules for the post type.
     def add_rewrite_rules
       # TODO implement class-wp-post-type.php add_rewrite_rules()

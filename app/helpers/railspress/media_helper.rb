@@ -4,6 +4,7 @@
  * file wp-includes\media.php
 =end
 module Railspress::MediaHelper
+  include Railspress::Functions
 
   # Retrieve additional image sizes.
   #
@@ -399,7 +400,7 @@ end
           alt: strip_tags(get_post_meta(attachment_id, '_wp_attachment_image_alt', true ))
       }
       default_attr[:alt].strip! unless default_attr[:alt].nil?
-      attr = wp_parse_args(attr, default_attr)
+      attr = Railspress::Functions.wp_parse_args(attr, default_attr)
 
       # Generate 'srcset' and 'sizes' if not already present.
       if attr[:srcset].blank?

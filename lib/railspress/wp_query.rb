@@ -313,7 +313,7 @@ module Railspress
     # @return [WP_Post[]|int[]] Array of post objects or post IDs.
     def query(query)
       init
-      @query = @query_vars = wp_parse_args(query)
+      @query = @query_vars = Functions.wp_parse_args(query)
       # TODO ? self.get_posts
     end
 
