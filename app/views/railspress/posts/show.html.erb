@@ -18,14 +18,14 @@
     <ul class="navigation post-navigation pagination bt-1" role="navigation">
       <% unless @post_prev.nil? %>
         <%= content_tag :li, class: 'page-item nav-previous' do %>
-          <a class="page-link" href="<%= show_post_path(slug: @post_prev.post_name) %>" rel="prev">
+          <a class="page-link" href="<%= wp_url_to_relative_url(get_permalink(@post_prev)) %>" rel="prev">
             <span class="meta-nav" aria-hidden="true" title="<%= @post_prev.post_title %>">« <%= t('railspress.post.show.prev') %></span>
             <%= content_tag :span, t('railspress.post.show.prev'), class: 'screen-reader-text' %></a>
         <% end %>
       <% end %>
       <% unless @post_next.nil? %>
         <%= content_tag :li, class: 'page-item nav-next' do %>
-          <a class="page-link" href="<%= show_post_path(slug: @post_next.post_name) %>" rel="next">
+          <a class="page-link" href="<%= wp_url_to_relative_url(get_permalink(@post_next)) %>" rel="next">
             <span class="meta-nav" aria-hidden="true" title="<%= @post_next.post_title %>"><%= t('railspress.post.show.next') %> »</span>
             <%= content_tag :span, t('railspress.post.show.next'), class: 'screen-reader-text' %></a>
         <% end %>

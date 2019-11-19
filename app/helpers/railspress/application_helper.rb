@@ -1,6 +1,15 @@
 include FontAwesome::Rails::IconHelper
 
 module Railspress::ApplicationHelper
+
+  def wp_url_to_relative_url(wp_url)
+    if wp_url.start_with? home_url
+      wp_url[home_url.length .. -1]
+    else
+      wp_url
+    end
+  end
+
   def display_errors_for(object, header_message = nil)
     if object.errors.any?
       content_tag(:div, class: 'card border-danger mb-4 mx-4') do

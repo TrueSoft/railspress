@@ -4,7 +4,7 @@
     <% @posts.each do |post| %>
       <%= content_tag :article, id: post.id do %>
         <%= content_tag :'post-date', I18n.l(post.post_date, format: '%e %b %Y'), datetime: post.post_date.strftime('%F') %>
-        <%= content_tag :'post-title', post.post_title, url: show_post_url(slug: post.post_name), path: show_post_path(slug: post.post_name) %>
+        <%= content_tag :'post-title', post.post_title, url: untrailingslashit(main_app.root_url) + wp_url_to_relative_url(get_permalink(post)), path: wp_url_to_relative_url(get_permalink(post)) %>
         <% extended_entry_info = get_extended(post.post_content)
            if post.post_excerpt.blank?
              excerpt = extended_entry_info[:main]

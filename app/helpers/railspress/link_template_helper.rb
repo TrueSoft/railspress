@@ -52,16 +52,15 @@ module Railspress::LinkTemplateHelper
         leavename ? '' : '%pagename%',
         ]
 
-    if  post.is_a?(Railspress::WpPost) && 'sample' == post.filter
+    if  post.is_a?(Railspress::WpPost) && false # ?? 'sample' == post.filter
       sample = true
     else
       post   = get_post( post )
       sample = false
     end
 
-    if post.id.blank?
-      return false
-    end
+    return false if post.id.blank?
+
     if post.post_type == 'page'
       return get_page_link(post, leavename, sample)
     elsif post.post_type == 'attachment'
@@ -76,22 +75,33 @@ module Railspress::LinkTemplateHelper
     permalink = apply_filters('pre_post_link', permalink, post, leavename)
 
     if !permalink.blank? && !['draft', 'pending', 'auto-draft', 'future'].include?(post.post_status)
-      # TODO continue with post...
-      # date           = explode( ' ', date( 'Y m d H i s', $unixtime ) );
-      # 		rewritereplace = [
-      # 			date[0],
-      # 			date[1],
-      # 			date[2],
-      # 			date[3],
-      # 			date[4],
-      # 			date[5],
-      # 			post->post_name,
-      # 			post->ID,
-      # 			category,
-      # 			author,
-      # 			post->post_name,
-      # 		]
-      # $permalink      = home_url( str_replace( $rewritecode, $rewritereplace, $permalink ) );
+      category = ''
+      if permalink.include? '%category%'
+        # TODO get the post category
+      end
+      author = ''
+      if permalink.include? '%author%'
+        author = post.author.user_nicename
+      end
+      unixtime = post.post_date
+      date     = unixtime.strftime('%Y %m %d %H %M %S').split(' ')
+      		rewritereplace = [
+      			date[0],
+      			date[1],
+      			date[2],
+      			date[3],
+      			date[4],
+      			date[5],
+      			post.post_name,
+      			post.ID.to_s,
+      			category,
+      			author,
+      			post.post_name,
+      		]
+      (1 .. rewritecode.length - 1).each do |i|
+        permalink.gsub! rewritecode[i], rewritereplace[i] unless rewritecode[i].blank?
+      end
+      permalink      = home_url(permalink)
       permalink      = user_trailingslashit(permalink, 'single')
     else # if they're not using the fancy permalink option
   		permalink = main_app.root_url + '?p=' + post.id
