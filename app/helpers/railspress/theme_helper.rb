@@ -118,12 +118,12 @@ module Railspress::ThemeHelper
       # Try prepending as the theme directory could be relative to the content directory
       directory = Railspress.WP_CONTENT_DIR + '/' + directory
       # If this directory does not exist, return and do not register
-      return false unless File.exist?(directory)
+      # TS_INFO: cannot access the WP dir, so we continue...  return false unless File.exist?(directory)
     end
 
-    Railspress.GLOBAL.wp_theme_directories = [] unless Railspress.GLOBAL.wp_theme_directories.is_a(Array)
+    Railspress.GLOBAL.wp_theme_directories = [] unless !Railspress.GLOBAL.wp_theme_directories.nil? && Railspress.GLOBAL.wp_theme_directories.is_a(Array)
 
-    untrailed = untrailingslashit( directory )
+    untrailed = Railspress::FormattingHelper.untrailingslashit( directory )
     if !untrailed.blank? && !Railspress.GLOBAL.wp_theme_directories.include?(untrailed)
       Railspress.GLOBAL.wp_theme_directories << untrailed
     end
@@ -162,17 +162,20 @@ module Railspress::ThemeHelper
     theme_root = get_raw_theme_root(stylesheet_or_template) if  stylesheet_or_template && ! theme_root
 
     if ( stylesheet_or_template && theme_root )
-      if Railspress.GLOBAL.wp_theme_directories.include?(theme_root)
-      # Absolute path. Make an educated guess. YMMV -- but note the filter below.
-      if theme_root.start_with?(Railspress.WP_CONTENT_DIR)
-        theme_root_uri = content_url( theme_root.gsub( WP_CONTENT_DIR, '') )
-      elsif theme_root.start_with?(Railspress.ABSPATH)
-        theme_root_uri = site_url(theme_root.gsub(Railspress.ABSPATH, ''))
-      elsif theme_root.start_with?(Railspress.WP_PLUGIN_DIR) || theme_root.start_with?(Railspress.WPMU_PLUGIN_DIR)
-        theme_root_uri = plugins_url( basename( theme_root ), theme_root )
-      else
-        theme_root_uri = theme_root
+      if Railspress.GLOBAL.wp_theme_directories.nil?
+        p "get_theme_root_uri(#{stylesheet_or_template}, #{theme_root})"
       end
+      if Railspress.GLOBAL.wp_theme_directories.include?(theme_root)
+        # Absolute path. Make an educated guess. YMMV -- but note the filter below.
+        if theme_root.start_with?(Railspress.WP_CONTENT_DIR)
+          theme_root_uri = content_url( theme_root.gsub( WP_CONTENT_DIR, '') )
+        elsif theme_root.start_with?(Railspress.ABSPATH)
+          theme_root_uri = site_url(theme_root.gsub(Railspress.ABSPATH, ''))
+        elsif theme_root.start_with?(Railspress.WP_PLUGIN_DIR) || theme_root.start_with?(Railspress.WPMU_PLUGIN_DIR)
+          theme_root_uri = plugins_url( basename( theme_root ), theme_root )
+        else
+          theme_root_uri = theme_root
+        end
       else
         theme_root_uri = content_url( theme_root )
       end
@@ -338,6 +341,67 @@ module Railspress::ThemeHelper
   def get_theme_support(feature, *args)
     # TS_INFO: Customizer not implemented
     false
+  end
+
+  # Allows a theme to de-register its support of a certain feature
+  #
+  # Should be called in the theme's functions.php file. Generally would
+  # be used for child themes to override support from the parent theme.
+  #
+  # @see add_theme_support()
+  # @param [string] feature The feature being removed.
+  # @return [bool|void] Whether feature was removed.
+  def remove_theme_support(feature)
+    # TS_INFO: Customizer not implemented
+    false
+  end
+
+  # Checks a theme's support for a given feature.
+  #
+  # @param [string] feature The feature being checked.
+  # @return [bool] True if the current theme supports the feature, false otherwise.
+  def current_theme_supports( feature, *args )
+    return current_theme_supports('custom-header', 'uploads') if feature == 'custom-header-uploads'
+
+    return false if !isset( Railspress.GLOBAL._wp_theme_features[ feature ] )
+
+    # If no args passed then no extra checks need be performed
+    return true if args.blank?
+
+    case feature
+    when 'post-thumbnails'
+      # post-thumbnails can be registered for only certain content/post types by passing
+      # an array of types to add_theme_support(). If no array was passed, then
+      # any type is accepted
+      return true if Railspress.GLOBAL._wp_theme_features[ feature ] == true # Registered for all types
+
+      content_type = args[0]
+      return Railspress.GLOBAL._wp_theme_features[ feature ][0].include?(content_type)
+
+    when 'html5', 'post-formats'
+      # specific post formats can be registered by passing an array of types to
+      # add_theme_support()
+
+      # Specific areas of HTML5 support *must* be passed via an array to add_theme_support()
+      type = args[0]
+      return Railspress.GLOBAL._wp_theme_features[ feature ][0].include?(type)
+
+    when 'custom-logo', 'custom-header', 'custom-background'
+      # Specific capabilities can be registered by passing an array to add_theme_support().
+      return ( !Railspress.GLOBAL._wp_theme_features[feature][0][args[0]].blank? && Railspress.GLOBAL._wp_theme_features[feature][0][args[0]] )
+    end
+
+    # Filters whether the current theme supports a specific feature.
+    #
+    # The dynamic portion of the hook name, `$feature`, refers to the specific theme
+    # feature. Possible values include 'post-formats', 'post-thumbnails', 'custom-background',
+    # 'custom-header', 'menus', 'automatic-feed-links', 'html5',
+    # 'starter-content', and 'customize-selective-refresh-widgets'.
+    #
+    # @param bool   true     Whether the current theme supports the given feature. Default true.
+    # @param array  $args    Array of arguments for the feature.
+    # @param string $feature The theme feature.
+    apply_filters( "current_theme_supports-#{feature}", true, args, _wp_theme_features[ feature ] )
   end
 
  # Whether the site is being previewed in the Customizer.

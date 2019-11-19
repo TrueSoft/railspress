@@ -4,6 +4,9 @@
  * file wp-includes\class-wp-rewrite.php
 =end
 module Railspress
+  require '../../app/helpers/railspress/options_helper'
+  require 'railspress/plugin'
+  require 'railspress/functions'
   # Core class used to implement a rewrite component API.
   #
   # The WordPress Rewrite class writes the rewrite module rules to the .htaccess
@@ -268,7 +271,6 @@ module Railspress
           's=',
       ]
       @feeds = ['feed', 'rdf', 'rss', 'rss2', 'atom']
-      init
     end
 
     # Determines whether permalinks are being used.
@@ -415,9 +417,9 @@ module Railspress
       @endpoints = []
       begin
         @permalink_structure = get_option( 'permalink_structure' )
-      rescue Mysql2::Error::ConnectionError
-        warn("[WARN] couldn't connect to database. Skipping Railspress::GLOBAL::wp_rewrite::permalink_structure initialization")
-        @permalink_structure = '/%postname%'
+      # rescue Mysql2::Error::ConnectionError
+      #   warn("[WARN] couldn't connect to database. Skipping Railspress.GLOBAL::wp_rewrite::permalink_structure initialization")
+      #   @permalink_structure = '/%postname%'
       end
       if @permalink_structure == false && Rails.env.test?
         @permalink_structure = '/%postname%'
