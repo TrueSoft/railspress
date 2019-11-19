@@ -6,6 +6,7 @@
  * file wp-includes\post-template.php
 =end
 module Railspress::PostTemplateHelper
+  include Railspress::TaxonomyLib
 
   # Display the ID of the current item in the WordPress Loop.
   def the_ID
@@ -65,7 +66,7 @@ module Railspress::PostTemplateHelper
         echo: true,
         post: get_post(),
     }
-    r = wp_parse_args(args, defaults)
+    r = Railspress::Functions.wp_parse_args(args, defaults)
 
     title = get_the_title(r[:post])
 
@@ -318,7 +319,7 @@ module Railspress::PostTemplateHelper
         item_spacing:  'preserve',
         walker:        ''
     }
-    r = wp_parse_args(args, defaults)
+    r = Railspress::Functions.wp_parse_args(args, defaults)
 
     unless ['preserve', 'discard'].include?(r[:item_spacing])
       # invalid value, fall back to default.
@@ -372,7 +373,7 @@ module Railspress::PostTemplateHelper
         item_spacing: 'discard',
         walker: '',
     }
-    args = wp_parse_args(args, defaults)
+    args = Railspress::Functions.wp_parse_args(args, defaults)
 
     unless ['preserve', 'discard'].include?(args[:item_spacing])
       # invalid value, fall back to default.

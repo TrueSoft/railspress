@@ -445,14 +445,15 @@ module Railspress::Functions
   # @param [string|array|object] args     Value to merge with $defaults.
   # @param [array]               defaults Optional. Array that serves as the defaults. Default empty.
   # @return [array] Merged user defined values with defaults.
-  def wp_parse_args(args, defaults = '')
+  def self.wp_parse_args(args, defaults = '')
+    require '../../app/helpers/railspress/formatting_helper'
     # TODO if ( is_object( args ) )
     #     $r = get_object_vars( $args );
     #  els
     if args.kind_of? Hash
       r = args
     else
-      r = wp_parse_str(args)
+      r = Railspress::FormattingHelper.wp_parse_str(args)
     end
 
     if defaults.kind_of? Hash

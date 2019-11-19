@@ -3,7 +3,7 @@
  *
  * file wp-includes\load.php
 =end
-module Railspress::LoadHelper
+module Railspress::Load
 
   # Determines whether the current request is for an administrative interface page.
   #

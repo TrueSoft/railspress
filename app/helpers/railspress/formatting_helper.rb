@@ -1,3 +1,4 @@
+require 'railspress/plugin'
 =begin
  * Main WordPress Formatting API.
  *
@@ -84,13 +85,142 @@ module Railspress::FormattingHelper
   #
   # @param [string] key String key
   # @return [string] Sanitized key
-  def sanitize_key(key)
+  def self.sanitize_key(key)
 	  raw_key = key
   	key.downcase!
   	key.gsub! /[^a-z0-9_\-]/, ''
 
 	  # Filters a sanitized key string.
-	  apply_filters('sanitize_key', key, raw_key)
+    Railspress::Plugin.apply_filters('sanitize_key', key, raw_key)
+  end
+
+  # Sanitizes a title, or returns a fallback title.
+  #
+  # Specifically, HTML and PHP tags are stripped. Further actions can be added
+  # via the plugin API. If $title is empty and $fallback_title is set, the latter
+  # will be used.
+  #
+  # @param [string] title          The string to be sanitized.
+  # @param [string] fallback_title Optional. A title to use if $title is empty.
+  # @param [string] context        Optional. The operation for which the string is sanitized
+  # @return [string] The sanitized string.
+  def sanitize_title(title, fallback_title = '', context = 'save' )
+    raw_title = title
+
+    title = remove_accents( title ) if 'save' == context
+
+    # Filters a sanitized title string.
+    #
+    # @param string $title     Sanitized title.
+    # @param string $raw_title The title prior to sanitization.
+    # @param string $context   The context for which the title is being sanitized.
+    title = apply_filters( 'sanitize_title', title, raw_title, context )
+
+    title = fallback_title if ( '' == title || false == title )
+
+    title
+  end
+
+  # Sanitizes a title with the 'query' context.
+  #
+  # Used for querying the database for a value from URL.
+  #
+  # @param [string] title The string to be sanitized.
+  # @return [string] The sanitized string.
+  def sanitize_title_for_query( title )
+    sanitize_title( title, '', 'query' )
+  end
+
+  # Sanitizes a title, replacing whitespace and a few other characters with dashes.
+  #
+  # Limits the output to alphanumeric characters, underscore (_) and dash (-).
+  # Whitespace becomes a dash.
+  #
+  # @param [string] title     The title to be sanitized.
+  # @param [string] raw_title Optional. Not used.
+  # @param [string] context   Optional. The operation for which the string is sanitized.
+  # @return [string] The sanitized title.
+  def sanitize_title_with_dashes(title, raw_title = '', context = 'display')
+    # TODO title = strip_tags(title)
+    # Preserve escaped octets.
+    # TODO title = title.gsub( '|%([a-fA-F0-9][a-fA-F0-9])|', '---$1---' )
+    # Remove percent signs that are not part of an octet.
+    title = title.gsub('%', '')
+    # Restore octets.
+    # TODO title = preg_replace( '|---([a-fA-F0-9][a-fA-F0-9])---|', '%$1', $title )
+
+    # if seems_utf8(title)
+    #   #		title = mb_strtolower( title, 'UTF-8' ) if ( function_exists( 'mb_strtolower' ) )
+    #   title = utf8_uri_encode(title, 200)
+    # end
+
+    title.downcase!
+
+    if 'save' == context
+      # Convert nbsp, ndash and mdash to hyphens
+      title.gsub!('%c2%a0', '-')
+      title.gsub!('%e2%80%93', '-')
+      title.gsub!('%e2%80%94', '-')
+      # Convert nbsp, ndash and mdash HTML entities to hyphens
+      title.gsub!('&nbsp;', '-')
+      title.gsub!('&#160;', '-')
+      title.gsub!('&ndash;', '-')
+      title.gsub!('&#8211;', '-')
+      title.gsub!('&mdash;', '-')
+      title.gsub!('&#8212;', '-')
+      # Convert forward slash to hyphen
+      title.gsub!('/', '-')
+
+      # Strip these characters entirely
+      # soft hyphens
+      title.gsub!('%c2%ad', '')
+      # iexcl and iquest
+      title.gsub!('%c2%a1', '')
+      title.gsub!('%c2%bf', '')
+      # angle quotes
+      title.gsub!('%c2%ab', '')
+      title.gsub!('%c2%bb', '')
+      title.gsub!('%e2%80%b9', '')
+      title.gsub!('%e2%80%ba', '')
+      # curly quotes
+      title.gsub!('%e2%80%98', '')
+      title.gsub!('%e2%80%99', '')
+      title.gsub!('%e2%80%9c', '')
+      title.gsub!('%e2%80%9d', '')
+      title.gsub!('%e2%80%9a', '')
+      title.gsub!('%e2%80%9b', '')
+      title.gsub!('%e2%80%9e', '')
+      title.gsub!('%e2%80%9f', '')
+      # copy, reg, deg, hellip and trade
+      title.gsub!('%c2%a9', '')
+      title.gsub!('%c2%ae', '')
+      title.gsub!('%c2%b0', '')
+      title.gsub!('%e2%80%a6', '')
+      title.gsub!('%e2%84%a2', '')
+      # acute accents
+      title.gsub!('%c2%b4', '')
+      title.gsub!('%cb%8a', '')
+      title.gsub!('%cc%81', '')
+      title.gsub!('%cd%81', '')
+      # grave accent, macron, caron
+      title.gsub!('%cc%80', '')
+      title.gsub!('%cc%84', '')
+      title.gsub!('%cc%8c', '')
+
+      # Convert times to x
+      title.gsub!('%c3%97', 'x')
+    end
+
+    title.gsub!(/&.+?;/, '') # kill entities
+    title.gsub!('.', '-')
+
+    title.gsub!(/[^%a-z0-9 _-]/, '')
+    title.gsub!(/\s+/, '-')
+    title.gsub!('|-+|', '-')
+    title.gsub!(/^-+/, '')
+    title.gsub!(/-+$/, '')
+
+    title
   end
 
   # Acts on text which is about to be edited.
@@ -202,6 +332,8 @@ module Railspress::FormattingHelper
     text = wp_trim_words(text, excerpt_length, excerpt_more)
   end
 
+  mattr_accessor :trailingslashit, :untrailingslashit
+
   # Appends a trailing slash.
   #
   # Will remove trailing forward and backslashes if it exists already before adding
@@ -224,6 +356,10 @@ module Railspress::FormattingHelper
   # @param [string] string What to remove the trailing slashes from.
   # @return String without the trailing slashes.
   def untrailingslashit(string)
+    string.gsub(/[\/\\]+$/, '')
+  end
+
+  def self.untrailingslashit(string)
     string.gsub(/[\/\\]+$/, '')
   end
 
@@ -415,8 +551,10 @@ module Railspress::FormattingHelper
     #     $array = stripslashes_deep( array );
     # }
     # Filters the array of variables derived from a parsed string.
-    apply_filters('wp_parse_str', array)
+    Railspress::Plugin.apply_filters('wp_parse_str', array)
   end
+
+  module_function :wp_parse_str
 
   # Properly strip all HTML tags including script and style
   #

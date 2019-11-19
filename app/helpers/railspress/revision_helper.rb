@@ -60,7 +60,7 @@ module Railspress::RevisionHelper
         orderby: 'post_date', # TODO How is it correct? orderby: 'date ID',
         check_enabled: true,
     }
-    args = wp_parse_args(args || {}, defaults)
+    args = Railspress::Functions.wp_parse_args(args || {}, defaults)
 
     if args[:check_enabled] && !wp_revisions_enabled(post)
       return {}
