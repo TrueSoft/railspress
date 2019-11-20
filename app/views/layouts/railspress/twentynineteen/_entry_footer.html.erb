@@ -1,0 +1,40 @@
+<%# twentynineteen_entry_footer() %>
+<%= content_tag :footer, class: 'entry-footer' do %>
+  <% if post.post_type == 'post' # Hide author, post date, category and tag text for pages. %>
+    <%= content_tag :span, class: 'byline' do %>
+      <svg class="svg-icon" width="16" height="16" aria-hidden="true" role="img" focusable="false" viewBox="0 0 24 24" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+        <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"></path>
+        <path d="M0 0h24v24H0z" fill="none"></path>
+      </svg>
+      <%= content_tag :span, t('railspress.post.show.posted_by'), class: 'screen-reader-text' %>
+      <span class="author vcard">
+              <%= link_to post.author.display_name, '#', class: 'url fn n' # TODO get_author_posts_url( get_the_author_meta( 'ID' ) ) in author-template.php
+              %>
+            </span>
+    <% end %>
+    <%= content_tag :span, class: 'posted-on' do %>
+      <svg class="svg-icon" width="16" height="16" aria-hidden="true" role="img" focusable="false" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+        <defs><path id="a" d="M0 0h24v24H0V0z"></path></defs>
+        <clipPath id="b"><use xlink:href="#a" overflow="visible"></use></clipPath>
+        <path clip-path="url(#b)" d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10 10-4.5 10-10S17.5 2 12 2zm4.2 14.2L11 13V7h1.5v5.2l4.5 2.7-.8 1.3z"></path>
+      </svg>
+      <%= link_to untrailingslashit(main_app.root_url) + wp_url_to_relative_url(get_permalink(post)), rel: 'bookmark' do %>
+        <%= content_tag :time, I18n.l(post.post_date, format: '%e %b %Y'), class: 'entry-date published', datetime: post.post_date.strftime('%FT%T') %>
+        <%= content_tag :time, I18n.l(post.post_modified, format: '%e %b %Y'), class: 'updated', datetime: post.post_modified.strftime('%FT%T') %>
+      <% end %>
+    <% end %>
+    <%#= content_tag :span, class: 'cat-links' do %>
+      <%# TODO implement get_the_category_list to get the post.categories %>
+    <%# end %>
+    <% unless post.tags.empty? %>
+      <%= content_tag :span, class: 'tags-links' do %>
+        <svg class="svg-icon" width="16" height="16" aria-hidden="true" role="img" focusable="false" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+          <path d="M21.41 11.58l-9-9C12.05 2.22 11.55 2 11 2H4c-1.1 0-2 .9-2 2v7c0 .55.22 1.05.59 1.42l9 9c.36.36.86.58 1.41.58.55 0 1.05-.22 1.41-.59l7-7c.37-.36.59-.86.59-1.41 0-.55-.23-1.06-.59-1.42zM5.5 7C4.67 7 4 6.33 4 5.5S4.67 4 5.5 4 7 4.67 7 5.5 6.33 7 5.5 7z"></path>
+          <path d="M0 0h24v24H0z" fill="none"></path>
+        </svg>
+        <%= content_tag :span, t('railspress.post.show.tags'), class: 'screen-reader-text' %>
+        <%= get_the_tag_list('', ', ', '', post).html_safe %>
+      <% end %>
+    <% end %>
+  <% end %>
+<% end %>
