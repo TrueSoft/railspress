@@ -9,7 +9,7 @@ Railspress::Engine.routes.draw do
   get 'posts/show/:id' => 'posts#show_id', constraints: {id: /\d+/}
   get 'posts/tag/:slug' => 'posts#tag'
 
-  get '*slug' => 'pages#show', as: :show_page
+  get '*slug' => 'pages#show'
   get '/' => 'pages#home'
 
 end
