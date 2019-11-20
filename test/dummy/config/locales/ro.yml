@@ -1,0 +1,7 @@
+ro:
+
+  railspress:
+    post:
+      show:
+        next_post: "Anunțul următor"
+        prev_post: "Anunțul precedent"
