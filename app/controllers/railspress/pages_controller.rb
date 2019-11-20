@@ -75,7 +75,7 @@ module Railspress
           if has_breadcrumb
             @breadcrumb = {}
             ancestors.each do |page|
-              @breadcrumb[page.post_title] = show_page_path(helpers.get_page_uri(page))
+              @breadcrumb[page.post_title] = main_app.show_page_path(helpers.get_page_uri(page))
             end
           end
         end

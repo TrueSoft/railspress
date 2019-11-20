@@ -320,7 +320,12 @@ module Railspress::NavMenuHelper
 
           menu_item._invalid = true  if 'trash' == get_post_status( menu_item.object_id_ )
 
-          menu_item.url = get_permalink( menu_item.object_id_ )
+          mi_poat_obj = get_post( menu_item.object_id_ )
+          if mi_poat_obj.post_type == 'page'
+            menu_item.url = main_app.show_page_path(slug: wp_url_to_relative_url(get_permalink(mi_poat_obj)).gsub(/^\//, ''))
+          else
+            menu_item.url = wp_url_to_relative_url(get_permalink(mi_poat_obj))
+          end
 
           original_object = get_post( menu_item.object_id_ )
           # This filter is documented in wp-includes/post-template.php
