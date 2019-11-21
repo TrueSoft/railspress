@@ -223,6 +223,34 @@ module Railspress::FormattingHelper
     title
   end
 
+  # Sanitizes an HTML classname to ensure it only contains valid characters.
+  #
+  # Strips the string down to A-Z,a-z,0-9,_,-. If this results in an empty
+  # string then it will return the alternative value supplied.
+  #
+  # @to do Expand to support the full range of CDATA that a class attribute can contain.
+  #
+  # @param [string] clazz    The classname to be sanitized
+  # @param [string] fallback Optional. The value to return if the sanitization ends up as an empty string.
+  # 	Defaults to an empty string.
+  # @return string The sanitized value
+  def sanitize_html_class(clazz, fallback = '' )
+    # Strip out any % encoded octets
+    sanitized = clazz.gsub( /%[a-fA-F0-9][a-fA-F0-9]/, '' )
+
+    # Limit to A-Z,a-z,0-9,_,-
+    sanitized = sanitized.gsub( /[^A-Za-z0-9_-]/, '' )
+
+    return sanitize_html_class( fallback ) if (sanitized.blank? && fallback )
+
+    # Filters a sanitized HTML class string.
+    #
+    # @param string $sanitized The sanitized HTML class.
+    # @param string $class     HTML class before sanitization.
+    # @param string $fallback  The fallback string.
+    apply_filters( 'sanitize_html_class', sanitized, clazz, fallback )
+  end
+
   # Acts on text which is about to be edited.
   #
   # The content is run through esc_textarea(), which uses htmlspecialchars()
