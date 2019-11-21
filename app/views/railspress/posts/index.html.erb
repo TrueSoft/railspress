@@ -31,7 +31,8 @@
                 <div class="info col">
                   <article id="<%= "post-#{post.id}" %>" class="<%= "post-#{post.id}" %> post type-<%= post.post_type %> status-<%= post.post_status %> format-standard hentry">
                     <h3 class="entry-title px-2 pt-2 mb-0 border-bottom">
-                      <%= link_to post.post_title, wp_url_to_relative_url(get_permalink(post)), rel: 'bookmark' %>
+                      <% post_link = (Railspress.links_to_wp ? get_permalink(post) : wp_url_to_relative_url(get_permalink(post))) %>
+                      <%= link_to post.post_title, post_link, rel: 'bookmark' %>
                     </h3>
                     <div class="entry-content p-2">
                       <% extended_entry_info = get_extended(post.post_content)
@@ -44,7 +45,7 @@
                       <%= excerpt.html_safe %>
                       <% unless extended_entry_info[:extended].blank? %>
                         <%= content_tag :div, class: 'text-sm-right' do %>
-                          <%= link_to wp_url_to_relative_url(get_permalink(post)), class: 'more-link btn btn-primary d-block d-sm-inline' do %>
+                          <%= link_to post_link, class: 'more-link btn btn-primary d-block d-sm-inline' do %>
                             <%= t('railspress.post.index.more') %>
                             <%= content_tag :span, '„' + post.post_title + '”', class: 'screen-reader-text' %>
                           <% end %>
