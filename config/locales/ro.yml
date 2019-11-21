@@ -31,6 +31,7 @@ ro:
         save: "Modificarile au fost salvate."
       delete:
         title: "Ștergere opțiune"
+        question: "Sigur vrei să ștergi opțiunea selectată?"
       destroy: "Inregistrarea a fost ștearsă."
     pages:
       show:

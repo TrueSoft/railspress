@@ -31,6 +31,7 @@ en:
         save: "The changes have been saved."
       delete:
         title: "Delete option"
+        question: "Are you sure you want to delete the selected option?"
       destroy: "The record was deleted."
     pages:
       show:
