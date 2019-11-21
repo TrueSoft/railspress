@@ -16,8 +16,6 @@ gemspec
 
 gem 'tzinfo-data', platforms: [:mingw, :mswin, :x64_mingw, :jruby]
 
-gem 'font-awesome-rails'
-
 gem 'shortcode'
 gem 'will_paginate', '~> 3.1.0'
 

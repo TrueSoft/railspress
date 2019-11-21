@@ -1,5 +1,3 @@
-include FontAwesome::Rails::IconHelper
-
 module Railspress::ApplicationHelper
 
   def wp_url_to_relative_url(wp_url)
@@ -7,6 +5,22 @@ module Railspress::ApplicationHelper
       wp_url[home_url.length .. -1]
     else
       wp_url
+    end
+  end
+
+  def svg_icon(icon)
+    case icon
+    when :edit
+      '<svg width="16" height="16" viewBox="0 0 24 24" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+        <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"></path>
+        <path d="M0 0h24v24H0z" fill="none"></path>
+      </svg>'.html_safe
+    when :remove
+      '<svg width="16" height="16" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+        <path d="M24 20.188l-8.315-8.209 8.2-8.282-3.697-3.697-8.212 8.318-8.31-8.203-3.666 3.666 8.321 8.24-8.206 8.313 3.666 3.666 8.237-8.318 8.285 8.203z"/>
+      </svg>'.html_safe
+    else
+      nil
     end
   end
 

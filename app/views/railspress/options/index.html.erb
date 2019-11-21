@@ -51,9 +51,9 @@
               <%= f.submit "OK", class: 'btn btn-primary' %>
               <%= link_to 'C', options_path, title: "Cancel" unless parametru.new_record? %>
             <% elsif option_is_editable_ts(parametru.option_name) %>
-              <%= link_to(fa_icon(:edit), edit_option_path(parametru)) %>
+              <%= link_to(svg_icon(:edit), edit_option_path(parametru)) %>
               <%= if option_is_deletable_ts(parametru.option_name)
-                    link_to(fa_icon(:remove), option_path(parametru), data: {confirm: "Sunteti sigur ca doriti sa stergeti aceasta inregistrare?"}, method: :delete, title: t('railspress.option.delete.title'), class: '')
+                    link_to(svg_icon(:remove), option_path(parametru), data: {confirm: "Sunteti sigur ca doriti sa stergeti aceasta inregistrare?"}, method: :delete, title: t('railspress.option.delete.title'), class: '')
                   end %>
             <% else %>
               -
