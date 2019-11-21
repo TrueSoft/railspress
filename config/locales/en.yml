@@ -41,12 +41,23 @@ en:
       index:
         title: "Posts"
         more: "Read more"
+        navigation: "Posts navigation"
+        older: "Older posts"
+        newer: "Newer posts"
+        prev_page: "&laquo; Previous Page"
+        next_page: "Next Page &raquo;"
       show:
         title_protected: "Protected: %{title}"
         title_private: "Private: %{title}"
         created_at_html: "Created at <time datetime=\"%{iso_date}\">%{date}</time>"
+        posted_by: "Posted by"
+        posted_in: "Posted in"
+        archives: "Archives"
+        navigation: "Post navigation"
         next: "Next"
         prev: "Previous"
+        next_post: "Next Post"
+        prev_post: "Previous Post"
         tags: "Tags"
 
         not_found: "The post with the name '%{slug}' is not found!"
