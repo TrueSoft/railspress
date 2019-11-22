@@ -275,6 +275,28 @@ module Railspress::MediaHelper
     apply_filters('wp_constrain_dimensions', [w, h], current_width, current_height, max_width, max_height)
   end
 
+  # Helper function to test if aspect ratios for two images match.
+  #
+  # @param [int] source_width  Width of the first image in pixels.
+  # @param [int] source_height Height of the first image in pixels.
+  # @param [int] target_width  Width of the second image in pixels.
+  # @param [int] target_height Height of the second image in pixels.
+  # @return [bool] True if aspect ratios match within 1px. False if not.
+  def wp_image_matches_ratio(source_width, source_height, target_width, target_height)
+    # To test for varying crops, we constrain the dimensions of the larger image
+    # to the dimensions of the smaller image and see if they match.
+    if source_width > target_width
+      constrained_size = wp_constrain_dimensions(source_width, source_height, target_width)
+      expected_size = [target_width, target_height]
+    else
+      constrained_size = wp_constrain_dimensions(target_width, target_height, source_width)
+      expected_size = [source_width, source_height]
+    end
+
+    # If the image dimensions are within 1px of the expected size, we consider it a match.
+    (constrained_size[0] - expected_size[0]).abs <= 1 && (constrained_size[1] - expected_size[1]).abs <= 1
+  end
+
   # Retrieves the image's intermediate size (resized) path, width, and height.
   #
   # The $size parameter can be an array with the width and height respectively.
@@ -355,8 +377,8 @@ def image_get_intermediate_size(post_id, size = 'thumbnail')
          # When the size requested is smaller than the thumbnail dimensions, we
          # fall back to the thumbnail size to maintain backward compatibility with
          # pre 4.6 versions of WordPress.
-         elsif ( ! empty( imagedata[:sizes]['thumbnail'] ) && imagedata[:sizes]['thumbnail']['width'] >= size[0] && imagedata[:sizes]['thumbnail']['width'] >= size[1] )
-          data = imagedata['sizes']['thumbnail']
+         elsif ( !  imagedata[:sizes]['thumbnail'].blank? && imagedata[:sizes]['thumbnail']['width'] >= size[0] && imagedata[:sizes]['thumbnail']['width'] >= size[1] )
+          data = imagedata[:sizes]['thumbnail']
          else
             return false
          end

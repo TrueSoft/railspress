@@ -157,11 +157,11 @@ module Railspress::GeneralTemplateHelper
 
     site_icon_id = get_option( 'site_icon' )
 
-    if site_icon_id
+    if site_icon_id && site_icon_id != '0'
       if size >= 512
         size_data = 'full'
       else
-        size_data = array(size, size)
+        size_data = [size, size]
       end
       url = wp_get_attachment_image_url(site_icon_id, size_data)
     end
@@ -343,7 +343,7 @@ def wp_site_icon()
 
   # Filters the site icon meta tags, so plugins can add their own.
   meta_tags = apply_filters( 'site_icon_meta_tags', meta_tags )
-  meta_tags = array_filter( meta_tags )
+  # TODO meta_tags = array_filter( meta_tags )
 
   output = ''
   meta_tags.each do |meta_tag|
