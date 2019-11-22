@@ -7,59 +7,10 @@
       <%= ' &ndash; '.html_safe + content_tag(:small, @year) unless @year.nil? %>
       <%= ' &ndash; '.html_safe + content_tag(:small, @tag.name) unless @tag.nil? %>
     <% end %>
-    <div class="container py-2 timeline">
-      <div class="timeline-line text-muted"></div>
 
       <% @posts.each do |post| %>
-
-        <div class="row mt-3">
-          <div class="news card-group mx-2 mb-2 mx-md-0">
-            <svg class="timeline-icon text-secondary pull-left d-none d-md-block" xmlns="http://www.w3.org/2000/svg" width="8" height="8" viewBox="0 0 8 8">
-              <path d="M0 0v8l4-4-4-4z" style="fill:#868E96;" transform="translate(2)"></path>
-            </svg>
-            <div class="card">
-              <div class="row no-gutters">
-                <div class="col-sm-auto card-header time p-2">
-                  <%= content_tag :h5, class: 'mb-0 text-sm-center' do %>
-                    <%= content_tag :time, datetime: post.post_date.strftime('%F'), title: I18n.l(post.post_date, format: '%e %b %Y') do %>
-                      <%= content_tag :strong, post.post_date.day, class: 'd-xs-inline-block d-sm-block' %>
-                      <%= content_tag :span, I18n.l(post.post_date, format: '%b'), class: 'd-xs-inline-block d-sm-block' %>
-                      <%= content_tag :small, post.post_date.year, class: 'd-xs-inline-block d-sm-block' %>
-                    <% end %>
-                  <% end %>
-                </div>
-                <div class="info col">
-                  <article id="<%= "post-#{post.id}" %>" class="<%= "post-#{post.id}" %> post type-<%= post.post_type %> status-<%= post.post_status %> format-standard hentry">
-                    <h3 class="entry-title px-2 pt-2 mb-0 border-bottom">
-                      <% post_link = (Railspress.links_to_wp ? get_permalink(post) : wp_url_to_relative_url(get_permalink(post))) %>
-                      <%= link_to post.post_title, post_link, rel: 'bookmark' %>
-                    </h3>
-                    <div class="entry-content p-2">
-                      <% extended_entry_info = get_extended(post.post_content)
-                         if post.post_excerpt.blank?
-                           excerpt = extended_entry_info[:main]
-                         else
-                           excerpt = post.post_excerpt
-                         end
-                      %>
-                      <%= excerpt.html_safe %>
-                      <% unless extended_entry_info[:extended].blank? %>
-                        <%= content_tag :div, class: 'text-sm-right' do %>
-                          <%= link_to post_link, class: 'more-link btn btn-primary d-block d-sm-inline' do %>
-                            <%= t('railspress.post.index.more') %>
-                            <%= content_tag :span, '„' + post.post_title + '”', class: 'screen-reader-text' %>
-                          <% end %>
-                        <% end %>
-                      <% end %>
-                    </div><!-- .entry-content -->
-                  </article><!-- #post-## -->
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
+        <%= render partial: 'content_excerpt', locals: {post: post} %>
       <% end %>
-    </div>
 
     <%= will_paginate @posts, list_classes: ['pagination pagination-sm'], inner_window: 2, outer_window: 0, previous_label: t('will_paginate.previous_label'), next_label: t('will_paginate.next_label') %>
 

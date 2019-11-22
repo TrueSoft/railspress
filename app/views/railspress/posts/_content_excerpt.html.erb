@@ -1,0 +1,39 @@
+<%= content_tag :article, id: "post-#{post.id}", class: get_post_class('', post).join(' ')  do %>
+  <header class="entry-header">
+    <%# php
+		if ( is_sticky() && is_home() && ! is_paged() ) {
+			printf( '<span class="sticky-post">%s</span>', _x( 'Featured', 'post', 'twentynineteen' ) );
+    }
+    the_title( sprintf( '<h2 class="entry-title"><a href="%s" rel="bookmark">', esc_url( get_permalink() ) ), '</a></h2>' );
+    %>
+    <h3 class="entry-title px-2 pt-2 mb-0 border-bottom">
+      <% post_link = (Railspress.links_to_wp ? get_permalink(post) : wp_url_to_relative_url(get_permalink(post))) %>
+      <%= link_to post.post_title, post_link, rel: 'bookmark' %>
+    </h3>
+  </header><!-- .entry-header -->
+
+  <%#?php twentynineteen_post_thumbnail(); %>
+
+  <div class="entry-content">
+    <% extended_entry_info = get_extended(post.post_content)
+       if post.post_excerpt.blank?
+         excerpt = extended_entry_info[:main]
+       else
+         excerpt = post.post_excerpt
+       end
+    %>
+    <%= excerpt.html_safe %>
+    <% unless extended_entry_info[:extended].blank? %>
+      <%= content_tag :div, class: 'text-sm-right' do %>
+        <%= link_to post_link, class: 'more-link btn btn-primary d-block d-sm-inline' do %>
+          <%= t('railspress.post.index.more') %>
+          <%= content_tag :span, '„' + post.post_title + '”', class: 'screen-reader-text' %>
+        <% end %>
+      <% end %>
+    <% end %>
+  </div><!-- .entry-content -->
+
+  <footer class="entry-footer">
+    <%#php twentynineteen_entry_footer(); %>
+  </footer><!-- .entry-footer -->
+<% end %>

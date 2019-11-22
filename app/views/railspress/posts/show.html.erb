@@ -1,40 +1,18 @@
 <%= display_breadcrumb @breadcrumb %>
 
-<div class="row">
-  <div class="col-md-12">
-    <%= content_tag :article, id: "post-#{@post.id}", class: get_post_class('', @post).join(' ')  do %>
-      <%= content_tag :h2, @post.post_title, class: 'entry-title' %>
-      <%= tag :hr, class: 'mt-1 mb-0' %>
-      <%= content_tag :div, class: 'text-right text-muted' do
-        content_tag(:small, fa_icon('calendar') + ' ' + t('railspress.post.show.created_at_html', iso_date: @post.post_date.strftime('%F'), date: I18n.l(@post.post_date, format: '%e %b %Y')), class: 'post_date')
-      end %>
-      <%= content_tag :div, class: 'entry-content p-2' do %>
-        <%= @post.post_content.html_safe %>
-      <% end %>
-    <% end %>
-    <%= tag :hr, class: 'mt-2 mb-2' %>
-  </div>
-  <div class="col-md-6">
-    <ul class="navigation post-navigation pagination bt-1" role="navigation">
-      <% unless @post_prev.nil? %>
-        <%= content_tag :li, class: 'page-item nav-previous' do %>
-          <a class="page-link" href="<%= wp_url_to_relative_url(get_permalink(@post_prev)) %>" rel="prev">
-            <span class="meta-nav" aria-hidden="true" title="<%= @post_prev.post_title %>">« <%= t('railspress.post.show.prev') %></span>
-            <%= content_tag :span, t('railspress.post.show.prev'), class: 'screen-reader-text' %></a>
-        <% end %>
-      <% end %>
-      <% unless @post_next.nil? %>
-        <%= content_tag :li, class: 'page-item nav-next' do %>
-          <a class="page-link" href="<%= wp_url_to_relative_url(get_permalink(@post_next)) %>" rel="next">
-            <span class="meta-nav" aria-hidden="true" title="<%= @post_next.post_title %>"><%= t('railspress.post.show.next') %> »</span>
-            <%= content_tag :span, t('railspress.post.show.next'), class: 'screen-reader-text' %></a>
-        <% end %>
-      <% end %>
-    </ul>
-  </div>
-  <div class="col-md-6 text-right">
-    <%= unless @post.tags.empty?
-          get_the_tag_list('<p>' + t('railspress.post.show.tags') + ': ',', ','</p>', @post).html_safe
-        end %>
-  </div>
-</div>
+<%= content_tag :article, id: "post-#{@post.id}", class: get_post_class('', @post).join(' ')  do %>
+  <%= render partial: 'entry_header',  locals: {post: @post} %>
+  <%= content_tag :div, class: 'entry-content' do %>
+    <%= @post.post_content.html_safe %>
+  <% end %>
+  <%= render partial: 'entry_footer',  locals: {post: @post} %>
+<% end %>
+
+<%= the_post_navigation({
+          next_text: '<span class="meta-nav" aria-hidden="true">' + t( 'railspress.post.show.next_post') + '</span> ' +
+              '<span class="screen-reader-text">' + t('railspress.post.show.next_post') + '</span> <br/>' +
+              '<span class="post-title">%title</span>',
+          prev_text: '<span class="meta-nav" aria-hidden="true">' + t( 'railspress.post.show.prev_post' ) + '</span> ' +
+              '<span class="screen-reader-text">' + t( 'railspress.post.show.prev_post' ) + '</span> <br/>' +
+              '<span class="post-title">%title</span>',
+      }).html_safe %>
