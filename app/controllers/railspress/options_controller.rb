@@ -20,7 +20,7 @@ module Railspress
       @option = Railspress::Option.new model_params
       if @option.save
         # ch_migr @option.create_activity :create, owner: current_user, parameters: {option_name: @option.option_name, option_value: @option.option_value}
-        redirect_to({action: :index}, notice: t('railspress.option.create.save'))
+        redirect_to(main_app.admin_options_path, notice: t('railspress.option.create.save'))
       else
         @options = get_display_options
         @options << @option # if @option.new_record?
@@ -45,9 +45,8 @@ module Railspress
     def update
       @option = Railspress::Option.find(params[:id])
       if @option.update_attributes(model_params)
-        flash[:notice] = t('railspress.option.update.save')
         # ch_migr  @option.create_activity :update, owner: current_user, parameters: {option_name: @option.option_name, option_value: @option.option_value}
-        redirect_to action: :index
+        redirect_to(main_app.admin_options_path, notice: t('railspress.option.update.save'))
       else
         @options = get_display_options
         render action: :index
@@ -58,7 +57,7 @@ module Railspress
       @option = Railspress::Option.find(params[:id])
       # ch_migr  @option.create_activity :destroy, owner: current_user, parameters: {option_name: @option.option_name, option_value: @option.option_value}
       if @option.destroy
-        redirect_to({action: :index}, notice: t('railspress.option.destroy'))
+        redirect_to(main_app.admin_options_path, notice: t('railspress.option.destroy'))
       else
         @options = get_display_options
         @option = Railspress::Option.new

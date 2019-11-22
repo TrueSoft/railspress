@@ -1,17 +1,15 @@
-<%= display_breadcrumb @breadcrumb %>
-
-<header class="page-header">
-  <%= content_tag :h1, t('railspress.option.index.title'), class: 'page-title' %>
-</header>
 <div class="entry">
 <div class="entry-content">
+  <header class="page-header">
+    <%= content_tag :h1, t('railspress.option.index.title'), class: 'page-title' %>
+  </header>
 
-<%= form_for @option, url: { action: @option.new_record? ? 'create' : 'update' } do |f| %>
+<%= form_for @option, url: ( @option.new_record? ? main_app.admin_options_path : main_app.admin_option_path) do |f| %>
   <%= display_errors_for(@option) %>
 
-  <%= content_tag :table, class: 'table parametri table-bordered table-striped table-hover' do %>
+  <%= content_tag :table, class: 'table table-bordered table-striped table-hover' do %>
     <%= content_tag :thead, class: 'thead-dark' do %>
-      <% ["Nr.", "Nume", "Valoare", "Autoload", "Op."].each do |col| %>
+      <% ["#", "Name", "Value", "Autoload", "Op."].each do |col| %>
         <%= content_tag :th, col %>
       <% end %>
     <% end %>
@@ -49,11 +47,11 @@
           <%= content_tag :td, class: ((is_edit_row || is_new_row) ? 'p-1' : '') + ' text-nowrap' do %>
             <% if (!@option.new_record? && @option.id == parametru.id) or (@option.new_record? && @option == parametru) %>
               <%= f.submit "OK", class: 'btn btn-primary' %>
-              <%= link_to 'C', options_path, title: "Cancel" unless parametru.new_record? %>
+              <%= link_to 'C', main_app.admin_options_path, title: "Cancel" unless parametru.new_record? %>
             <% elsif option_is_editable_ts(parametru.option_name) %>
-              <%= link_to(svg_icon(:edit), edit_option_path(parametru)) %>
+              <%= link_to(svg_icon(:edit), main_app.edit_admin_option_path(parametru)) %>
               <%= if option_is_deletable_ts(parametru.option_name)
-                    link_to(svg_icon(:remove), option_path(parametru), data: {confirm: t('railspress.option.delete.question')}, method: :delete, title: t('railspress.option.delete.title'), class: '')
+                    link_to(svg_icon(:remove), main_app.admin_option_path(parametru), data: {confirm: t('railspress.option.delete.question')}, method: :delete, title: t('railspress.option.delete.title'), class: '')
                   end %>
             <% else %>
               -
