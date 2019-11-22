@@ -2,6 +2,8 @@ ro:
 
   railspress:
     post:
+      index:
+        title: "Anunțuri"
       show:
         next_post: "Anunțul următor"
         prev_post: "Anunțul precedent"
