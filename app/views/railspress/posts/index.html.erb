@@ -1,27 +1,13 @@
-<%= display_breadcrumb @breadcrumb %>
+<%= content_tag :h2 do %>
+  <%= t('railspress.post.index.title') %>
+  <%= ' &ndash; '.html_safe + content_tag(:small, @year) unless @year.nil? %>
+  <%= ' &ndash; '.html_safe + content_tag(:small, @tag.name) unless @tag.nil? %>
+<% end %>
 
-<div class="row">
-  <div class="col-md-8 blog-main">
-    <%= content_tag :h2 do %>
-      <%= t('news.index.title') %>
-      <%= ' &ndash; '.html_safe + content_tag(:small, @year) unless @year.nil? %>
-      <%= ' &ndash; '.html_safe + content_tag(:small, @tag.name) unless @tag.nil? %>
-    <% end %>
+<% @posts.each do |post| %>
+  <%= render partial: 'content_excerpt', locals: {post: post} %>
+<% end %>
 
-      <% @posts.each do |post| %>
-        <%= render partial: 'content_excerpt', locals: {post: post} %>
-      <% end %>
-
-    <%= will_paginate @posts, list_classes: ['pagination pagination-sm'], inner_window: 2, outer_window: 0, previous_label: t('will_paginate.previous_label'), next_label: t('will_paginate.next_label') %>
-
-  </div><!-- /.blog-main -->
-
-  <aside class="col-md-4 primary-sidebar" role="complementary">
-    <ul class="widget-area list-unstyled">
-      <li id="recent-posts-3" class="widget widget_recent_entries">
-
-      </li>
-    </ul>
-  </aside><!-- /.primary-sidebar -->
-
-</div>
+<%= content_tag :nav, class: 'navigation pagination', role: 'navigation' do %>
+  <%= will_paginate @posts, class: 'nav-links', previous_label: t('railspress.post.index.newer'), next_label: t('railspress.post.index.older') %>
+<% end %>

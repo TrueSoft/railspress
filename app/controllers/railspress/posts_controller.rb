@@ -4,9 +4,9 @@ module Railspress
   class PostsController < ApplicationController
     def index
       if Railspress.multi_language
-        @posts = Railspress::Post.published.descending.joins(:languages).where(default_filter).paginate(page: params[:page], per_page: params[:per_page])
+        @posts = Railspress::Post.published.descending.joins(:languages).where(default_filter).paginate(page: params[:page], per_page: helpers.get_option('posts_per_page', nil))
       else
-        @posts = Railspress::Post.published.descending.where(default_filter).paginate(page: params[:page], per_page: params[:per_page])
+        @posts = Railspress::Post.published.descending.where(default_filter).paginate(page: params[:page], per_page: helpers.get_option('posts_per_page', nil))
       end
     end
 
@@ -58,9 +58,9 @@ module Railspress
       flt = default_filter
       flt[:id] = posts_for_tag
       if Railspress.multi_language
-        @posts = Railspress::Post.published.descending.joins(:languages).where(flt).paginate(page: params[:page], per_page: params[:per_page])
+        @posts = Railspress::Post.published.descending.joins(:languages).where(flt).paginate(page: params[:page], per_page: helpers.get_option('posts_per_page', nil))
       else
-        @posts = Railspress::Post.published.descending.where(flt).paginate(page: params[:page], per_page: params[:per_page])
+        @posts = Railspress::Post.published.descending.where(flt).paginate(page: params[:page], per_page: helpers.get_option('posts_per_page', nil))
       end
       render action: :index
     rescue ActiveRecord::RecordNotFound

@@ -33,7 +33,6 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'php-serialization'
   spec.add_dependency 'shortcode'
   spec.add_dependency 'will_paginate', '~> 3.1.0'
-  spec.add_dependency 'will_paginate-bootstrap4'
 
   spec.add_development_dependency "mysql2"
 end
