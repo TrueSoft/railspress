@@ -107,6 +107,18 @@ module Railspress::ThemeHelper
     apply_filters('template_directory', template_dir, template, theme_root )
   end
 
+  # Retrieve theme directory URI.
+  #
+  # @return string Template directory URI.
+  def get_template_directory_uri
+    template = rawurlencode(get_template).gsub('%2F', '/')
+    theme_root_uri = get_theme_root_uri(template)
+    template_dir_uri = "#{theme_root_uri}/#{template}"
+
+    # Filters the current theme directory URI.
+    apply_filters('template_directory_uri', template_dir_uri, template, theme_root_uri)
+  end
+
   # Register a directory that contains themes.
   #
   # @global Railspress.GLOBAL.wp_theme_directories
