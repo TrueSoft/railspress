@@ -11,6 +11,8 @@ Rails.application.routes.draw do
 
   get 'test' => 'railspress/pages#test'
 
+  get 'page/*slug' => 'railspress/pages#show', as: :show_page
+
 #  mount Railspress::Engine => "/railspress"
 
   root 'railspress/pages#home'
