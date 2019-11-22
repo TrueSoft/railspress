@@ -32,7 +32,7 @@ module Railspress
     def show
       @post = Railspress::Post.published.where(post_name: params[:slug]).first!
       @post_prev, @post_next = neighbours(@post)
-      @breadcrumb = {t('railspress.post.index.title') => posts_path}
+      @breadcrumb = {t('railspress.post.index.title') => main_app.all_posts_path}
       @breadcrumb[@post.post_date.year] = news_of_year_path(year: @post.post_date.year) unless @post.post_date.year == Date.current.year
       @breadcrumb[@post.post_title] = nil
     rescue ActiveRecord::RecordNotFound
@@ -42,7 +42,7 @@ module Railspress
     def show_id
       @post = Railspress::Post.published.where(id: params[:id]).first!
       @post_prev, @post_next = neighbours(@post)
-      @breadcrumb = {t('railspress.post.index.title') => posts_path}
+      @breadcrumb = {t('railspress.post.index.title') => main_app.all_posts_path}
       @breadcrumb[@post.post_date.year] = news_of_year_path(year: @post.post_date.year) unless @post.post_date.year == Date.current.year
       @breadcrumb[@post.post_title] = nil
       render action: :show
@@ -52,7 +52,7 @@ module Railspress
 
     def tag
       @tag = Railspress::Term.joins(:taxonomy).where(Railspress::Taxonomy.table_name => {taxonomy: 'post_tag'}, slug: params[:slug]).first!
-      @breadcrumb = {t('railspress.post.index.title') => posts_path}
+      @breadcrumb = {t('railspress.post.index.title') => main_app.all_posts_path}
       @breadcrumb[@tag.name] = nil
       posts_for_tag = Railspress::Relationship.where(term_taxonomy_id: @tag.taxonomy.term_taxonomy_id).pluck(:object_id)
       flt = default_filter
@@ -64,7 +64,7 @@ module Railspress
       end
       render action: :index
     rescue ActiveRecord::RecordNotFound
-      redirect_to news_path, alert: t('railspress.tag.not_found', slug: params[:slug])
+      redirect_to main_app.all_posts_path, alert: t('railspress.tag.not_found', slug: params[:slug])
     end
 
     private

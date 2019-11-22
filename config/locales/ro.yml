@@ -42,6 +42,7 @@ ro:
       index:
         title: "Articole"
         more: "Citește mai mult"
+        type_archive: "Arhivă tip de articol"
         navigation: "Navigare în articole"
         older: "Articole mai vechi"
         newer: "Articole mai noi"
@@ -50,6 +51,7 @@ ro:
       show:
         title_protected: "Protected: %{title}"
         title_private: "Private: %{title}"
+        no_title: "#%{id} (fără titlu)"
         created_at_html: "Publicat la <time datetime=\"%{iso_date}\">%{date}</time>"
         posted_by: "Publicat de"
         posted_in: "Publicat în"

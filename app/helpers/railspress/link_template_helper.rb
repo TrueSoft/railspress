@@ -201,6 +201,46 @@ module Railspress::LinkTemplateHelper
     apply_filters('_get_page_link', link, post.id)
   end
 
+  # Retrieves the permalink for a post type archive.
+  #
+  # @param [string] post_type Post type.
+  # @return string|false The post type archive permalink.
+  def get_post_type_archive_link( post_type )
+    #global $wp_rewrite;
+    post_type_obj = get_post_type_object( post_type )
+    return false if !post_type_obj
+
+    if ( 'post' == post_type )
+      show_on_front  = get_option( 'show_on_front' )
+      page_for_posts = get_option( 'page_for_posts' )
+
+      if 'page' == show_on_front && page_for_posts
+        link = get_permalink( page_for_posts )
+      else
+        link = get_home_url
+      end
+      # This filter is documented in wp-includes/link-template.php
+      return apply_filters( 'post_type_archive_link', link, post_type )
+    end
+
+    return false unless post_type_obj.has_archive
+
+    if get_option( 'permalink_structure' ) && is_array( post_type_obj.rewrite )
+      struct = ( true == post_type_obj.has_archive ) ? post_type_obj.rewrite['slug'] : post_type_obj.has_archive
+      if post_type_obj.rewrite['with_front']
+        struct = wp_rewrite.front + struct;
+      else
+        struct = wp_rewrite.root + struct;
+      end
+      link = home_url( user_trailingslashit( struct, 'post_type_archive' ) )
+    else
+      link = home_url( '?post_type=' + post_type )
+    end
+
+    # Filters the post type archive permalink.
+    apply_filters( 'post_type_archive_link', link, post_type )
+  end
+
   # Retrieves the adjacent post.
   #
   # Can either be next or previous post.

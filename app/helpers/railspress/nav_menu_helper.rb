@@ -312,7 +312,7 @@ module Railspress::NavMenuHelper
         if 'post_type' == menu_item.type
           object = get_post_type_object(menu_item.object)
           if object
-            menu_item.type_label = object.labels.singular_name
+            menu_item.type_label = object.labels['singular_name']
           else
             menu_item.type_label = menu_item.object
             menu_item._invalid   = true
@@ -325,7 +325,11 @@ module Railspress::NavMenuHelper
               menu_item.url = get_permalink(mi_post_obj)
             else
               if mi_post_obj.post_type == 'page'
-                menu_item.url = main_app.show_page_path(slug: wp_url_to_relative_url(get_permalink(mi_post_obj)).gsub(/^\//, ''))
+                if menu_item.object_id_.to_s == get_option('page_for_posts').to_s
+                  menu_item.url = main_app.all_posts_path
+                else
+                  menu_item.url = main_app.show_page_path(slug: wp_url_to_relative_url(get_permalink(mi_post_obj)).gsub(/^\//, ''))
+                end
               else
                 menu_item.url = wp_url_to_relative_url(get_permalink(mi_post_obj))
               end
@@ -337,10 +341,10 @@ module Railspress::NavMenuHelper
 
           if original_title.blank?
             # translators: %d: ID of a post
-            original_title = sprintf( t( '#%d (no title)' ), original_object.id )
+            original_title = t('railspress.post.show.no_title', id: original_object.id)
           end
 
-          menu_item.title = '' == menu_item.post_title ? original_title : menu_item.post_title
+          menu_item.title = menu_item.post_title.blank? ? original_title : menu_item.post_title
 
         elsif 'post_type_archive' == menu_item.type
           object = get_post_type_object( menu_item.object )
@@ -352,7 +356,7 @@ module Railspress::NavMenuHelper
             post_type_description = ''
           end
 
-          menu_item.type_label = __( 'Post Type Archive' )
+          menu_item.type_label = t('railspress.post.index.type_archive')
           post_content          = wp_trim_words( menu_item.post_content, 200 )
           post_type_description = post_content.blank? ? post_type_description : post_content
           menu_item.url        = get_post_type_archive_link( menu_item.object )
