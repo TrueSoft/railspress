@@ -1,23 +1,18 @@
-<%= display_breadcrumb @breadcrumb %>
+<%= content_tag :article, id: "post-#{@page.id}", class: get_post_class('', @page).join(' ') do %>
+  <%= content_tag :header, class: 'entry-header' do
+    content_tag :h3, @page.post_title, class: 'entry-title px-2 pt-2 mb-0 border-bottom'
+  end %>
+  <%= if @is_revision
+        content_tag :h4, class: 'revision-parent px-2 text-muted' do
+          t('railspress.shortcodes.revisions.title_html',
+            date: I18n.l(@page.post_date, format: @revision_post_date_title_format),
+            post: link_to(@main_post.post_title, (get_page_uri(@main_post))))
+        end
+      end %>
 
-<div class="row">
-  <div class="col-md-12">
-    <%= content_tag :article, id: "post-#{@page.id}", class: get_post_class('', @page).join(' ')  do %>
-        <%= content_tag :header, class: 'entry-header' do
-          content_tag :h3, @page.post_title, class: 'entry-title px-2 pt-2 mb-0 border-bottom'
-        end %>
-      <%= if @is_revision
-            content_tag :h4, class: 'revision-parent px-2 text-muted' do
-              t('railspress.shortcodes.revisions.title_html', date: I18n.l(@page.post_date, format: @revision_post_date_title_format), post: link_to(@main_post.post_title, show_page_path(get_page_uri(@main_post))))
-            end
-          end %>
+  <%= content_tag :div, class: "entry-content p-2 #{@post_class}" do %>
+    <%#= @page.post_content.html_safe %>
+    <%= content_html @page.post_content %>
+  <% end %>
 
-      <%= content_tag :div, class: "entry-content p-2 #{@post_class}" do %>
-        <%#= @page.post_content.html_safe %>
-        <%= content_html @page.post_content %>
-      <% end %>
-
-    <% end %>
-
-  </div>
-</div>
+<% end %>
