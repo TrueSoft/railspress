@@ -325,6 +325,98 @@ module Railspress::TaxonomyLib
 
   # TODO unregister_taxonomy()
 
+  # Builds an object with all taxonomy labels out of a taxonomy object.
+  #
+  # @param [WP_Taxonomy] tax Taxonomy object.
+  # @return object {
+  #     Taxonomy labels object. The first default value is for non-hierarchical taxonomies
+  #     (like tags) and the second one is for hierarchical taxonomies (like categories).
+  #
+  #     @type string $name                       General name for the taxonomy, usually plural. The same
+  #                                              as and overridden by `$tax->label`. Default 'Tags'/'Categories'.
+  #     @type string $singular_name              Name for one object of this taxonomy. Default 'Tag'/'Category'.
+  #     @type string $search_items               Default 'Search Tags'/'Search Categories'.
+  #     @type string $popular_items              This label is only used for non-hierarchical taxonomies.
+  #                                              Default 'Popular Tags'.
+  #     @type string $all_items                  Default 'All Tags'/'All Categories'.
+  #     @type string $parent_item                This label is only used for hierarchical taxonomies. Default
+  #                                              'Parent Category'.
+  #     @type string $parent_item_colon          The same as `parent_item`, but with colon `:` in the end.
+  #     @type string $edit_item                  Default 'Edit Tag'/'Edit Category'.
+  #     @type string $view_item                  Default 'View Tag'/'View Category'.
+  #     @type string $update_item                Default 'Update Tag'/'Update Category'.
+  #     @type string $add_new_item               Default 'Add New Tag'/'Add New Category'.
+  #     @type string $new_item_name              Default 'New Tag Name'/'New Category Name'.
+  #     @type string $separate_items_with_commas This label is only used for non-hierarchical taxonomies. Default
+  #                                              'Separate tags with commas', used in the meta box.
+  #     @type string $add_or_remove_items        This label is only used for non-hierarchical taxonomies. Default
+  #                                              'Add or remove tags', used in the meta box when JavaScript
+  #                                              is disabled.
+  #     @type string $choose_from_most_used      This label is only used on non-hierarchical taxonomies. Default
+  #                                              'Choose from the most used tags', used in the meta box.
+  #     @type string $not_found                  Default 'No tags found'/'No categories found', used in
+  #                                              the meta box and taxonomy list table.
+  #     @type string $no_terms                   Default 'No tags'/'No categories', used in the posts and media
+  #                                              list tables.
+  #     @type string $items_list_navigation      Label for the table pagination hidden heading.
+  #     @type string $items_list                 Label for the table hidden heading.
+  #     @type string $most_used                  Title for the Most Used tab. Default 'Most Used'.
+  #     @type string $back_to_items              Label displayed after a term has been updated.
+  # }
+  def get_taxonomy_labels( tax )
+    # tax.labels = (array) $tax->labels
+
+    # if ( !tax.helps.nil? && tax.labels['separate_items_with_commas'].blank? )
+    #   tax.labels['separate_items_with_commas'] = tax.helps
+    # end
+    #
+    # if ( !tax.no_tagcloud.nil? && tax.labels['not_found'].blank? )
+    #   tax.labels['not_found'] = tax.no_tagcloud
+    # end
+
+    nohier_vs_hier_defaults = {
+        'name'                       => ['Tags', 'Categories'],
+        'singular_name'              => ['Tag', 'Category']
+      #  'search_items'               => array( __( 'Search Tags' ), __( 'Search Categories' ) ),
+      #  'popular_items'              => array( __( 'Popular Tags' ), null ),
+      #  'all_items'                  => array( __( 'All Tags' ), __( 'All Categories' ) ),
+      #  'parent_item'                => array( null, __( 'Parent Category' ) ),
+      #  'parent_item_colon'          => array( null, __( 'Parent Category:' ) ),
+      #  'edit_item'                  => array( __( 'Edit Tag' ), __( 'Edit Category' ) ),
+      #  'view_item'                  => array( __( 'View Tag' ), __( 'View Category' ) ),
+      #  'update_item'                => array( __( 'Update Tag' ), __( 'Update Category' ) ),
+      #  'add_new_item'               => array( __( 'Add New Tag' ), __( 'Add New Category' ) ),
+      #  'new_item_name'              => array( __( 'New Tag Name' ), __( 'New Category Name' ) ),
+      #  'separate_items_with_commas' => array( __( 'Separate tags with commas' ), null ),
+      #  'add_or_remove_items'        => array( __( 'Add or remove tags' ), null ),
+      #  'choose_from_most_used'      => array( __( 'Choose from the most used tags' ), null ),
+      #  'not_found'                  => array( __( 'No tags found.' ), __( 'No categories found.' ) ),
+      #  'no_terms'                   => array( __( 'No tags' ), __( 'No categories' ) ),
+      #  'items_list_navigation'      => array( __( 'Tags list navigation' ), __( 'Categories list navigation' ) ),
+      #  'items_list'                 => array( __( 'Tags list' ), __( 'Categories list' ) ),
+      #  # translators: Tab heading when selecting from the most used terms 
+      # 'most_used'                  => array( _x( 'Most Used', 'tags' ), _x( 'Most Used', 'categories' ) ),
+      #  'back_to_items'              => array( __( '&larr; Back to Tags' ), __( '&larr; Back to Categories' ) ),
+    }
+    nohier_vs_hier_defaults['menu_name'] = nohier_vs_hier_defaults['name']
+
+    labels = Railspress::PostsHelper._get_custom_object_labels( tax, nohier_vs_hier_defaults )
+
+    # taxonomy = tax.name
+    #
+    # default_labels = clone labels
+    #
+    # Filters the labels of a specific taxonomy.
+    #
+    # The dynamic portion of the hook name, `$taxonomy`, refers to the taxonomy slug.
+    #
+    # labels = apply_filters( "taxonomy_labels_{$taxonomy}", $labels );
+    # 
+    # Ensure that the filtered labels contain all required default values.
+    # labels = array_merge(  default_labels,  labels )
+    labels
+  end
+
   # Add an already registered taxonomy to an object type.
   #
   # @global array $wp_taxonomies The registered taxonomies.
@@ -421,15 +513,15 @@ module Railspress::TaxonomyLib
 
     if term.is_a? Railspress::Term
       _term = term
-    elsif !term.is_a?(Integer)
+    elsif term.is_a?(Integer) || term.is_a?(String)
+      _term = Railspress::Term.find(term.to_i)
+    else
       if term.filter.blank? || 'raw' == term.filter
         _term = sanitize_term(term, taxonomy, 'raw')
         _term = Railspress::Term.new(_term)
       else
         _term = Railspress::Term.find(term.term_id)
       end
-    else
-      _term = Railspress::Term.find(term.to_i)
     end
 
     if _term.is_a? Railspress::WP_Error
@@ -547,6 +639,32 @@ module Railspress::TaxonomyLib
     get_term(term, taxonomy, output, filter)
   end
 
+  # TODO get_term_children
+
+  # Get sanitized Term field.
+  #
+  # The function is for contextual reasons and for simplicity of usage.
+  #
+  # @see sanitize_term_field()
+  #
+  # @param [string]      field    Term field to fetch.
+  # @param [int|WP_Term] term     Term ID or object.
+  # @param [string]      taxonomy Optional. Taxonomy Name. Default empty.
+  # @param [string]      context  Optional, default is display. Look at sanitize_term_field() for available options.
+  # @return [string|int|null|WP_Error] Will return an empty string if $term is not an object or if $field is not set in $term.
+  def get_term_field( field, term, taxonomy = '', context = 'display' )
+    term = get_term( term, taxonomy )
+    return term if term.is_a?(Railspress::WP_Error)
+
+    return '' unless term.is_a? Object
+
+    return '' if term.send(field).nil?
+
+    sanitize_term_field( field, term.send(field), term.term_id, term.taxonomy, context )
+  end
+
+  # TODO get_term_to_edit
+
   # Retrieve the terms in a given taxonomy or list of taxonomies.
   #
   # You can fully inject any customizations to the query before it is sent, as
@@ -606,6 +724,7 @@ module Railspress::TaxonomyLib
     apply_filters('get_terms', terms, term_query.query_vars['taxonomy'], term_query.query_vars, term_query)
   end
 
+  # TODO add_term_meta delete_term_meta get_term_meta update_term_meta update_termmeta_cache has_term_meta register_term_meta unregister_term_meta term_exists term_is_ancestor_of
 
   # Sanitize Term all fields.
   #

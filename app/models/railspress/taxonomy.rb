@@ -9,6 +9,7 @@ module Railspress
 
     include Load
     include Railspress::FormattingHelper
+    include Railspress::TaxonomyLib
 
     def self.find_sti_class type_name
       case type_name
@@ -41,6 +42,9 @@ module Railspress
 
     delegate :name, to: :term, allow_nil: true
     delegate :slug, to: :term, allow_nil: true
+
+    attr_accessor :labels
+    attr_accessor :label
 
     def set_defaults
       self.description = '' unless self.description_changed?
@@ -162,11 +166,11 @@ module Railspress
       end
 
       args.each_pair do |property_name, property_value|
-        # TODO $this->$property_name = $property_value
+        self.send(property_name + '=', property_value) if %w(label labels).include?(property_name) # TODO make attrs for all
       end
 
-   #   @labels = get_taxonomy_labels( self )
-   #   @label  = @labels.name
+     @labels = get_taxonomy_labels( self )
+     @label  = @labels['name']
 
     end
 
