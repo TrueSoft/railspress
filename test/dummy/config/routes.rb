@@ -9,7 +9,7 @@ Rails.application.routes.draw do
   get 'news/show/:id' => 'railspress/posts#show_id', constraints: {id: /\d+/}
   get 'news/tag/:slug' => 'railspress/posts#tag'
 
-  get 'page/*slug' => 'railspress/pages#show'
+  get 'test' => 'railspress/pages#test'
 
 #  mount Railspress::Engine => "/railspress"
 

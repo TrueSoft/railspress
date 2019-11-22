@@ -83,6 +83,10 @@ module Railspress
       end
     end
 
+    def test
+      
+    end
+
     private
 
     def default_filter

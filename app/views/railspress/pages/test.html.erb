@@ -1,0 +1,43 @@
+<%= content_tag :h2, "GeneralTemplateHelper" %>
+
+<%= content_tag :ul do %>
+  <%= content_tag :li, 'bloginfo()' + bloginfo %>
+  <% filter = 'display' %>
+  <%= content_tag :li, 'get_bloginfo(name)'   + get_bloginfo('name', filter) %>
+  <%= content_tag :li, 'get_bloginfo(description)'    + get_bloginfo('description', filter) %>
+  <%= content_tag :li, 'get_bloginfo(wpurl)'  + get_bloginfo('wpurl', filter) %>
+  <%= content_tag :li, 'get_bloginfo(url)'    + get_bloginfo('url', filter) %>
+  <%= content_tag :li, 'get_bloginfo(admin_email)'    + get_bloginfo('admin_email', filter) %>
+  <%= content_tag :li, 'get_bloginfo(charset)'    + get_bloginfo('charset', filter) %>
+  <%= content_tag :li, 'get_bloginfo(version)'    + get_bloginfo('version', filter) %>
+  <%= content_tag :li, 'get_bloginfo(html_type)'  + get_bloginfo('html_type', filter) %>
+  <%#= content_tag :li, 'get_bloginfo(text_direction)'     + get_bloginfo('text_direction', filter) %>
+  <%#= content_tag :li, 'get_bloginfo(language)'   + get_bloginfo('language', filter) %>
+  <%= content_tag :li, 'get_bloginfo(stylesheet_url)'     + get_bloginfo('stylesheet_url', filter) %>
+  <%= content_tag :li, 'get_bloginfo(stylesheet_directory)'   + get_bloginfo('stylesheet_directory', filter) %>
+  <%#= content_tag :li, 'get_bloginfo(template_url)'   + get_bloginfo('template_url', filter) %>
+  <%#= content_tag :li, 'get_bloginfo(pingback_url)'   + get_bloginfo('pingback_url', filter) %>
+  <%#= content_tag :li, 'get_bloginfo(atom_url)'   + get_bloginfo('atom_url', filter) %>
+  <%#= content_tag :li, 'get_bloginfo(rdf_url)'    + get_bloginfo('rdf_url', filter) %>
+  <%#= content_tag :li, 'get_bloginfo(rss_url)'    + get_bloginfo('rss_url', filter) %>
+  <%#= content_tag :li, 'get_bloginfo(rss2_url)'   + get_bloginfo('rss2_url', filter) %>
+  <%#= content_tag :li, 'get_bloginfo(comments_atom_url)'  + get_bloginfo('comments_atom_url', filter) %>
+  <%#= content_tag :li, 'get_bloginfo(comments_rss2_url)'  + get_bloginfo('comments_rss2_url', filter) %>
+<% end %>
+
+<table style="width:auto;">
+  <tbody>
+  <tr><th>ABSPATH</th><td><%= Railspress.ABSPATH; %></td></tr>
+  <tr><th>WPINC</th><td><%= Railspress.WPINC; %></td></tr>
+  <tr><th>UPLOADS</th><td><%= Railspress.UPLOADS; %></td></tr>
+  <tr><th>WP_CONTENT_DIR</th><td><%= Railspress.WP_CONTENT_DIR; %></td></tr>
+  <tr><th>WP_POST_REVISIONS</th><td><%= Railspress.WP_POST_REVISIONS; %></td></tr>
+  <tr><th>WP_PLUGIN_DIR</th><td><%= Railspress.WP_PLUGIN_DIR; %></td></tr>
+  <tr><th>WP_CONTENT_URL</th><td><%= Railspress.WP_CONTENT_URL; %></td></tr>
+  <tr><th>WP_PLUGIN_URL</th><td><%= Railspress.WP_PLUGIN_URL; %></td></tr>
+  <tr><th>get_post_type_archive_link(page)</th><td><%= get_post_type_archive_link('page') %></td></tr>
+  <tr><th>get_post_type_archive_link(post)</th><td><%= get_post_type_archive_link('post') %></td></tr>
+  <tr><th>get_post_type_object(post)</th><td><%#= get_post_type_object('post').inspect %></td></tr>
+  </tbody>
+</table>
+
