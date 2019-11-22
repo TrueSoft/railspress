@@ -363,24 +363,23 @@ module Railspress::NavMenuHelper
         elsif 'taxonomy' == menu_item.type
           object = get_taxonomy( menu_item.object )
           if object
-            menu_item.type_label = object.labels.singular_name
+            menu_item.type_label = object.labels['singular_name']
           else
             menu_item.type_label = menu_item.object
             menu_item._invalid   = true
           end
 
-          term_url       = get_term_link( menu_item.object_id.to_i, menu_item.object )
+          term_url       = get_term_link( menu_item.object_id_.to_i, menu_item.object )
           menu_item.url = term_url.is_a?(Railspress::WP_Error) ? '' : term_url
 
-          original_title = get_term_field( 'name', menu_item.object_id, menu_item.object, 'raw' )
+          original_title = get_term_field( 'name', menu_item.object_id_, menu_item.object, 'raw' )
 
-          original_title = # TODO ?? false
-          is_wp_error( original_title )
+          original_title = false if original_title.is_a?(Railspress::WP_Error)
 
-          menu_item.title = '' == menu_item.post_title ? $original_title : menu_item.post_title
+          menu_item.title = '' == menu_item.post_title ? original_title : menu_item.post_title
 
         else
-          menu_item.type_label = t( 'Custom Link' ) # TODO
+          menu_item.type_label = t('railspress.menu.custom_link')
           menu_item.title      = menu_item.post_title
           menu_item.url        = menu_item.url.blank? ? get_post_meta( menu_item.ID, '_menu_item_url', true ) : menu_item.url
           if params[:language] && params[:language] != I18n.default_locale.to_s && !menu_item.url.include?('?')
@@ -403,7 +402,7 @@ module Railspress::NavMenuHelper
       else
         menu_item.db_id            = 0
         menu_item.menu_item_parent = 0
-        menu_item.object_id        = menu_item.id.to_i
+        menu_item.object_id_        = menu_item.id.to_i
         menu_item.type             = 'post_type'
 
         object                = get_post_type_object( menu_item.post_type )
@@ -431,7 +430,7 @@ module Railspress::NavMenuHelper
       menu_item.ID               = menu_item.term_id
       menu_item.db_id            = 0
       menu_item.menu_item_parent = 0
-      menu_item.object_id        = menu_item.term_id.to_i
+      menu_item.object_id_       = menu_item.term_id.to_i
       menu_item.post_parent      = menu_item.parent.to_i
       menu_item.type             = 'taxonomy'
 

@@ -33,6 +33,9 @@ en:
         title: "Delete option"
         question: "Are you sure you want to delete the selected option?"
       destroy: "The record was deleted."
+    menu:
+      custom_link: "Custom Link"
+      home_label: "Home"
     pages:
       show:
         not_found: "The page with the name '%{slug}' is not found!"

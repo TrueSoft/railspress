@@ -33,6 +33,9 @@ ro:
         title: "Ștergere opțiune"
         question: "Sigur vrei să ștergi opțiunea selectată?"
       destroy: "Inregistrarea a fost ștearsă."
+    menu:
+      custom_link: "Legătură personalizată"
+      home_label: "Prima pagină"
     pages:
       show:
         not_found: "Pagina numele '%{slug}' nu este gasită!"
