@@ -40,6 +40,9 @@ module Railspress::TaxonomyLib
           },
           post_format: post_format_base ? {'slug' => post_format_base} : false,
       }
+      # The below lines fix the wp_rewrite.extra_permastructs[...][struct] value. It was not prefixed with @front, but with @root
+      rewrite[:category].delete('with_front') if rewrite[:category]['with_front'].nil?
+      rewrite[:post_tag].delete('with_front') if rewrite[:post_tag]['with_front'].nil?
     end
     register_taxonomy('category',
                       'post',

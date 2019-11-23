@@ -291,7 +291,7 @@ module Railspress
       return false if @permalink_structure.blank?
 
       # If the index is not in the permalink, we're using mod_rewrite.
-      @permalink_structure.match( /^\/*#{@index}/).blank?
+      @permalink_structure.match( /^\/*#{@index}/)
     end
 
     # Determines whether permalinks are being used and rewrite module is enabled.
