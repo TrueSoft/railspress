@@ -583,8 +583,8 @@ module Railspress::PostsHelper
   # @return WP_Post_Type|null WP_Post_Type object if it exists, null otherwise.
   def get_post_type_object(post_type)
 
-    if !( post_type.is_a?(Numeric) || post_type.is_a?(String) || post_type.is_a?(FalseClass) || post_type.is_a?(TrueClass)) || Railspress.GLOBAL.wp_post_types[ post_type ].blank?
-        return nil
+    if !Railspress::PHP.is_scalar(post_type) || Railspress.GLOBAL.wp_post_types[post_type].blank?
+      return nil
     end
 
     Railspress.GLOBAL.wp_post_types[post_type]

@@ -1,4 +1,13 @@
 module Railspress::PHP
+
+  def self.is_array(var)
+    var.is_a? Array or var.is_a? Hash
+  end
+
+  def self.is_scalar(var)
+    var.is_a?(Numeric) || var.is_a?(String) || var.is_a?(FalseClass) || var.is_a?(TrueClass)
+  end
+
   def self.print_r(inHash, *indent)
     output = ''
     @indent = indent.join

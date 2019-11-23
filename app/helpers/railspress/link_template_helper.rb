@@ -225,7 +225,7 @@ module Railspress::LinkTemplateHelper
 
     return false unless post_type_obj.has_archive
 
-    if get_option( 'permalink_structure' ) && is_array( post_type_obj.rewrite )
+    if get_option( 'permalink_structure' ) && PHP.is_array( post_type_obj.rewrite )
       struct = ( true == post_type_obj.has_archive ) ? post_type_obj.rewrite['slug'] : post_type_obj.has_archive
       if post_type_obj.rewrite['with_front']
         struct = wp_rewrite.front + struct;
