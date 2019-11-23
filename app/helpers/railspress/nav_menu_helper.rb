@@ -411,7 +411,7 @@ module Railspress::NavMenuHelper
 
         if menu_item.post_title.blank?
           # translators: %d: ID of a post
-          menu_item.post_title = sprintf( t( '#%d (no title)' ), menu_item.id )
+          menu_item.post_title = t('railspress.post.show.no_title', id: menu_item.id)
         end
 
         menu_item.title  = menu_item.post_title
