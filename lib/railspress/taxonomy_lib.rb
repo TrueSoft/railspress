@@ -5,6 +5,8 @@
 =end
 require 'railspress/functions'
 module Railspress::TaxonomyLib
+
+  include Railspress::OptionsHelper
   include Railspress::Functions
   include Railspress::Plugin
 
@@ -14,12 +16,31 @@ module Railspress::TaxonomyLib
   # backward compatibility reasons), and again on the {@see 'init'} action. We must
   # avoid registering rewrite rules before the {@see 'init'} action.
   def create_initial_taxonomies
-    # TODO if ! did_action( 'init' )  ...
+    if false # ! did_action( 'init' )  ...
     rewrite = {
         category:    false,
         post_tag:    false,
         post_format: false,
     }
+    else
+      # Filters the post formats rewrite base.
+      post_format_base = apply_filters('post_format_rewrite_base', 'type')
+      rewrite = {
+          category: {
+              'hierarchical' => true,
+              'slug' => get_option('category_base').blank? ? 'category' : get_option('category_base') ,
+              'with_front' => !get_option('category_base') || Railspress.GLOBAL.wp_rewrite.using_index_permalinks,
+              'ep_mask' => :EP_CATEGORIES,
+          },
+          post_tag: {
+              'hierarchical' => false,
+              'slug' => get_option('tag_base').blank? ? 'tag' : get_option('tag_base'),
+              'with_front' => !get_option('tag_base') || Railspress.GLOBAL.wp_rewrite.using_index_permalinks,
+              'ep_mask' => :EP_TAGS,
+          },
+          post_format: post_format_base ? {'slug' => post_format_base} : false,
+      }
+    end
     register_taxonomy('category',
                       'post',
                       {
@@ -204,7 +225,7 @@ module Railspress::TaxonomyLib
     global_tax = Railspress.GLOBAL.wp_taxonomies[taxonomy]
     return global_tax unless global_tax.nil?
 
-    Railspress::Taxonomy.where(taxonomy: taxonomy).all
+    Railspress::Taxonomy.where(taxonomy: taxonomy).first
   end
 
   # Determines whether the taxonomy name exists.
@@ -963,40 +984,42 @@ module Railspress::TaxonomyLib
 
     return term if term.is_a? Railspress::WP_Error
 
-    taxonomy = term.taxonomy
+  #  taxonomy = term.taxonomy
 
-    termlink = 'news/tag/%post_tag%' # TODO GLOBAL.wp_rewrite.get_extra_permastruct(taxonomy)
-
+    termlink = Railspress.GLOBAL.wp_rewrite.get_extra_permastruct(taxonomy)
     # Filters the permalink structure for a terms before token replacement occurs.
     termlink = apply_filters('pre_term_link', termlink, term)
 
     slug = term.slug
     t    = get_taxonomy(taxonomy)
-
     if termlink.blank?
       if 'category' == taxonomy
         termlink = {cat: term.term_id} # '?cat=' + term.term_id
-        # elsif t.query_var
-        #    termlink = "?$t->query_var=$slug";
+      elsif t.query_var
+        termlink = "?#{t.query_var}=#{slug}"
       else
-        termlink = {taxonomy: taxonomy, term: slug} # "?taxonomy=$taxonomy&term=$slug";
+        termlink =  {taxonomy: taxonomy, term: slug} # "?taxonomy=$taxonomy&term=$slug";
       end
       termlink = main_app.root_url(termlink)
     else
-      if false # TODO t.rewrite['hierarchical']
-        # $hierarchical_slugs = array();
-        # $ancestors          = get_ancestors( $term->term_id, $taxonomy, 'taxonomy' );
+      if t.rewrite['hierarchical']
+        hierarchical_slugs = []
+        # TODO ancestors          = get_ancestors( term.term_id, taxonomy, 'taxonomy' )
         # foreach ( (array) $ancestors as $ancestor ) {
         #     $ancestor_term        = get_term( $ancestor, $taxonomy );
         # $hierarchical_slugs[] = $ancestor_term->slug;
         # }
-        # $hierarchical_slugs   = array_reverse( $hierarchical_slugs );
-        # $hierarchical_slugs[] = $slug;
-        # $termlink             = str_replace( "%$taxonomy%", implode( '/', $hierarchical_slugs ), $termlink );
+        hierarchical_slugs   = hierarchical_slugs.reverse
+        hierarchical_slugs << slug
+        termlink = termlink.gsub( "%#{taxonomy}%", hierarchical_slugs.join('/'))
       else
-        termlink = termlink.gsub("%#{taxonomy.taxonomy}%", slug)
+        termlink = termlink.gsub("%#{taxonomy}%", slug)
       end
-      termlink = main_app.root_url + termlink # home_url( user_trailingslashit( termlink, 'category' ) )
+      termlink = if Railspress.links_to_wp
+                   home_url(user_trailingslashit(termlink, 'category'))
+                 else
+                   untrailingslashit(main_app.root_url) + termlink
+                 end
     end
     # Back Compat filters.
     if 'post_tag' == taxonomy

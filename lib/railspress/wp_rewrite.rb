@@ -291,7 +291,7 @@ module Railspress
       return false if @permalink_structure.blank?
 
       # If the index is not in the permalink, we're using mod_rewrite.
-      @permalink_structure.match '#^/*' + @index + '#'
+      @permalink_structure.match( /^\/*#{@index}/).blank?
     end
 
     # Determines whether permalinks are being used and rewrite module is enabled.
@@ -405,6 +405,102 @@ module Railspress
 
     # TODO implement class-wp-rewrite.php get_feed_permastruct, get_comment_feed_permastruct
 
+    # Adds or updates existing rewrite tags (e.g. %postname%).
+    #
+    # If the tag already exists, replace the existing pattern and query for
+    # that tag, otherwise add the new tag.
+    #
+    # @see WP_Rewrite::$rewritecode
+    # @see WP_Rewrite::$rewritereplace
+    # @see WP_Rewrite::$queryreplace
+    #
+    # @param [string] tag   Name of the rewrite tag to add or update.
+    # @param [string] regex Regular expression to substitute the tag for in rewrite rules.
+    # @param [string] query String to append to the rewritten query. Must end in '='.
+    def add_rewrite_tag(tag, regex, query)
+      position = @rewritecode.index(tag)
+      if !position.nil?
+        @rewritereplace[position] = regex
+        @queryreplace[position] = query
+      else
+        @rewritecode << tag
+        @rewritereplace << regex
+        @queryreplace << query
+      end
+    end
+
+    # TODO implement class-wp-rewrite.php remove_rewrite_tag generate_rewrite_rules generate_rewrite_rule rewrite_rules wp_rewrite_rules mod_rewrite_rules iis7_url_rewrite_rules add_rule add_external_rule add_endpoint
+
+    # Adds a new permalink structure.
+    #
+    # A permalink structure (permastruct) is an abstract definition of a set of rewrite rules;
+    # it is an easy way of expressing a set of regular expressions that rewrite to a set of
+    # query strings. The new permastruct is added to the WP_Rewrite::$extra_permastructs array.
+    #
+    # When the rewrite rules are built by WP_Rewrite::rewrite_rules(), all of these extra
+    # permastructs are passed to WP_Rewrite::generate_rewrite_rules() which transforms them
+    # into the regular expressions that many love to hate.
+    #
+    # The `args` parameter gives you control over how WP_Rewrite::generate_rewrite_rules()
+    # works on the new permastruct.
+    #
+    # @since 2.5.0
+    #
+    # @param [string] name   Name for permalink structure.
+    # @param [string] struct Permalink structure (e.g. category/%category%)
+    # @param [array]  args   {
+    #     Optional. Arguments for building rewrite rules based on the permalink structure.
+    #     Default empty array.
+    #
+    #     @type bool $with_front  Whether the structure should be prepended with `WP_Rewrite::$front`.
+    #                             Default true.
+    #     @type int  $ep_mask     The endpoint mask defining which endpoints are added to the structure.
+    #                             Accepts `EP_NONE`, `EP_PERMALINK`, `EP_ATTACHMENT`, `EP_DATE`, `EP_YEAR`,
+    #                             `EP_MONTH`, `EP_DAY`, `EP_ROOT`, `EP_COMMENTS`, `EP_SEARCH`, `EP_CATEGORIES`,
+    #                             `EP_TAGS`, `EP_AUTHORS`, `EP_PAGES`, `EP_ALL_ARCHIVES`, and `EP_ALL`.
+    #                             Default `EP_NONE`.
+    #     @type bool $paged       Whether archive pagination rules should be added for the structure.
+    #                             Default true.
+    #     @type bool $feed        Whether feed rewrite rules should be added for the structure. Default true.
+    #     @type bool $forcomments Whether the feed rules should be a query for a comments feed. Default false.
+    #     @type bool $walk_dirs   Whether the 'directories' making up the structure should be walked over
+    #                             and rewrite rules built for each in-turn. Default true.
+    #     @type bool $endpoints   Whether endpoints should be applied to the generated rules. Default true.
+    # }
+    def add_permastruct(name, struct, args = {})
+      # Back-compat for the old parameters: $with_front and $ep_mask.
+      args = {'with_front' => args} unless args.is_a? Hash
+      # args['ep_mask'] = func_get_arg( 3 ) if ( func_num_args() == 4 )
+
+      defaults = {
+          'with_front' => true,
+          'ep_mask' => :EP_NONE,
+          'paged' => true,
+          'feed' => true,
+          'forcomments' => false,
+          'walk_dirs' => true,
+          'endpoints' => true,
+      }
+      args = args.select {|k, _| defaults.include? k}
+      args = Functions.wp_parse_args(args, defaults)
+
+      if args['with_front']
+        struct = @front + struct
+      else
+        struct = @root + struct
+      end
+      args['struct'] = struct
+
+      @extra_permastructs[name] = args
+    end
+
+    # Removes a permalink structure.
+    #
+    # @param [string] name Name for permalink structure.
+    def remove_permastruct(name)
+      @extra_permastructs.delete(name)
+    end
+
     # Sets up the object's properties.
     #
     # The 'use_verbose_page_rules' object property will be set to true if the
@@ -445,6 +541,7 @@ module Railspress
       end
     end
 
+    # TS_INFO: set_permalink_structure, set_category_base, set_tag_base will not be called
 
   end
 end

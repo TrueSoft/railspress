@@ -45,6 +45,13 @@ module Railspress
 
     attr_accessor :labels
     attr_accessor :label
+    attr_accessor :rewrite
+    attr_accessor :query_var
+
+    def initialize(attributes = nil)
+      super(attributes)
+      @name = attributes[:taxonomy]
+    end
 
     def set_defaults
       self.description = '' unless self.description_changed?
@@ -166,7 +173,7 @@ module Railspress
       end
 
       args.each_pair do |property_name, property_value|
-        self.send(property_name + '=', property_value) if %w(label labels).include?(property_name) # TODO make attrs for all
+        self.send(property_name + '=', property_value) if %w(label labels rewrite query_var).include?(property_name) # TODO make attrs for all
       end
 
      @labels = get_taxonomy_labels( self )
@@ -174,8 +181,20 @@ module Railspress
 
     end
 
+    # Adds the necessary rewrite rules for the taxonomy.
     def add_rewrite_rules
-      # TODO implement from class class-wp-taxonomy.php
+      # Non-publicly queryable taxonomies should not register query vars, except in the admin.
+#      wp.add_query_var(@query_var) if (false != @query_var && wp)
+
+      if false != @rewrite && (is_admin || '' != Railspress.GLOBAL.wp_rewrite.permalink_structure) # instead get_option('permalink_structure'))
+        if @hierarchical && @rewrite['hierarchical']
+          tag = '(.+?)'
+        else
+          tag = '([^/]+)'
+        end
+        Railspress.GLOBAL.wp_rewrite.add_rewrite_tag("%#{@name}%", tag, @query_var ? "#{@query_var}=" : "taxonomy=#{@name}&term=")
+        Railspress.GLOBAL.wp_rewrite.add_permastruct(@name, "#{@rewrite['slug']}/%#{@name}%", @rewrite)
+      end
     end
 
     def add_hooks

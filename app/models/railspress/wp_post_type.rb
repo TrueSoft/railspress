@@ -418,7 +418,43 @@ module Railspress
 
     # Adds the necessary rewrite rules for the post type.
     def add_rewrite_rules
-      # TODO implement class-wp-post-type.php add_rewrite_rules()
+      # global $wp_rewrite, $wp;
+
+      # if ( false != @query_var && $wp && is_post_type_viewable( self ) )
+      #   $wp->add_query_var( @query_var )
+      # end
+
+      if ( false != @rewrite && ( is_admin() || !get_option( 'permalink_structure' ).blank? ) )
+        if @hierarchical
+          add_rewrite_tag( "%#{@name}%", '(.+?)', @query_var ? "#{@query_var}=" : "post_type=#{@name}&pagename=" )
+        else
+          add_rewrite_tag( "%#{@name}%", '([^/]+)', @query_var ? "#{@query_var}=" : "post_type=#{@name}&name=" )
+        end
+
+        if @has_archive
+          archive_slug = true == @has_archive ? @rewrite['slug'] : @has_archive
+          if @rewrite['with_front']
+            archive_slug = Railspress.GLOBAL.wp_rewrite.front[1..-1] + archive_slug
+          else
+            archive_slug = @root + archive_slug;
+          end
+
+          # TODO continue
+          # add_rewrite_rule( "#{archive_slug}/?$", "index.php?post_type=#{@name}", 'top' )
+          # if ( @rewrite['feeds'] && Railspress.GLOBAL.wp_rewrite.feeds )
+          #   feeds = '(' + Railspress.GLOBAL.wp_rewrite.feeds.join('|').strip   + ')'
+          #   add_rewrite_rule( "#{archive_slug}/feed/#{feeds}/?$", "index.php?post_type=#{@name}" + '&feed=$matches[1]', 'top' )
+          #   add_rewrite_rule( "#{archive_slug}/#{feeds}/?$", "index.php?post_type=#{@name}" + '&feed=$matches[1]', 'top' )
+          # end
+          # if @rewrite['pages']
+          #   add_rewrite_rule( "{$archive_slug}/{$wp_rewrite->pagination_base}/([0-9]{1,})/?$", "index.php?post_type=$this->name" + '&paged=$matches[1]', 'top' )
+          # end
+        end
+
+        permastruct_args         = @rewrite
+        permastruct_args['feed'] = permastruct_args['feeds']
+        Railspress.GLOBAL.wp_rewrite.add_permastruct( @name, "#{@rewrite['slug']}/%#{@name}%", permastruct_args )
+      end
     end
 
     # Registers the post type meta box if a custom callback was specified.
