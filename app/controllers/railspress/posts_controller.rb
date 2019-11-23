@@ -39,17 +39,6 @@ module Railspress
       redirect_to news_path, alert: t('railspress.post.show.not_found', slug: params[:slug])
     end
 
-    def show_id
-      @post = Railspress::Post.published.where(id: params[:id]).first!
-      @post_prev, @post_next = neighbours(@post)
-      @breadcrumb = {t('railspress.post.index.title') => main_app.all_posts_path}
-      @breadcrumb[@post.post_date.year] = news_of_year_path(year: @post.post_date.year) unless @post.post_date.year == Date.current.year
-      @breadcrumb[@post.post_title] = nil
-      render action: :show
-    rescue ActiveRecord::RecordNotFound
-      redirect_to news_path, alert: t('railspress.post.show.id_not_found', id: params[:id])
-    end
-
     def tag
       @tag = Railspress::Term.joins(:taxonomy).where(Railspress::Taxonomy.table_name => {taxonomy: 'post_tag'}, slug: params[:slug]).first!
       @breadcrumb = {t('railspress.post.index.title') => main_app.all_posts_path}
