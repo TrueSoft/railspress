@@ -26,6 +26,7 @@ en:
         save: "The option was saved successfully."
         error_not_unique: "The option %{name} already exists."
       edit:
+        title: "Edit option"
         error_not_found: "Invalid option"
       update:
         save: "The changes have been saved."

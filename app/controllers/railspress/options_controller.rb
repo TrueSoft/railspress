@@ -6,13 +6,19 @@ module Railspress
       @options = get_display_options
       @option = Railspress::Option.new
       @options << @option
+      if Railspress.generate_breadcrumb
+        @breadcrumb = {t('railspress.option.index.title') => main_app.admin_options_path}
+      end
     end
 
     def new
       @options = get_display_options
       @option = Railspress::Option.new
       @options << @option # if @option.new_record?
-      @breadcrumb[t('railspress.option.new.title')] = nil
+      if Railspress.generate_breadcrumb
+        @breadcrumb = {t('railspress.option.index.title') => main_app.admin_options_path}
+        @breadcrumb[t('railspress.option.new.title')] = nil
+      end
       render action: :index
     end
 
@@ -24,7 +30,10 @@ module Railspress
       else
         @options = get_display_options
         @options << @option # if @option.new_record?
-        @breadcrumb[t('railspress.option.new.title')] = nil if @breadcrumb # TODO implement breadcrumb
+        if Railspress.generate_breadcrumb
+          @breadcrumb = {t('railspress.option.index.title') => main_app.admin_options_path}
+          @breadcrumb[t('railspress.option.new.title')] = nil
+        end
         render action: :index
       end
     rescue ActiveRecord::RecordNotUnique
@@ -36,6 +45,10 @@ module Railspress
     def edit
       @options = get_display_options
       @option = Railspress::Option.find(params[:id])
+      if Railspress.generate_breadcrumb
+        @breadcrumb = {t('railspress.option.index.title') => main_app.admin_options_path}
+        @breadcrumb[t('railspress.option.edit.title')] = nil
+      end
       render action: :index
     rescue ActiveRecord::RecordNotFound
       flash[:error] = t('railspress.option.edit.error_not_found')
@@ -84,10 +97,6 @@ module Railspress
         opts += Railspress::Option.where('option_name LIKE ?', opt_name.gsub(/\*/, '%')).to_a
       end
       opts
-    end
-
-    def breadcrumb_items
-      super.merge(t('railspress.option.index.title') => options_path)
     end
 
     def model_params

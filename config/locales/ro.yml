@@ -26,6 +26,7 @@ ro:
         save: "Opțiunea a fost salvată cu succes."
         error_not_unique: "Opțiunea cu numele %{name} există deja."
       edit:
+        title: "Editare opțiune"
         error_not_found: "Opțiunea nu este validă"
       update:
         save: "Modificarile au fost salvate."

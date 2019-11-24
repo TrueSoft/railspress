@@ -32,17 +32,21 @@ module Railspress
     def show
       @post = Railspress::Post.published.where(post_name: params[:slug]).first!
       @post_prev, @post_next = neighbours(@post)
-      @breadcrumb = {t('railspress.post.index.title') => main_app.all_posts_path}
-      @breadcrumb[@post.post_date.year] = news_of_year_path(year: @post.post_date.year) unless @post.post_date.year == Date.current.year
-      @breadcrumb[@post.post_title] = nil
+      if Railspress.generate_breadcrumb
+        @breadcrumb = {t('railspress.post.index.title') => main_app.all_posts_path}
+        @breadcrumb[@post.post_date.year] = news_of_year_path(year: @post.post_date.year) unless @post.post_date.year == Date.current.year
+        @breadcrumb[@post.post_title] = nil
+      end
     rescue ActiveRecord::RecordNotFound
       redirect_to main_app.all_posts_path, alert: t('railspress.post.show.not_found', slug: params[:slug])
     end
 
     def category
       @archive = Railspress::Term.joins(:taxonomy).where(Railspress::Taxonomy.table_name => {taxonomy: 'category'}, slug: params[:slug]).first!
-      @breadcrumb = {t('railspress.post.index.title') => main_app.all_posts_path}
-      @breadcrumb[@archive.name] = nil
+      if Railspress.generate_breadcrumb
+        @breadcrumb = {t('railspress.post.index.title') => main_app.all_posts_path}
+        @breadcrumb[@archive.name] = nil
+      end
       posts_for_tag = Railspress::Relationship.where(term_taxonomy_id: @archive.taxonomy.term_taxonomy_id).pluck(:object_id)
       flt = default_filter
       flt[:id] = posts_for_tag
@@ -58,8 +62,10 @@ module Railspress
 
     def tag
       @archive = Railspress::Term.joins(:taxonomy).where(Railspress::Taxonomy.table_name => {taxonomy: 'post_tag'}, slug: params[:slug]).first!
-      @breadcrumb = {t('railspress.post.index.title') => main_app.all_posts_path}
-      @breadcrumb[@archive.name] = nil
+      if Railspress.generate_breadcrumb
+        @breadcrumb = {t('railspress.post.index.title') => main_app.all_posts_path}
+        @breadcrumb[@archive.name] = nil
+      end
       posts_for_tag = Railspress::Relationship.where(term_taxonomy_id: @archive.taxonomy.term_taxonomy_id).pluck(:object_id)
       flt = default_filter
       flt[:id] = posts_for_tag

@@ -71,11 +71,13 @@ module Railspress
           @revision_post_date_title_format = prdtf.first.meta_value unless prdtf.empty?
         end
         unless @is_revision
-          has_breadcrumb = (@page.metas.select { |meta|  meta.meta_key == 'breadcrumb' and meta.meta_value == '0' }.empty?)
-          if has_breadcrumb
-            @breadcrumb = {}
-            ancestors.each do |page|
-              @breadcrumb[page.post_title] = main_app.show_page_path(helpers.get_page_uri(page))
+          if Railspress.generate_breadcrumb
+            has_breadcrumb = (@page.metas.select {|meta| meta.meta_key == 'breadcrumb' and meta.meta_value == '0'}.empty?)
+            if has_breadcrumb
+              @breadcrumb = {}
+              ancestors.each do |page|
+                @breadcrumb[page.post_title] = main_app.show_page_path(helpers.get_page_uri(page))
+              end
             end
           end
         end
