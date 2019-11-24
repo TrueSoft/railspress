@@ -257,7 +257,51 @@ module Railspress::PostTemplateHelper
     classes.uniq
   end
 
-    ##
+
+  # Displays the class names for the body element.
+  #
+  # @param [string|string[]] class_ Space-separated string or array of class names to add to the class list.
+  def body_class( class_ = '' )
+    # Separates class names with a single space, collates class names for body element
+    'class="' + get_body_class( class_ ).join(' ') + '"'
+  end
+
+  # Retrieves an array of the class names for the body element.
+  #
+  # @global WP_Query $wp_query
+  #
+  # @param [string|string[]] class_ Space-separated string or array of class names to add to the class list.
+  # @return string[] Array of class names.
+  def get_body_class(class_ = '')
+    # global $wp_query;
+
+    classes = []
+
+    # classes << 'rtl' if is_rtl()
+    # classes << 'home' if is_front_page()
+    # classes << 'blog' if is_home()
+    # classes << 'privacy-policy' if is_privacy_policy()
+    classes << 'archive' if !@archive.nil? # is_archive()
+    # classes << 'date' if is_date()
+
+    # TODO continue get_body_class
+
+    if !class_.blank?
+      class_ = class_.split(/\s+/) if !class_.is_a?(Array)
+      classes += class_
+    else
+      # Ensure that we always coerce class to being an array.
+      class_ = []
+    end
+
+    classes = classes.map(&method(:esc_attr))
+
+    # Filters the list of CSS body class names for the current post or page.
+    classes = apply_filters('body_class', classes, class_)
+    classes.uniq
+  end
+
+  ##
   ## Page Template Functions for usage in Themes
   ##
 
@@ -273,7 +317,7 @@ module Railspress::PostTemplateHelper
   #
   # @see get_pages()
   #
-  # @param array|string $args {
+  # @param [array|string] args {
   #     Optional. Array or string of arguments to generate a list of pages. See `get_pages()` for additional arguments.
   #
   #     @type int          $child_of     Display only the sub-pages of a single page by ID. Default 0 (all pages).
