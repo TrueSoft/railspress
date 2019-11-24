@@ -6,7 +6,6 @@ Railspress::Engine.routes.draw do
   get 'posts/:year' => 'posts#by_year', constraints: {year: /20[12]\d/}, as: :news_of_year
   get 'posts/:year/:month' => 'posts#by_month', constraints: {year: /20[12]\d/, month: /(0?\d)|10|11|12/}
   get 'posts/:slug' => 'posts#show'
-  get 'posts/show/:id' => 'posts#show_id', constraints: {id: /\d+/}
   get 'posts/tag/:slug' => 'posts#tag'
 
   get '*slug' => 'pages#show'
