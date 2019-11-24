@@ -68,6 +68,11 @@ module Railspress
     # # @var bool
     # attr_accessible :is_page = false;
 
+    # Signifies whether the current query is for an archive.
+    #
+    # @var bool
+    attr_accessor :is_archive
+
     # Signifies whether the current query is for a category archive.
     #
     # @var bool
@@ -111,7 +116,7 @@ module Railspress
       # @is_single            = false
       # @is_preview           = false
       # @is_page              = false
-      # @is_archive           = false
+      @is_archive           = false
       # @is_date              = false
       # @is_year              = false
       # @is_month             = false
@@ -354,5 +359,45 @@ module Railspress
     def initialize(p_query = '')
       query(p_query) unless p_query.nil?
     end
+
+    # Is the query for an existing archive page?
+    #
+    # Month, Year, Category, Author, Post Type archive...
+    #
+    # @return bool
+    def is_archive?
+      @is_archive
+    end
+
+  # TODO is_post_type_archive is_attachment is_author
+    # Is the query for an existing category archive page?
+    #
+    # If the $category parameter is specified, this function will additionally
+    # check if the query is for one of the categories specified.
+    #
+    # @param [mixed] category Optional. Category ID, name, slug, or array of Category IDs, names, and slugs.
+    # @return bool
+    def is_category?( category = '' )
+      return false unless @is_category
+
+      # return true if @archive.is_a?
+      # return true if category.blank?
+      #
+      # cat_obj = get_queried_object
+      #
+      # category = array_map( 'strval', (array) category )
+      #
+      # if ( in_array( (string) $cat_obj->term_id, $category ) )
+      #     return true;
+      # elsif ( in_array( $cat_obj->name, $category ) )
+      #   return true;
+      # elsif ( in_array( $cat_obj->slug, $category ) )
+      #   return true;
+      # end
+
+      false
+      end
+
+
   end
 end

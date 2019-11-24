@@ -36,14 +36,14 @@ module Railspress
       @breadcrumb[@post.post_date.year] = news_of_year_path(year: @post.post_date.year) unless @post.post_date.year == Date.current.year
       @breadcrumb[@post.post_title] = nil
     rescue ActiveRecord::RecordNotFound
-      redirect_to news_path, alert: t('railspress.post.show.not_found', slug: params[:slug])
+      redirect_to main_app.all_posts_path, alert: t('railspress.post.show.not_found', slug: params[:slug])
     end
 
-    def tag
-      @tag = Railspress::Term.joins(:taxonomy).where(Railspress::Taxonomy.table_name => {taxonomy: 'post_tag'}, slug: params[:slug]).first!
+    def category
+      @archive = Railspress::Term.joins(:taxonomy).where(Railspress::Taxonomy.table_name => {taxonomy: 'category'}, slug: params[:slug]).first!
       @breadcrumb = {t('railspress.post.index.title') => main_app.all_posts_path}
-      @breadcrumb[@tag.name] = nil
-      posts_for_tag = Railspress::Relationship.where(term_taxonomy_id: @tag.taxonomy.term_taxonomy_id).pluck(:object_id)
+      @breadcrumb[@archive.name] = nil
+      posts_for_tag = Railspress::Relationship.where(term_taxonomy_id: @archive.taxonomy.term_taxonomy_id).pluck(:object_id)
       flt = default_filter
       flt[:id] = posts_for_tag
       if Railspress.multi_language
@@ -51,7 +51,24 @@ module Railspress
       else
         @posts = Railspress::Post.published.descending.where(flt).paginate(page: params[:page], per_page: helpers.get_option('posts_per_page', nil))
       end
-      render action: :index
+      render action: :archive
+    rescue ActiveRecord::RecordNotFound
+      redirect_to main_app.all_posts_path, alert: t('railspress.category.not_found', slug: params[:slug])
+    end
+
+    def tag
+      @archive = Railspress::Term.joins(:taxonomy).where(Railspress::Taxonomy.table_name => {taxonomy: 'post_tag'}, slug: params[:slug]).first!
+      @breadcrumb = {t('railspress.post.index.title') => main_app.all_posts_path}
+      @breadcrumb[@archive.name] = nil
+      posts_for_tag = Railspress::Relationship.where(term_taxonomy_id: @archive.taxonomy.term_taxonomy_id).pluck(:object_id)
+      flt = default_filter
+      flt[:id] = posts_for_tag
+      if Railspress.multi_language
+        @posts = Railspress::Post.published.descending.joins(:languages).where(flt).paginate(page: params[:page], per_page: helpers.get_option('posts_per_page', nil))
+      else
+        @posts = Railspress::Post.published.descending.where(flt).paginate(page: params[:page], per_page: helpers.get_option('posts_per_page', nil))
+      end
+      render action: :archive
     rescue ActiveRecord::RecordNotFound
       redirect_to main_app.all_posts_path, alert: t('railspress.tag.not_found', slug: params[:slug])
     end

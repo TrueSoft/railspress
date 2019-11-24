@@ -1,0 +1,20 @@
+<%#
+ * Template part for displaying a message that posts cannot be found
+ *
+ * @link https://developer.wordpress.org/themes/basics/template-hierarchy/
+%>
+<section class="no-results not-found">
+  <header class="page-header">
+    <%= content_tag :h1, t('railspress.post.archive.none'), class: 'page-title' %>
+  </header><!-- .page-header -->
+
+  <div class="page-content">
+    <% if false # is_search() %>
+      <%= content_tag :p, t('railspress.post.archive.none_search') %>
+      <%# get_search_form %>
+    <% else %>
+      <%= content_tag :p, t('railspress.post.archive.none_text') %>
+      <%# get_search_form %>
+    <% end %>
+  </div><!-- .page-content -->
+</section><!-- .no-results -->

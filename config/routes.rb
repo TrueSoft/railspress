@@ -7,6 +7,7 @@ Railspress::Engine.routes.draw do
   get 'posts/:year/:month' => 'posts#by_month', constraints: {year: /20[12]\d/, month: /(0?\d)|10|11|12/}
   get 'posts/:slug' => 'posts#show'
   get 'posts/tag/:slug' => 'posts#tag'
+  get 'posts/category/:slug' => 'posts#category'
 
   get '*slug' => 'pages#show'
   get '/' => 'pages#home'

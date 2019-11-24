@@ -51,6 +51,19 @@ en:
         newer: "Newer posts"
         prev_page: "&laquo; Previous Page"
         next_page: "Next Page &raquo;"
+      archive:
+        title:
+          category: "Category: %{name}"
+          tag: "Tag: %{name}"
+          author: "Author: %{name}"
+          year: "Year: %{name}"
+          month: "Month: %{name}"
+          day: "Day: %{name}"
+          other: "Archives: %{name}"
+        none: "Nothing Found"
+        none_search: "Sorry, but nothing matched your search terms. Please try again with some different keywords."
+        none_text: "It seems we can’t find what you’re looking for. Perhaps searching can help."
+
       show:
         title_protected: "Protected: %{title}"
         title_private: "Private: %{title}"
@@ -68,6 +81,9 @@ en:
 
         not_found: "The post with the name '%{slug}' is not found!"
         id_not_found: "The post with the id '%{id}' is not found!"
+    category:
+      uncategorized: "Uncategorized"
+      not_found: "The category '%{slug}' is not found!"
     tag:
       not_found: "The tag '%{slug}' is not found!"
     invalid_term: "Empty Term."

@@ -258,6 +258,78 @@ module Railspress::GeneralTemplateHelper
 
   # TODO wp_get_document_title, _wp_render_title_tag, wp_title, single_post_title, post_type_archive_title, single_cat_title, ...
 
+
+  # Display the archive title based on the queried object.
+  #
+  # @see get_the_archive_title()
+  #
+  # @param [string] before Optional. Content to prepend to the title. Default empty.
+  # @param [string] after  Optional. Content to append to the title. Default empty.
+  def the_archive_title( before = '', after = '' )
+    title = get_the_archive_title
+
+    unless title.blank?
+      (before + title + after).html_safe
+    end
+  end
+
+  # Retrieve the archive title based on the queried object.
+  #
+  # @return [string] Archive title.
+  def get_the_archive_title()
+    if @archive.taxonomy.is_a?(Railspress::Category) # is_category()
+      # translators: Category archive title. %s: Category name
+      title = t('railspress.post.archive.title.category', name: @archive.name) # sprintf( __( 'Category: %s' ), single_cat_title( '', false ) )
+    elsif @archive.taxonomy.is_a?(Railspress::PostTag) # is_tag()
+      # translators: Tag archive title. %s: Tag name
+      title = t('railspress.post.archive.title.tag', name: @archive.name) # sprintf( __( 'Tag: %s' ), single_tag_title( '', false ) )
+    # elsif ( is_author() )
+    #   # translators: Author archive title. %s: Author name
+    #   title = sprintf( __( 'Author: %s' ), '<span class="vcard">' + get_the_author() + '</span>' )
+    # elsif ( is_year() )
+    #   # translators: Yearly archive title. %s: Year
+    #   title = sprintf( __( 'Year: %s' ), get_the_date( _x( 'Y', 'yearly archives date format' ) ) )
+    # elsif ( is_month() )
+    #   # translators: Monthly archive title. %s: Month name and year
+    #   title = sprintf( __( 'Month: %s' ), get_the_date( _x( 'F Y', 'monthly archives date format' ) ) )
+    # elsif ( is_day() )
+    #   # translators: Daily archive title. %s: Date
+    #   title = sprintf( __( 'Day: %s' ), get_the_date( _x( 'F j, Y', 'daily archives date format' ) ) )
+    # elsif ( is_tax( 'post_format' ) )
+      #	if ( is_tax( 'post_format', 'post-format-aside' ) ) {
+      #		title = _x( 'Asides', 'post format archive title' );
+      #	} elseif ( is_tax( 'post_format', 'post-format-gallery' ) ) {
+      #		title = _x( 'Galleries', 'post format archive title' );
+      #	} elseif ( is_tax( 'post_format', 'post-format-image' ) ) {
+      #		title = _x( 'Images', 'post format archive title' );
+      #	} elseif ( is_tax( 'post_format', 'post-format-video' ) ) {
+      #		title = _x( 'Videos', 'post format archive title' );
+      #	} elseif ( is_tax( 'post_format', 'post-format-quote' ) ) {
+      #		title = _x( 'Quotes', 'post format archive title' );
+      #	} elseif ( is_tax( 'post_format', 'post-format-link' ) ) {
+      #		title = _x( 'Links', 'post format archive title' );
+      #	} elseif ( is_tax( 'post_format', 'post-format-status' ) ) {
+      #		title = _x( 'Statuses', 'post format archive title' );
+      #	} elseif ( is_tax( 'post_format', 'post-format-audio' ) ) {
+      #		title = _x( 'Audio', 'post format archive title' );
+      #	} elseif ( is_tax( 'post_format', 'post-format-chat' ) ) {
+      #		title = _x( 'Chats', 'post format archive title' );
+      #	}
+    # elsif ( is_post_type_archive() )
+    #   # translators: Post type archive title. %s: Post type name
+    #   title = sprintf( __( 'Archives: %s' ), post_type_archive_title( '', false ) )
+    # elsif ( is_tax() )
+    #   tax = get_taxonomy( get_queried_object().taxonomy )
+    #   # translators: Taxonomy term archive title. 1: Taxonomy singular name, 2: Current taxonomy term
+    #   title = sprintf( __( '%1$s: %2$s' ), tax.labels.singular_name, single_term_title( '', false ) )
+    else
+      title = t('railspress.post.archive.title.other')
+    end
+
+    # Filters the archive title.
+    apply_filters( 'get_the_archive_title', title )
+  end
+
   # Fire the wp_head action.
   def wp_head
     # Prints scripts or data in the head tag on the front end.

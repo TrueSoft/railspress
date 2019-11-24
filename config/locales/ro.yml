@@ -51,6 +51,19 @@ ro:
         newer: "Articole mai noi"
         prev_page: "&laquo; Pagina precedentă"
         next_page: "Pagina următoare &raquo;"
+      archive:
+        title:
+          category: "Categorie: %{name}"
+          tag: "Etichetă: %{name}"
+          author: "Autor: %{name}"
+          year: "An: %{name}"
+          month: "Lună: %{name}"
+          day: "Zi: %{name}"
+          other: "Arhive: %{name}"
+        none: "N-am găsit nimic"
+        none_search: "Regret, dar nu s-a potrivit nimic cu termenii tăi de căutare. Te rog încearcă din nou cu alte cuvinte cheie."
+        none_text: "Se pare că n-am putut găsi ceea ce cauți. Probabil căutarea poate ajuta."
+
       show:
         title_protected: "Protected: %{title}"
         title_private: "Private: %{title}"
@@ -68,6 +81,9 @@ ro:
 
         not_found: "Postarea cu numele '%{slug}' nu este gasită!"
         id_not_found: "Postarea cu id '%{id}' nu este gasită!"
+    category:
+      uncategorized: "Fără categorie"
+      not_found: "Categoria cu numele '%{slug}' nu este gasită!"
     tag:
       not_found: "Eticheta cu numele '%{slug}' nu este gasită!"
     invalid_term: "Termen gol."
