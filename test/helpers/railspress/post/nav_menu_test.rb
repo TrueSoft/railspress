@@ -4,7 +4,7 @@ class NavMenuTest < ActionView::TestCase
 
   include Railspress::NavMenuHelper
   include Railspress::Plugin
-  include Railspress::TaxonomyHelper
+  include Railspress::TaxonomyLib
 
   attr_accessor :menu_id
 
