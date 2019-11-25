@@ -1,5 +1,5 @@
 module Railspress
-  class Option < ApplicationRecord
+  class Option < Railspress::ApplicationRecord
     self.table_name = self.prefix_table_name('options')
     self.primary_key = :option_id
 
