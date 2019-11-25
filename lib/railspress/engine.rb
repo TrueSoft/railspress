@@ -5,7 +5,8 @@ module Railspress
     isolate_namespace Railspress
 
     ActiveSupport.on_load :action_controller do
-      helper Railspress::Engine.helpers
+      # helper Railspress::Engine.helpers
+      ::ActionController::Base.send(:include, Railspress::Engine.helpers)
     end
 
     # Add a load path for this specific Engine

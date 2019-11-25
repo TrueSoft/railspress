@@ -4,7 +4,7 @@
  * file wp-includes\class-wp-rewrite.php
 =end
 module Railspress
-  require '../../app/helpers/railspress/options_helper'
+  require_relative '../../app/helpers/railspress/options_helper'
   require 'railspress/plugin'
   require 'railspress/functions'
   # Core class used to implement a rewrite component API.
