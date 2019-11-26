@@ -2,7 +2,7 @@ module Railspress
   require 'railspress/global_vars'
 
   class Engine < ::Rails::Engine
-    isolate_namespace Railspress
+    # isolate_namespace Railspress
 
     ActiveSupport.on_load :action_controller do
       if defined? helper
