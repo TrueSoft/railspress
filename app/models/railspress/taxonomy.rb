@@ -18,6 +18,8 @@ module Railspress
       else
         "railspress/#{type_name}".camelize.constantize
       end
+    rescue NameError
+      Railspress::CustomTaxonomy
     end
 
     def self.sti_name
