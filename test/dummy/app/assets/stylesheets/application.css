@@ -14,3 +14,23 @@
  *= require railspress/application
  *= require_self
  */
+body {
+    font-family: "Helvetica Neue", Helvetica, Arial, Sans-Serif;
+}
+.navbar-brand {
+    float: left;
+}
+#menu-top-menu li {
+    vertical-align: top;
+    display: inline-block;
+    margin: 0 4px;
+}
+.nav-links > .nav-previous, .nav-links > .nav-next {
+    display: inline-block;
+    margin: 1em 3em;
+}
+footer.site-footer {
+    border-top: 2px #d3d3d3 dashed;
+    margin: 1em;
+    padding: 1em 0;
+}
