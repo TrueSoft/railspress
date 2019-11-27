@@ -203,15 +203,14 @@ module Railspress::TaxonomyLib
     object = [object]
 
     taxonomies = 'names' == output ? [] : {}
-    Railspress::Taxonomy.all.each do |tax|
-      tax_name, tax_obj = tax.name, tax
-      # unless (object & tax_obj.object_type.to_a).blank?  TODO taxonomy object_type
-      #   if 'names' == output
-      #     taxonomies << tax_name
-      #   else
-      #     taxonomies[tax_name] = tax_obj
-      #   end
-      # end
+    Railspress.GLOBAL.wp_taxonomies.each_pair do |tax_name, tax_obj|
+      unless (object & tax_obj.object_type.to_a).blank?
+        if 'names' == output
+          taxonomies << tax_name
+        else
+          taxonomies[tax_name] = tax_obj
+        end
+      end
     end
     taxonomies
   end

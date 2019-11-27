@@ -471,7 +471,7 @@ module Railspress
 
     # Registers the taxonomies for the post type.
     def register_taxonomies
-      self.taxonomies.each do |taxonomy|
+      @taxonomies.each do |taxonomy|
         register_taxonomy_for_object_type(taxonomy, self.name)
       end
     end

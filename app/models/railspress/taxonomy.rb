@@ -49,6 +49,7 @@ module Railspress
     attr_accessor :label
     attr_accessor :rewrite
     attr_accessor :query_var
+    attr_accessor :object_type
 
     def initialize(attributes = nil)
       super(attributes)
@@ -149,7 +150,7 @@ module Railspress
       args['cap'] = default_caps.merge args['capabilities']
       args.except!('capabilities')
 
-# TODO      args['object_type'] = array_unique( (array) object_type )
+      args['object_type'] = [ object_type ]
 
       # If not set, use the default meta box
       if args['meta_box_cb'].nil?
@@ -175,7 +176,7 @@ module Railspress
       end
 
       args.each_pair do |property_name, property_value|
-        self.send(property_name + '=', property_value) if %w(label labels rewrite query_var).include?(property_name) # TODO make attrs for all
+        self.send(property_name + '=', property_value) if %w(label labels rewrite query_var object_type).include?(property_name) # TODO make attrs for all
       end
 
      @labels = get_taxonomy_labels( self )
