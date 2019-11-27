@@ -30,7 +30,7 @@
             <% if is_edit_row || is_new_row %>
               <%= f.text_field :option_value, class: 'form-control' %>
             <% else %>
-              <% if is_serialized(parametru.option_value) %>
+              <% if Railspress::Functions.is_serialized(parametru.option_value) %>
                 <%= PhpSerialization.load parametru.option_value %>
               <% else %>
                 <%= parametru.option_value %>

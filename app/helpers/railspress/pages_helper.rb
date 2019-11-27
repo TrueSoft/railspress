@@ -57,7 +57,7 @@ module Railspress
         if translations.empty?
           logger.error "Page (#{orig_page.post_name}) does not have a translation for #{required_language}!"
         else
-          translation_info = maybe_unserialize(translations.first.taxonomy.description)
+          translation_info = Railspress::Functions.maybe_unserialize(translations.first.taxonomy.description)
           translation_id = translation_info[required_language]
           if translation_id.nil?
             logger.error "Page (#{orig_page.post_name}) does not have a translation for #{required_language}"

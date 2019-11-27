@@ -33,7 +33,7 @@ module Railspress::Functions
   #
   # @param [string] original Maybe unserialized original, if is needed.
   # @return Unserialized data can be any type.
-  def maybe_unserialize(original)
+  def self.maybe_unserialize(original)
     if is_serialized(original) # don't attempt to unserialize data that wasn't serialized going in
       # PHP.unserialize original
       PhpSerialization.load(original)
@@ -50,7 +50,7 @@ module Railspress::Functions
   # @param [string] data   Value to check to see if was serialized.
   # @param [bool]   strict Optional. Whether to be strict about the end of the string. Default true.
   # @return [bool] False if not serialized and true if it was.
-  def is_serialized(data, strict = true)
+  def self.is_serialized(data, strict = true)
     # if it isn't a string, it isn't serialized.
     return false unless data.is_a? String
     data.strip!
