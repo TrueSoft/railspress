@@ -26,6 +26,7 @@ module Railspress
       @option = Railspress::Option.new model_params
       if @option.save
         # ch_migr @option.create_activity :create, owner: current_user, parameters: {option_name: @option.option_name, option_value: @option.option_value}
+        helpers.add_option  @option.option_name, @option.option_value
         redirect_to(main_app.admin_options_path, notice: t('railspress.option.create.save'))
       else
         @options = get_display_options
@@ -59,6 +60,7 @@ module Railspress
       @option = Railspress::Option.find(params[:id])
       if @option.update_attributes(model_params)
         # ch_migr  @option.create_activity :update, owner: current_user, parameters: {option_name: @option.option_name, option_value: @option.option_value}
+        helpers.update_option  @option.option_name, @option.option_value
         redirect_to(main_app.admin_options_path, notice: t('railspress.option.update.save'))
       else
         @options = get_display_options
@@ -70,6 +72,7 @@ module Railspress
       @option = Railspress::Option.find(params[:id])
       # ch_migr  @option.create_activity :destroy, owner: current_user, parameters: {option_name: @option.option_name, option_value: @option.option_value}
       if @option.destroy
+        helpers.delete_option @option.option_name
         redirect_to(main_app.admin_options_path, notice: t('railspress.option.destroy'))
       else
         @options = get_display_options
@@ -100,7 +103,7 @@ module Railspress
     end
 
     def model_params
-      params.require(:option).permit([:option_id, :option_name, :option_value, :autoload])
+      params.require(:railspress_option).permit([:option_id, :option_name, :option_value, :autoload])
     end
 
   end

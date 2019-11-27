@@ -31,53 +31,36 @@ module Railspress::OptionsHelper
   # @param [mixed]  default Optional. Default value to return if the option does not exist.
   # @return [mixed] Value set for the option.
   def get_option(option, default = (default_not_passed = true; false))
-    # global $wpdb;
     option = option.strip
     return false if option.blank?
     # Filters the value of an existing option before it is retrieved.
     pre = apply_filters("pre_option_#{option}", false, option, default)
 
     return pre if pre != false
-    return false if defined? WP_SETUP_CONFIG
+    # return false if defined? WP_SETUP_CONFIG
     passed_default = !default_not_passed
     if true #! wp_installing()
-      value = Railspress::Option.where(option_name: option).pluck(:option_value).first
-      if value.nil?
-        return apply_filters( "default_option_#{option}", default, option, passed_default)
-      else
-        return apply_filters( "option_#{option}", maybe_unserialize(value), option)
-      end
       # prevent non-existent options from triggering multiple queries
-      notoptions = wp_cache_get( 'notoptions', 'options' )
-      if ( isset( $notoptions[ $option ] ) )
+      notoptions = Rails.cache.read 'Railspress::' + 'options' + '/' + 'notoptions'
+      if !notoptions.blank? && notoptions[option]
         # Filters the default value for an option.
         return apply_filters( "default_option_#{option}", default, option, passed_default)
       end
 
-      alloptions = wp_load_alloptions()
+      alloptions = wp_load_alloptions
 
       if alloptions[option]
         value = alloptions[option]
       else
-        value = wp_cache_get(option, 'options')
-# TODO continue implement option.php
-        if false == value
-          $row = $wpdb.get_row( $wpdb.prepare( "SELECT option_value FROM $wpdb->options WHERE option_name = %s LIMIT 1", option ) )
-
-          # Has to be get_row instead of get_var because of funkiness with 0, false, null values
-          if is_object( $row )
-            value = $row.option_value
-            wp_cache_add(option, value, 'options')
-          else  # option does not exist, so we must cache its non-existence
-            if !notoptions.kind_of?(Hash)
-              notoptions = {};
-            end
-            notoptions[ option ] = true
-            wp_cache_set( 'notoptions', notoptions, 'options' )
-
-            # This filter is documented in wp-includes/option.php */
-            return apply_filters("default_option_#{option}", default, option, passed_default)
-          end
+        value = Rails.cache.fetch('Railspress::' + 'options' + '/' + option) {
+          Railspress::Option.where(option_name: option).pluck(:option_value).first
+        }
+        if value.nil?  # option does not exist, so we must cache its non-existence
+          notoptions = {} unless notoptions.kind_of? Hash
+          notoptions[ option ] = true
+          Rails.cache.write 'Railspress::' + 'options' + '/' + 'notoptions', notoptions
+          # This filter is documented in wp-includes/option.php */
+          return apply_filters("default_option_#{option}", default, option, passed_default)
         end
       end
     else
@@ -88,13 +71,135 @@ module Railspress::OptionsHelper
       return get_option('siteurl')
     end
 
-    if ['siteurl', 'home', 'category_base', 'tag_base'].include? option
-      value = untrailingslashit(value)
+    if %w(siteurl home category_base tag_base).include? option
+      value = Railspress::FormattingHelper.untrailingslashit(value)
     end
 
     # Filters the value of an existing option.
-    apply_filters( "option_#{option}", maybe_unserialize(value), option)
+    apply_filters( "option_#{option}", Railspress::Functions.maybe_unserialize(value), option)
   end
 
+  # Protect WordPress special option from being modified.
+  #
+  # Will die if $option is in protected list. Protected options are 'alloptions'
+  # and 'notoptions' options.
+  #
+  # @param [string] option Option name.
+  def wp_protect_special_option( option )
+    if 'alloptions' == option || 'notoptions' == option
+      raise sprintf( '%s is a protected WP option and may not be modified', esc_html(option))
+    end
+  end
+
+  # Loads and caches all autoloaded options, if available or all options.
+  #
+  # @return array List of all options.
+  def wp_load_alloptions
+    if true # ! wp_installing() || ! is_multisite()
+      alloptions = false # TS_INFO:  don't save all in cache wp_cache_get( 'alloptions', 'options' )
+    else
+      alloptions = false
+    end
+
+    unless alloptions
+      alloptions = {}
+      # TS_INFO: Don't load all in the cache
+      # foreach ( (array) $alloptions_db as $o ) {
+      #     $alloptions[ $o->option_name ] = $o->option_value;
+      # }
+      #
+      # if ( ! wp_installing() || ! is_multisite() )
+      #     # Filters all options before caching them.
+      #     alloptions = apply_filters( 'pre_cache_alloptions', alloptions )
+      #     wp_cache_add( 'alloptions', alloptions, 'options' )
+      # end
+    end
+
+    # Filters all options after retrieving them.
+    apply_filters( 'alloptions', alloptions )
+  end
+
+  def update_option(option, value, autoload = nil)
+    option = option.strip
+    return false if option.blank?
+
+    wp_protect_special_option( option )
+
+    # value     = sanitize_option( option, value )
+    old_value = get_option( option )
+
+    # Filters a specific option before its value is (maybe) serialized and updated.
+    #
+    # The dynamic portion of the hook name, `$option`, refers to the option name.
+    #
+    # @param mixed  $value     The new, unserialized option value.
+    # @param mixed  $old_value The old option value.
+    # @param string $option    Option name.
+    value = apply_filters( "pre_update_option_{$option}", value, old_value, option )
+
+    # Filters an option before its value is (maybe) serialized and updated.
+    #
+    # @param mixed  $value     The new, unserialized option value.
+    # @param string $option    Name of the option.
+    # @param mixed  $old_value The old option value.
+    value = apply_filters( 'pre_update_option', value, option, old_value )
+
+    # If the new and old values are the same, no need to update.
+    #
+    # Unserialized values will be adequate in most cases. If the unserialized
+    # data differs, the (maybe) serialized data is checked to avoid
+    # unnecessary database calls for otherwise identical object instances.
+    #
+    # See https://core.trac.wordpress.org/ticket/38903
+    if value == old_value # || maybe_serialize( value ) == maybe_serialize( old_value )
+      return false
+    end
+
+    Rails.cache.write 'Railspress::' + 'options' + '/' + option, value
+
+    notoptions = Rails.cache.read 'Railspress::' + 'options' + '/' + 'notoptions'
+    if !notoptions.blank? && notoptions[option]
+      notoptions.delete option
+      Rails.cache.write 'Railspress::' + 'options' + '/' + 'notoptions', notoptions
+    end
+
+    # Fires after the value of a specific option has been successfully updated.
+    do_action( "update_option_#{option}", old_value, value, option )
+
+    # Fires after the value of an option has been successfully updated.
+    do_action( 'updated_option', option, old_value, value )
+    true
+  end
+
+  def add_option(option, value = '', deprecated = '', autoload = 'yes')
+    option = option.strip
+    return false if option.blank?
+
+    wp_protect_special_option( option )
+
+    Rails.cache.write 'Railspress::' + 'options' + '/' + option, value
+
+    notoptions = Rails.cache.read 'Railspress::' + 'options' + '/' + 'notoptions'
+    if !notoptions.blank? && notoptions[option]
+      notoptions.delete option
+      Rails.cache.write 'Railspress::' + 'options' + '/' + 'notoptions', notoptions
+    end
+
+    true
+  end
+
+  # Removes option by name. Prevents removal of protected WordPress options.
+  #
+  # @param [string] option Name of option to remove. Expected to not be SQL-escaped.
+  # @return bool True, if option is successfully deleted. False on failure.
+  def delete_option( option )
+    option = option.strip
+    return false if option.blank?
+
+    wp_protect_special_option( option )
+
+    Rails.cache.delete 'Railspress::' + 'options' + '/' + option
+    true
+  end
 
 end
