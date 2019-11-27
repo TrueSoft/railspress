@@ -30,9 +30,11 @@ module Railspress::MetaHelper
         return check
       end
     end
-    # meta_cache = wp_cache_get( object_id, meta_type + '_meta' )
-    values = Railspress::Postmeta.where(post_id: object_id, meta_key: meta_key).pluck(:meta_value)
-    values.map! {|meta_value| maybe_unserialize meta_value }
+    values = Rails.cache.fetch('Railspress::' + meta_type + '_meta' + '.' + meta_key + '/' + object_id.to_s) {
+      result = Railspress::Postmeta.where(post_id: object_id, meta_key: meta_key).pluck(:meta_value)
+      result.map! {|meta_value| Railspress::Functions.maybe_unserialize meta_value }
+      result
+    }
     if values.blank?
       single ? '' : []
     else
