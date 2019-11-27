@@ -164,13 +164,17 @@ module Railspress::TaxonomyLib
   # @return string[]|WP_Taxonomy[] An array of taxonomy names or objects.
   def get_taxonomies( args = {}, output = 'names', operator = 'and' )
     if output == 'names'
-      names = []
-      Railspress::Taxonomy.where(args).all.each do |tax|
-        names << tax.name
-      end
-      names
+      Rails.cache.fetch('Railspress::' + 'get_taxonomies(names)', expires_in: 1.hour) {
+        names = []
+        Railspress::Taxonomy.where(args).all.each do |tax|
+          names << tax.name
+        end
+        names
+      }
     else
-      Railspress::Taxonomy.where(args)
+      Rails.cache.fetch('Railspress::' + 'get_taxonomies', expires_in: 1.hour) {
+        Railspress::Taxonomy.where(args)
+      }
     end
     # TODO continue get_taxonomies()
   end
