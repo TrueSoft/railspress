@@ -38,4 +38,8 @@ module Railspress::PHP
     8.times {@indent.chop!}
     output
   end
+
+  def stream_get_wrappers
+    %w(https ftps compress.zlib php file glob data http ftp phar)
+  end
 end

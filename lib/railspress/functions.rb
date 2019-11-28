@@ -552,7 +552,6 @@ module Railspress::Functions
     protocols
   end
 
-
   # Test if a given path is a stream URL
   # @param [String] path The resource path or URL.
   # @return True if the path is a stream URL.
@@ -562,11 +561,7 @@ module Railspress::Functions
     scheme_separator = path.index('://')
 
     stream = path.slice(0, scheme_separator)
-    stream_get_wrappers.include? stream
+    Railspress::PHP.stream_get_wrappers.include? stream
   end
 
-  # This is from PHP
-  def stream_get_wrappers
-    %w(https ftps compress.zlib php file glob data http ftp phar)
-  end
 end
