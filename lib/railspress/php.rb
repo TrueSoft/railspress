@@ -18,7 +18,7 @@ module Railspress::PHP
           output << "#{@indent}    [#{key}] => "
           output << self.print_r(value, "#{@indent}        ")
         else
-          output << "#{@indent}    [#{key}] => #{value}\n"
+          output << "#{@indent}    [#{key}] => #{value.inspect}\n"
         end
       }
       output << "#{@indent})\n"
@@ -29,7 +29,7 @@ module Railspress::PHP
           output << "#{@indent}    [#{index}] => "
           output << self.print_r(value, "#{@indent}        ")
         else
-          output << "#{@indent}    [#{index}] => #{value}\n"
+          output << "#{@indent}    [#{index}] => #{value.inspect}\n"
         end
       }
       output << "#{@indent})\n"
