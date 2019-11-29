@@ -7,6 +7,7 @@ require 'railspress/plugin'
  * file wp-includes\formatting.php
 =end
 module Railspress::FormattingHelper
+  include Railspress::Plugin
 
   # Converts a number of special characters into their HTML entities.
   #
@@ -282,8 +283,8 @@ module Railspress::FormattingHelper
     # Store the site charset as a static to avoid multiple calls to get_option()
     is_utf8 = nil
 
-    if is_utf8.nil?
-      is_utf8 = ['utf8', 'utf-8', 'UTF8', 'UTF-8'].include?(get_option('blog_charset'))
+    if is_utf8.nil? # TODO because it's called from a module function, it cannot access get_option from the helper
+      is_utf8 = true # ['utf8', 'utf-8', 'UTF8', 'UTF-8'].include?(get_option('blog_charset'))
     end
     return string unless is_utf8
 
@@ -558,8 +559,10 @@ module Railspress::FormattingHelper
 	  safe_text = _wp_specialchars( safe_text, :ENT_QUOTES )
     # Filters a string cleaned and escaped for output in an HTML attribute.
     # Text passed to esc_attr() is stripped of invalid or special characters  before output.
-    apply_filters('attribute_escape', safe_text, text )
+    Railspress::Plugin.apply_filters('attribute_escape', safe_text, text )
   end
+
+  module_function :esc_attr, :wp_check_invalid_utf8, :_wp_specialchars
 
   # Escaping for textarea values.
   def esc_textarea(text)
