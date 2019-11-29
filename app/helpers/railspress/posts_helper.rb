@@ -9,7 +9,7 @@ module Railspress::PostsHelper
   include Railspress::Load
 
   # Creates the initial post types when 'init' action is fired.
-  def self.create_initial_post_types # TODO should be in PostsHelper
+  def self.create_initial_post_types
     register_post_type('post',
                        {
                            'labels' => {
