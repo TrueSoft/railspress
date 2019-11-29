@@ -541,11 +541,17 @@ module Railspress::TaxonomyLib
     if term.is_a? Railspress::Term
       _term = term
     elsif term.is_a?(Integer) || term.is_a?(String)
-      _term = Railspress::Term.find(term.to_i)
+      if term.to_i == 0
+        _term = nil
+      else
+        _term = Railspress::Term.find(term.to_i)
+      end
     else
-      if term.filter.blank? || 'raw' == term.filter
+      if !term.respond_to?(filter) || term.filter.blank? || 'raw' == term.filter
         _term = sanitize_term(term, taxonomy, 'raw')
-        _term = Railspress::Term.new(_term)
+        if _term.is_a?(Hash)
+          _term = Railspress::Term.new(_term)
+        end
       else
         _term = Railspress::Term.find(term.term_id)
       end
@@ -558,7 +564,7 @@ module Railspress::TaxonomyLib
     end
 
     # Ensure for filters that this is not empty.
-    taxonomy = _term.taxonomy.taxonomy
+    taxonomy = _term.taxonomy
 
     # Filters a taxonomy term object.
     _term = apply_filters('get_term', _term, taxonomy)
@@ -1010,11 +1016,11 @@ module Railspress::TaxonomyLib
     else
       if t.rewrite['hierarchical']
         hierarchical_slugs = []
-        # TODO ancestors          = get_ancestors( term.term_id, taxonomy, 'taxonomy' )
-        # foreach ( (array) $ancestors as $ancestor ) {
-        #     $ancestor_term        = get_term( $ancestor, $taxonomy );
-        # $hierarchical_slugs[] = $ancestor_term->slug;
-        # }
+        ancestors          = get_ancestors(term.term_id, taxonomy, 'taxonomy')
+        ancestors.each do |ancestor|
+          ancestor_term        = get_term(ancestor, taxonomy)
+          hierarchical_slugs << ancestor_term.slug
+        end
         hierarchical_slugs   = hierarchical_slugs.reverse
         hierarchical_slugs << slug
         termlink = termlink.gsub( "%#{taxonomy}%", hierarchical_slugs.join('/'))
@@ -1055,7 +1061,53 @@ module Railspress::TaxonomyLib
     taxonomies.include? taxonomy
   end
 
-  # TODO get_ancestors, wp_get_term_taxonomy_parent_id, wp_check_term_hierarchy_for_loops, is_taxonomy_viewable, wp_cache_set_terms_last_changed, wp_check_term_meta_support_prefilter
+  # Get an array of ancestor IDs for a given object.
+  #
+  # @param [int]    object_id     Optional. The ID of the object. Default 0.
+  # @param [string] object_type   Optional. The type of object for which we'll be retrieving
+  #                               ancestors. Accepts a post type or a taxonomy name. Default empty.
+  # @param [string] resource_type Optional. Type of resource $object_type is. Accepts 'post_type'
+  #                               or 'taxonomy'. Default empty.
+  # @return [array] An array of ancestors from lowest to highest in the hierarchy.
+  def get_ancestors(object_id = 0, object_type = '', resource_type = '')
+    object_id = object_id.to_i
+
+    ancestors = []
+
+    if object_id.blank?
+      # This filter is documented in wp-includes/taxonomy.php
+      return apply_filters( 'get_ancestors', ancestors, object_id, object_type, resource_type)
+    end
+
+    if !resource_type
+      if is_taxonomy_hierarchical(object_type)
+        resource_type = 'taxonomy'
+      elsif post_type_exists(object_type)
+        resource_type = 'post_type'
+      end
+    end
+
+    if 'taxonomy' == resource_type
+      term = get_term(object_id, object_type)
+      # TODO continue
+      #	while ( ! is_wp_error( $term ) && ! empty( $term->parent ) && ! in_array( $term->parent, $ancestors ) ) {
+      #		ancestors[] = (int) $term->parent;
+      #		term        = get_term(term.parent, object_type)
+      #	}
+    elsif 'post_type' == resource_type
+      ancestors = get_post_ancestors(object_id)
+    end
+
+    # Filters a given object's ancestors.
+    #
+    # @param [array]  ancestors     An array of object ancestors.
+    # @param [int]    object_id     Object ID.
+    # @param [string] object_type   Type of object.
+    # @param [string] resource_type Type of resource $object_type is.
+    apply_filters('get_ancestors', ancestors, object_id, object_type, resource_type)
+  end
+
+  # TODO wp_get_term_taxonomy_parent_id, wp_check_term_hierarchy_for_loops, is_taxonomy_viewable, wp_cache_set_terms_last_changed, wp_check_term_meta_support_prefilter
 
 
 end
