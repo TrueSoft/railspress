@@ -76,7 +76,7 @@ module Railspress::OptionsHelper
     end
 
     # Filters the value of an existing option.
-    apply_filters( "option_#{option}", Railspress::Functions.maybe_unserialize(value), option)
+    apply_filters( "option_#{option}", Railspress::Functions.maybe_unserialize(value), option).freeze
   end
 
   # Protect WordPress special option from being modified.

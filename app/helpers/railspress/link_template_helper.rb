@@ -99,7 +99,7 @@ module Railspress::LinkTemplateHelper
       			post.post_name,
       		]
       (1 .. rewritecode.length - 1).each do |i|
-        permalink.gsub! rewritecode[i], rewritereplace[i] unless rewritecode[i].blank?
+        permalink = permalink.gsub rewritecode[i], rewritereplace[i] unless rewritecode[i].blank?
       end
       permalink      = home_url(permalink)
       permalink      = user_trailingslashit(permalink, 'single')
@@ -861,7 +861,7 @@ module Railspress::LinkTemplateHelper
     scheme = is_ssl ? 'https' : 'http';
     end
 
-    url.strip!
+    url = url.strip
     url = 'http:' + url if url.start_with?('//')
 
     if 'relative' == scheme

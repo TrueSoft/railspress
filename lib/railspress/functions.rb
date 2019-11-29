@@ -53,7 +53,7 @@ module Railspress::Functions
   def self.is_serialized(data, strict = true)
     # if it isn't a string, it isn't serialized.
     return false unless data.is_a? String
-    data.strip!
+    data = data.strip
     return true if 'N;' == data
     return false if data.length < 4
     return false if data[1] != ':'
