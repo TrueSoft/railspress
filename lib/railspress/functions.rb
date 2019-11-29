@@ -564,4 +564,22 @@ module Railspress::Functions
     Railspress::PHP.stream_get_wrappers.include? stream
   end
 
+  # Filter/validate a variable as a boolean.
+  #
+  # Alternative to `filter_var( $var, FILTER_VALIDATE_BOOLEAN )`.
+  #
+  # @param [mixed] var Boolean value to validate.
+  # @return [bool] Whether the value is validated.
+  def wp_validate_boolean(var)
+    return var if var.is_a?(FalseClass) || var.is_a?(TrueClass)
+
+    return false if (var.is_a?(String) && 'false' == var.downcase)
+
+    if var.blank? || var.to_f == 0.0
+      false
+    else
+      true
+    end
+  end
+
 end
