@@ -77,7 +77,30 @@ module Railspress::LinkTemplateHelper
     if !permalink.blank? && !['draft', 'pending', 'auto-draft', 'future'].include?(post.post_status)
       category = ''
       if permalink.include? '%category%'
-        # TODO get the post category
+        cats = get_the_category(post.id)
+        if cats
+          # TODO cats = wp_list_sort(cats, {term_id: 'ASC'})
+          # Filters the category that gets used in the %category% permalink token.
+          #
+          # @param WP_Term  $cat  The category to use in the permalink.
+          # @param array    $cats Array of all categories (WP_Term objects) associated with the post.
+          # @param WP_Post  $post The post in question.
+          category_object = apply_filters( 'post_link_category', cats[0], cats, post )
+
+          category_object = get_term( category_object, 'category' )
+          category        = category_object.slug
+          if category_object.parent
+            category = get_category_parents( category_object.parent, false, '/', true ) + category
+          end
+          # show default category in permalinks, without
+          # having to assign it explicitly
+          if category.blank?
+            default_category = get_term( get_option( 'default_category' ), 'category' )
+            if  default_category && !default_category.is_a?(Railspress::WP_Error)
+              category = default_category.slug
+            end
+          end
+        end
       end
       author = ''
       if permalink.include? '%author%'
@@ -140,25 +163,19 @@ module Railspress::LinkTemplateHelper
         slug = get_page_uri(post)
     end
 
-    if ( ! post_link.blank? && ( ! draft_or_pending || sample ) )
-        unless leavename
-            post_link = post_link.gsub( '%' + post.post_type + '%', slug)
-        end
-        post_link = home_url( user_trailingslashit( post_link ) )
-        else
-            if post_type.query_var && ( isset( $post.post_status ) && ! draft_or_pending )
-                post_link = add_query_arg( post_type.query_var, slug, '' )
-            else
-                post_link = add_query_arg(
-                    {
-                        'post_type' => post.post_type,
-                        'p'         => post.id,
-                    },
-                    ''
-                )
-            end
-            post_link = home_url(post_link)
-            end
+    if !post_link.blank? && (!draft_or_pending || sample)
+      unless leavename
+        post_link = post_link.gsub('%' + post.post_type + '%', slug)
+      end
+      post_link = home_url(user_trailingslashit(post_link))
+    else
+      if post_type.query_var && (!post.post_status.nil? && !draft_or_pending)
+        post_link = {post_type.query_var.to_sym => slug}.to_query
+      else
+        post_link = {post_type: post.post_type, p: post.id}.to_query
+      end
+      post_link = home_url('?' + post_link)
+    end
 
     # Filters the permalink for a post of a custom post type.
     apply_filters( 'post_type_link', post_link, post, leavename, sample )

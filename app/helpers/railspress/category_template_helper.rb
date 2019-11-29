@@ -5,6 +5,50 @@
 =end
 module Railspress::CategoryTemplateHelper
 
+  # TODO get_category_link
+
+  # Retrieve category parents with separator.
+  #
+  # @param [int] 	id Category ID.
+  # @param [bool] 	link Optional, default is false. Whether to format with link.
+  # @param [string] 	separator Optional, default is '/'. How to separate categories.
+  # @param [bool] 	nicename Optional, default is false. Whether to use nice name for display.
+  # @param [array] 	deprecated Not used.
+  # @return string|WP_Error A list of category parents on success, WP_Error on failure.
+  def get_category_parents(id, link = false, separator = '/', nicename = false, deprecated = [])
+
+    format = nicename ? 'slug' : 'name'
+
+    args = {separator: separator, link: link, format: format}
+
+    get_term_parents_list( id, 'category', args )
+  end
+
+  # Retrieve post categories.
+  #
+  # This tag may be used outside The Loop by passing a post id as the parameter.
+  #
+  # Note: This function only returns results from the default "category" taxonomy.
+  # For custom taxonomies use get_the_terms().
+  #
+  # @param [int] id Optional, default to current post ID. The post ID.
+  # @return WP_Term[] Array of WP_Term objects, one for each category assigned to the post.
+  def get_the_category( id = false )
+    categories = get_the_terms( id, 'category' )
+    if !categories || categories.is_a?(Railspress::WP_Error)
+      categories = {}
+    end
+
+    categories = categories.values.to_a if categories.is_a?(Hash)
+
+    # foreach ( array_keys( categories ) as $key ) {
+    # 	_make_cat_compat( categories[ key ] );
+    # }
+
+    # Filters the array of categories to return for a post.
+    apply_filters( 'get_the_categories', categories, id )
+  end
+
   # Retrieve the tags for a post.
   #
   # @param [int] id Post ID.
@@ -85,6 +129,61 @@ module Railspress::CategoryTemplateHelper
     term_links = apply_filters("term_links-#{taxonomy}", links)
 
     before + term_links.join(sep) + after
+  end
+
+  # Retrieve term parents with separator.
+  #
+  # @param [int]     term_id  Term ID.
+  # @param [string]  taxonomy Taxonomy name.
+  # @param [string|array] args {
+  #     Array of optional arguments.
+  #
+  #     @type string :format    Use term names or slugs for display. Accepts 'name' or 'slug'.
+  #                             Default 'name'.
+  #     @type string :separator Separator for between the terms. Default '/'.
+  #     @type bool   :link      Whether to format as a link. Default true.
+  #     @type bool   :inclusive Include the term to get the parents for. Default true.
+  # }
+  # @return [string|WP_Error] A list of term parents on success, WP_Error or empty string on failure.
+  def get_term_parents_list( term_id, taxonomy, args = {} )
+    list = ''
+    term = get_term( term_id, taxonomy )
+
+    return term if term.is_a?(Railspress::WP_Error)
+
+    return list unless term
+
+    term_id = term.term_id
+
+    defaults = {
+        format: 'name',
+        separator: '/',
+        link: true,
+        inclusive: true,
+    }
+
+    args = wp_parse_args(args, defaults)
+
+    %i(link inclusive).each do |bool|
+      args[bool] = wp_validate_boolean(args[bool])
+    end
+
+    parents = get_ancestors(term_id, taxonomy, 'taxonomy')
+
+    parents.unshift(term_id) if args[:inclusive]
+
+    parents.reverse.each do |term_id|
+      parent = get_term(term_id, taxonomy )
+      name   = ('slug' == args[:format] ) ? parent.slug : parent.name
+
+      if args[:link]
+        list += '<a href="' + esc_url( get_term_link( parent.term_id, taxonomy)) + '">' + name + '</a>' + args[:separator]
+      else
+        list += name + args[:separator]
+      end
+    end
+
+    list
   end
 
 end

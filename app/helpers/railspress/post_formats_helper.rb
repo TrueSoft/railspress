@@ -20,6 +20,7 @@ module Railspress::PostFormatsHelper
 
     format = _format # ? reset(_format)
 
+    format = format.first if format.is_a? Array
     format.slug.gsub('post-format-', '')
   end
 

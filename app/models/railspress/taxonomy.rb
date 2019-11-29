@@ -50,6 +50,7 @@ module Railspress
     attr_accessor :rewrite
     attr_accessor :query_var
     attr_accessor :object_type
+    attr_accessor :filter_str # or delegate to term's filter_str
 
     def initialize(attributes = nil)
       super(attributes)
