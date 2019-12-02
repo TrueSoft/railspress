@@ -10,8 +10,8 @@ Gem::Specification.new do |spec|
   spec.authors     = ["True Soft"]
   spec.email       = ["truesoft@ymail.com"]
   spec.homepage    = "https://truesoft.ro"
-  spec.summary     = "Shows Wordpress posts in a Ruby on Rails application."
-  spec.description = "Integrates Wordpress functions in a Ruby on Rails application."
+  spec.summary     = "Shows WordPress posts in a Ruby on Rails application."
+  spec.description = "Integrates WordPress functions in a Ruby on Rails application."
   spec.license     = "MIT"
 
   # Prevent pushing this gem to RubyGems.org. To allow pushes either set the 'allowed_push_host'
@@ -19,19 +19,18 @@ Gem::Specification.new do |spec|
   if spec.respond_to?(:metadata)
     spec.metadata["allowed_push_host"] = "https://truesoft.ro"
   else
-    raise "RubyGems 2.0 or newer is required to protect against " \
-      "public gem pushes."
+    raise "RubyGems 2.0 or newer is required to protect against public gem pushes."
   end
 
   spec.files = Dir["{app,config,db,lib}/**/*", "MIT-LICENSE", "Rakefile", "README.md"]
 
   spec.add_dependency "rails", "~> 5.2.3"
 
-  spec.add_dependency 'addressable'
+  spec.add_dependency 'addressable', '~> 2.7'
 
   spec.add_dependency 'sass-rails', '~> 5.0'
-  spec.add_dependency 'php-serialization'
-  spec.add_dependency 'shortcode'
+  spec.add_dependency 'php-serialization', '~> 1.0.0'
+  spec.add_dependency 'shortcode', '~> 2.0.0'
   spec.add_dependency 'will_paginate', '~> 3.1.0'
 
   spec.add_development_dependency "mysql2"
