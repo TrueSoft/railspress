@@ -236,6 +236,7 @@ module Railspress::NavMenuTemplateHelper
   # @param [array] menu_items The current menu item objects to which to add the class property information.
   def _wp_menu_item_classes_by_context(menu_items)
     # TODO queried_object?
+    @wp_query = Railspress::WP_Query.new if @wp_query.nil?
     queried_object    = @wp_query.get_queried_object
     queried_object_id = @wp_query.queried_object_id
 
