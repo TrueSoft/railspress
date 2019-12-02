@@ -9,7 +9,7 @@ Gem::Specification.new do |spec|
   spec.version     = Railspress::VERSION
   spec.authors     = ["True Soft"]
   spec.email       = ["truesoft@ymail.com"]
-  spec.homepage    = "https://truesoft.ro"
+  spec.homepage    = "https://truesoft.ro/railspress"
   spec.summary     = "Shows WordPress posts in a Ruby on Rails application."
   spec.description = "Integrates WordPress functions in a Ruby on Rails application."
   spec.license     = "MIT"
@@ -21,6 +21,8 @@ Gem::Specification.new do |spec|
   else
     raise "RubyGems 2.0 or newer is required to protect against public gem pushes."
   end
+
+  spec.metadata["bug_tracker_uri"] = "https://github.com/TrueSoft/railspress/issues"
 
   spec.files = Dir["{app,config,db,lib}/**/*", "MIT-LICENSE", "Rakefile", "README.md"]
 
