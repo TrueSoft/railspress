@@ -249,7 +249,8 @@ module Railspress::NavMenuTemplateHelper
 
     front_page_url         = main_app.root_url
     front_page_id          = get_option('page_on_front').to_i
-    privacy_policy_page_id = get_option('wp_page_for_privacy_policy' ).to_i
+    ppp_id = get_option('wp_page_for_privacy_policy' )
+    privacy_policy_page_id = (ppp_id.is_a?(String) || ppp_id.is_a?(Integer)) ? ppp_id.to_i : 0
 
     menu_items.each do |menu_item|
       menu_item.current = false
