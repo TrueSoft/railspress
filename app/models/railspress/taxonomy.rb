@@ -1,13 +1,12 @@
 require 'railspress/plugin'
 require 'railspress/load'
 
-module Railspress
-  class Taxonomy < ApplicationRecord
+class Railspress::Taxonomy < Railspress::ApplicationRecord
     self.table_name = self.prefix_table_name('term_taxonomy')
     self.primary_key = :term_taxonomy_id
     self.inheritance_column = 'taxonomy'
 
-    include Load
+    include Railspress::Load
     include Railspress::FormattingHelper
     include Railspress::TaxonomyLib
 
@@ -66,10 +65,10 @@ module Railspress
     # @param [array|string] object_type Name of the object type for the taxonomy object.
     # @param [array|string] args        Array or query string of arguments for registering a taxonomy.
     def set_props(object_type, args)
-      args = Functions.wp_parse_args args
+      args = Railspress::Functions.wp_parse_args args
 
       # Filters the arguments for registering a taxonomy.
-      args = Plugin.apply_filters('register_taxonomy_args', args, @name, object_type)
+      args = Railspress::Plugin.apply_filters('register_taxonomy_args', args, @name, object_type)
 
       # Args prefixed with an underscore are reserved for internal use.
       defaults = {
@@ -114,7 +113,7 @@ module Railspress
       end
 
       if args['rewrite'] != false && ( is_admin() ||  get_option('permalink_structure') != '' )
-        args['rewrite'] = Functions.wp_parse_args(
+        args['rewrite'] = Railspress::Functions.wp_parse_args(
             args['rewrite'],
             {
                 'with_front'   => true,
@@ -212,5 +211,4 @@ module Railspress
     def title
       [name, description].compact.join(": ")
     end
-  end
 end
