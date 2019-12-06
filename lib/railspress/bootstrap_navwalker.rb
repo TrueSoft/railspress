@@ -4,7 +4,7 @@ module Railspress
   # in a custom theme using the WordPress built in menu manager.
   #
   # @see https://github.com/wp-bootstrap/wp-bootstrap-navwalker
-  class BootstrapNavwalker < WalkerNavMenu
+  class BootstrapNavwalker < ::Railspress::WalkerNavMenu
 
     include Railspress::FormattingHelper
 
