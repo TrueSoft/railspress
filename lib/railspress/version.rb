@@ -1,5 +1,5 @@
 module Railspress
-  VERSION = '0.1.4'
+  VERSION = '0.1.3'
 
   # Below there is the version information for the WordPress release used for this engine
 
