@@ -1,3 +1,4 @@
+require_relative 'walker'
 class Railspress::WalkerNavMenu < ::Railspress::Walker
 
   include Railspress::Functions
