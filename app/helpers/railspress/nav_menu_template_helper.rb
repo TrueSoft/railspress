@@ -343,6 +343,7 @@ module Railspress::NavMenuTemplateHelper
   # @param [stdClass] r     An object containing wp_nav_menu() arguments.
   # @return [string] The HTML list content for the menu items.
   def walk_nav_menu_tree( items, depth, r )
+    require_relative '../../../lib/railspress/walker_nav_menu'
     walker =  r[:walker].blank? ? Railspress::WalkerNavMenu.new : r[:walker]
     walker.walk items, depth, r
   end
