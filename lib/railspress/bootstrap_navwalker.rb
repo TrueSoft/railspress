@@ -1,10 +1,10 @@
-module Railspress
   # WP_Bootstrap_Navwalker
   # A custom WordPress nav walker class to implement the Bootstrap 4 navigation style
   # in a custom theme using the WordPress built in menu manager.
   #
   # @see https://github.com/wp-bootstrap/wp-bootstrap-navwalker
-  class BootstrapNavwalker < ::Railspress::WalkerNavMenu
+  require_relative 'walker_nav_menu'
+  class Railspress::BootstrapNavwalker < ::Railspress::WalkerNavMenu
 
     include Railspress::FormattingHelper
 
@@ -396,4 +396,3 @@ module Railspress
       output
     end
   end
-end
