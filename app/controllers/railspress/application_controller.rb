@@ -20,6 +20,7 @@ module Railspress
     end
 
     def init_wp_query
+      require_relative '../../../lib/railspress/wp_query'
       @wp_query = Railspress::WP_Query.new
     end
   end
