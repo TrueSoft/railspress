@@ -496,6 +496,7 @@ module Railspress::Functions
   #                               Default false.
   # @return [array] A list of objects or object fields.
   def wp_filter_object_list(list, args = {}, operator = 'and', field = false)
+    require 'wp_list_util'
     return {} unless list.is_a? Hash
 
     util = Railspress::WpListUtil.new(list)
