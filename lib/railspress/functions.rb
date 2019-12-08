@@ -483,7 +483,7 @@ module Railspress::Functions
   # Filters a list of objects, based on a set of key => value arguments.
   #
   # @since 3.0.0
-  # @since 4.7.0 Uses `WP_List_Util` class.
+  # @since 4.7.0 Uses `WpListUtil` class.
   #
   # @param [array]       list     An array of objects to filter
   # @param [array]       args     Optional. An array of key => value arguments to match
@@ -498,7 +498,7 @@ module Railspress::Functions
   def wp_filter_object_list(list, args = {}, operator = 'and', field = false)
     return {} unless list.is_a? Hash
 
-    util = Railspress::WP_List_Util.new(list)
+    util = Railspress::WpListUtil.new(list)
     util.filter(args, operator)
     util.pluck(field) if field
     util.output

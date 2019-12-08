@@ -9,7 +9,7 @@
  *
  * Utility class to handle operations on an array of objects.
 =end
-class Railspress::WP_List_Util
+class Railspress::WpListUtil
   # The input array.
   attr_accessor :input
 
