@@ -163,20 +163,13 @@ module Railspress::TaxonomyLib
   #                          Default 'and'.
   # @return string[]|WP_Taxonomy[] An array of taxonomy names or objects.
   def get_taxonomies( args = {}, output = 'names', operator = 'and' )
-    if output == 'names'
-      Rails.cache.fetch('Railspress::' + 'get_taxonomies(names)', expires_in: 1.hour) {
-        names = []
-        Railspress::Taxonomy.where(args).all.each do |tax|
-          names << tax.name
-        end
-        names
-      }
-    else
-      Rails.cache.fetch('Railspress::' + 'get_taxonomies', expires_in: 1.hour) {
-        Railspress::Taxonomy.where(args)
-      }
-    end
-    # TODO continue get_taxonomies()
+    field = ( 'names' == output ) ? 'name' : false
+    return wp_filter_object_list(Railspress.GLOBAL.wp_taxonomies, args, operator, field)
+    # if output == 'names'
+    #   Railspress::Term.where(term_id: Railspress::Taxonomy.where(args).pluck(:term_id)).pluck(:name)
+    # else
+    #   Railspress::Taxonomy.where(args)
+    # end
   end
 
   # Return the names or objects of the taxonomies which are registered for the requested object or object type, such as
