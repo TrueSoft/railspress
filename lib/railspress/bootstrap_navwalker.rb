@@ -19,7 +19,7 @@
 
       # Filters the CSS class(es) applied to a menu list element.
       class_names = apply_filters('nav_menu_submenu_css_class', classes, args, depth).join(' ')
-      class_names = class_names ? ' class="' + FormattingHelper.esc_attr(class_names) + '"' : ''
+      class_names = class_names ? ' class="' + Railspress::FormattingHelper.esc_attr(class_names) + '"' : ''
 
       # The `.dropdown-menu` container needs to have a labelledby
       # attribute which points to it's trigger link.
@@ -73,11 +73,11 @@
 
       # Allow filtering the classes.
       class_names = apply_filters( 'nav_menu_css_class', classes.reject(&:blank?), item, args, depth ).join(' ')
-      class_names = class_names ? ' class="' + FormattingHelper.esc_attr(class_names) + '"' : ''
+      class_names = class_names ? ' class="' + Railspress::FormattingHelper.esc_attr(class_names) + '"' : ''
 
       # Filters the ID applied to a menu item's list item element.
       id = apply_filters('nav_menu_item_id', 'menu-item-' + item.id.to_s, item, args, depth)
-      id = id ? ' id="' + FormattingHelper.esc_attr(id) + '"' : ''
+      id = id ? ' id="' + Railspress::FormattingHelper.esc_attr(id) + '"' : ''
 
       output << indent + '<li itemscope="itemscope" itemtype="https://www.schema.org/SiteNavigationElement"' + id + class_names + '>'
 
@@ -115,7 +115,7 @@
       attributes = ''
       atts.each_pair do |attr, value|
         unless value.blank?
-          value = ('href' == attr.to_s) ? esc_url(value) : FormattingHelper.esc_attr(value)
+          value = ('href' == attr.to_s) ? esc_url(value) : Railspress::FormattingHelper.esc_attr(value)
           attributes += ' ' + attr + '="' + value + '"'
         end
       end
@@ -141,7 +141,7 @@
       icon_html = ''
       unless icon_class_string.blank?
         # append an <i> with the icon classes to what is output before links.
-        icon_html = '<i class="' + FormattingHelper.esc_attr( icon_class_string ) + '" aria-hidden="true"></i> '
+        icon_html = '<i class="' + Railspress::FormattingHelper.esc_attr( icon_class_string ) + '" aria-hidden="true"></i> '
       end
 
       # This filter is documented in wp-includes/post-template.php
@@ -330,7 +330,7 @@
             # so long as it's not a sr-only class.
             if 'sr-only' != link_class
               atts['class'] ||= ''
-              atts['class'] += ' ' + FormattingHelper.esc_attr( link_class )
+              atts['class'] += ' ' + Railspress::FormattingHelper.esc_attr( link_class )
             end
             # check for special class types we need additional handling for.
             if 'disabled' == link_class
