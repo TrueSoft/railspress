@@ -128,7 +128,7 @@ module Railspress::ThemeHelper
   def self.register_theme_directory( directory )
     unless File.exist? directory
       # Try prepending as the theme directory could be relative to the content directory
-      directory = Railspress.WP_CONTENT_DIR + '/' + directory
+      directory = Railspress.WP_CONTENT_DIR + '/' + directory unless Railspress.WP_CONTENT_DIR.nil?
       # If this directory does not exist, return and do not register
       # TS_INFO: cannot access the WP dir, so we continue...  return false unless File.exist?(directory)
     end
