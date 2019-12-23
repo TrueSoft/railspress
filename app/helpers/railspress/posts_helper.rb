@@ -831,15 +831,14 @@ module Railspress::PostsHelper
   # @return Attachment meta field. False on failure.
   def wp_get_attachment_metadata(attachment_id = 0, unfiltered = false)
     attachment_id = attachment_id.to_i
-    post = get_post(attachment_id )
-    return false if post.nil?
+    return false unless Railspress::WpPost.exists?(attachment_id)
 
-    data = get_post_meta(post.id, '_wp_attachment_metadata', true)
+    data = get_post_meta(attachment_id, '_wp_attachment_metadata', true)
 
     return data if unfiltered
 
     # Filters the attachment meta data.
-    apply_filters('wp_get_attachment_metadata', data, post.id)
+    apply_filters('wp_get_attachment_metadata', data, attachment_id)
   end
 
 
@@ -952,7 +951,10 @@ module Railspress::PostsHelper
   # @param [int|WP_Post] post Optional. Attachment ID or object. Default is global $post.
   # @return [bool] Whether the attachment is an image.
   def wp_attachment_is_image(post = nil)
-    wp_attachment_is('image', post)
+    return false if post.nil?
+    Rails.cache.fetch('Railspress::' + 'Post.' + 'wp_attachment_is_image' + '/' + (((post.is_a?(Integer) || post.is_a?(String))) ? post : post.id).to_s ) {
+      wp_attachment_is('image', post)
+    }
   end
 
   # Retrieve the icon for a MIME type.
