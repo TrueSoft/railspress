@@ -197,7 +197,11 @@ module Railspress
       return self if @filter_str == filter_str
 
       if 'raw' == filter_str
+        if self.is_a?(self.class)
+          return self
+        else
           return self.class.find_by id: self.id
+        end
       end
 
       sanitize_post(self, filter_str)
