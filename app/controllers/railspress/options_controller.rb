@@ -87,7 +87,7 @@ module Railspress
 
     def check_signed_in
       event_check_si = Railspress.main_app_hook.on_check_signed_in
-      if !event_check_si.nil? && !event_check_si.on(:signed_in?)
+      if !event_check_si.nil? && !event_check_si.on(:signed_in?, {controller: controller_name, action: action_name})
         redirect_to main_app.root_url, alert: (event_check_si.temp_message || 'You need to be signed in to access this page.')
       end
     end
