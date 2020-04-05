@@ -41,9 +41,12 @@ module Railspress
         end
       end
       unless @page.nil?
-        if @page.post_status == 'private' && !user_signed_in?
-          redirect_to main_app.root_path, alert: t('railspress.pages.show.no_public', slug: params[:slug])
-          return
+        if @page.post_status == 'private'
+          event_check_si = Railspress.main_app_hook.on_check_signed_in
+          if !event_check_si.nil? && !event_check_si.on(:signed_in?)
+            redirect_to main_app.root_path, alert: t('railspress.pages.show.no_public', slug: params[:slug])
+            return
+          end
         end
         orig_page_id = @page.id
         if Railspress.multi_language
