@@ -43,7 +43,7 @@ module Railspress
       unless @page.nil?
         if @page.post_status == 'private'
           event_check_si = Railspress.main_app_hook.on_check_signed_in
-          if !event_check_si.nil? && !event_check_si.on(:signed_in?)
+          if !event_check_si.nil? && !event_check_si.on(:signed_in?, @page)
             redirect_to main_app.root_path, alert: t('railspress.pages.show.no_public', slug: params[:slug])
             return
           end
