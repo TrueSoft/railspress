@@ -41,6 +41,7 @@ en:
       show:
         not_found: "The page with the name '%{slug}' is not found!"
         no_public: "The page with the name '%{slug}' is not available!"
+        not_allowed: "The page with the name '%{slug}' cannot be displayed!"
         read_more: "Read more"
     post:
       index:

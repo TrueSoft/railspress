@@ -41,6 +41,7 @@ ro:
       show:
         not_found: "Pagina numele '%{slug}' nu este gasită!"
         no_public: "Pagina numele '%{slug}' nu este disponibilă!"
+        not_allowed: "Pagina numele '%{slug}' nu poate fi afișată!"
         read_more: "Mai multe detalii"
     post:
       index:

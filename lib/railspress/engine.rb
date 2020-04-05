@@ -54,6 +54,7 @@ module Railspress
     mattr_accessor :TS_READONLY_OPTIONS
     mattr_accessor :TS_EDITABLE_OPTIONS
     mattr_accessor :GLOBAL
+    mattr_accessor :main_app_hook
 
     # add default values of more config vars here
     self.WPINC = "wp-includes"
@@ -64,6 +65,7 @@ module Railspress
 
   # this function maps the vars from your app into your engine
   def self.setup(&block)
+    self.main_app_hook ||= Railspress::MainAppHook.new
     yield self
 
 

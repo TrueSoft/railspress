@@ -81,6 +81,12 @@ module Railspress
             end
           end
         end
+        Railspress.main_app_hook.on_show_wp_page.each do |event|
+          unless event.on(:show_page, @page)
+            redirect_to main_app.root_path, alert: (event.temp_message || t('railspress.pages.show.not_allowed', slug: params[:slug]))
+            return
+          end
+        end
         @post_class = @page.metas.select { |meta|  meta.meta_key == 'post-class' }.map { |meta| meta.meta_value}.first
       end
     end
