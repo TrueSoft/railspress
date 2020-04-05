@@ -2,6 +2,8 @@ require_dependency "railspress/application_controller"
 
 module Railspress
   class OptionsController < ApplicationController
+    before_action :check_signed_in
+
     def index
       @options = get_display_options
       @option = Railspress::Option.new
@@ -82,6 +84,13 @@ module Railspress
     end
 
     private
+
+    def check_signed_in
+      event_check_si = Railspress.main_app_hook.on_check_signed_in
+      if !event_check_si.nil? && !event_check_si.on(:signed_in?)
+        redirect_to main_app.root_url, alert: (event_check_si.temp_message || 'You need to be signed in to access this page.')
+      end
+    end
 
     def get_display_options
       opts = []
