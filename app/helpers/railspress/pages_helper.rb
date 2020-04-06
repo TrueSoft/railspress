@@ -9,11 +9,69 @@ module Railspress
                                          Railspress::OptionsHelper, Railspress::PostsHelper, Railspress::PostTemplateHelper,
                                          Railspress::PostThumbnailTemplateHelper, Railspress::RevisionHelper]
       shortcode.register_presenter(PagePresenter, RevisionsPresenter)
-      shortcode.process(c, page: @page, main_post: @main_post)
+      processed_c = shortcode.process(c, page: @page, main_post: @main_post)
+      process_video_blocks processed_c
     end
 
     def content_html(c)
       raw content(c)
+    end
+
+    def process_video_blocks(c)
+      original_content = c
+      begin
+        regex_start = /(<!-- wp:core-embed\/(vimeo|youtube)\s*(\{.*\})\s*-->)/
+        regex_end = /(<!-- \/wp:core-embed\/(vimeo|youtube)\s*-->)/
+        starts_of_blocks = c.scan(regex_start)
+        ends_of_blocks = c.scan(regex_end)
+        replacements = []
+        if !starts_of_blocks.blank? && starts_of_blocks.length == ends_of_blocks.length
+          cursor = 0
+          starts_of_blocks.each_with_index do |start_of_block, si|
+            v_params = JSON.parse(start_of_block[2]).symbolize_keys
+            s_index = c.index(start_of_block[0], cursor)
+            cursor = s_index + start_of_block[0].length
+            e_index = c.index(ends_of_blocks[si][0], cursor)
+            cursor = e_index + ends_of_blocks[si][0].length
+            block_content_indices = [s_index + start_of_block[0].length, e_index - 1]
+            unless v_params[:url].blank?
+              to_replace_start = c.index(v_params[:url], block_content_indices.first)
+              raise "Video url #{v_params[:url]} not found in block." if to_replace_start > block_content_indices.last
+              replacement = case v_params[:providerNameSlug]
+                            when 'youtube'
+                            then
+                              match_yt = v_params[:url].scan(/^.*((youtu.be\/)|(v\/)|(\/u\/\w\/)|(embed\/)|(watch\?))\??v?=?([^#\&\?]*).*/)
+                              if !match_yt.blank? && match_yt.first[6].length == 11
+                                content_tag(:iframe, '', width: 640, height:360,
+                                            src: 'https://www.youtube.com/embed/' + match_yt.first[6],
+                                            frameborder: 0, allow: 'accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture', allowfullscreen: true)
+                              else
+                                nil
+                              end
+                            when 'vimeo' then
+                              match_v = v_params[:url].scan(/^https?:\/\/(www\.)?vimeo.com\/(?:channels\/(?:\w+\/)?|groups\/([^\/]*)\/videos\/|)(\d+)(?:|\/\?)/)
+                              if !match_v.blank? && !match_v.first[2].blank?
+                                content_tag(:iframe, '', width: 640, height:360,
+                                            src: 'https://player.vimeo.com/video/' + match_v.first[2],
+                                            frameborder: 0, allow: 'autoplay; fullscreen', allowfullscreen: true)
+                              else
+                                nil
+                              end
+                            else
+                              nil
+                            end
+              replacements << [[to_replace_start, v_params[:url].length], replacement] unless replacement.nil?
+            end
+          end
+        end
+        replacements.reverse.each do |repl|
+          c[repl[0][0], repl[0][1]] = repl[1]
+        end
+        c
+      rescue => err
+        logger.error "Error parsing video tag: #{err.to_s}"
+        original_content
+      end
     end
 
     def output_page_as_card(page, no_content = false)

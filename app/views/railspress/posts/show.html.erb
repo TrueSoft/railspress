@@ -1,7 +1,8 @@
 <%= content_tag :article, id: "post-#{@post.id}", class: get_post_class('', @post).join(' ')  do %>
   <%= render partial: 'entry_header',  locals: {post: @post} %>
   <%= content_tag :div, class: 'entry-content' do %>
-    <%= @post.post_content.html_safe %>
+    <%#= @post.post_content.html_safe %>
+    <%= content_html @post.post_content %>
   <% end %>
   <%= render partial: 'entry_footer',  locals: {post: @post} %>
 <% end %>
