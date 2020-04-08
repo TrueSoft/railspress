@@ -33,6 +33,9 @@ module Railspress
       puts "Initializing Railspress - create_initial_taxonomies..."
       create_initial_taxonomies
 
+      Railspress.main_app_hook.add_action_init.each do |event|
+        event.call
+      end
     end
 
   end
