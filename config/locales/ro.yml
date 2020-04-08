@@ -88,6 +88,8 @@ ro:
       not_found: "Categoria cu numele '%{slug}' nu este gasită!"
     tag:
       not_found: "Eticheta cu numele '%{slug}' nu este gasită!"
+    taxonomy:
+      not_found: "%{taxonomy} cu numele '%{slug}' nu este gasit!"
     invalid_term: "Termen gol."
     invalid_taxonomy: "Taxonomie invalidă."
     invalid_taxonomy_s: "Taxonomie invalidă: %{s}."

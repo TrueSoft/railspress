@@ -88,6 +88,8 @@ en:
       not_found: "The category '%{slug}' is not found!"
     tag:
       not_found: "The tag '%{slug}' is not found!"
+    taxonomy:
+      not_found: "The %{taxonomy} '%{slug}' is not found!"
     invalid_term: "Empty Term."
     invalid_taxonomy: "Invalid taxonomy."
     invalid_taxonomy_s: "Invalid taxonomy: %{s}."
