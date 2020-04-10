@@ -277,15 +277,15 @@ module Railspress::GeneralTemplateHelper
   #
   # @return [string] Archive title.
   def get_the_archive_title()
-    if @archive.taxonomy.is_a?(Railspress::Category) # is_category()
+    if @archive.is_a?(Railspress::Term) && @archive.taxonomy.is_a?(Railspress::Category) # is_category()
       # translators: Category archive title. %s: Category name
       title = t('railspress.post.archive.title.category', name: @archive.name) # sprintf( __( 'Category: %s' ), single_cat_title( '', false ) )
-    elsif @archive.taxonomy.is_a?(Railspress::PostTag) # is_tag()
+    elsif @archive.is_a?(Railspress::Term) && @archive.taxonomy.is_a?(Railspress::PostTag) # is_tag()
       # translators: Tag archive title. %s: Tag name
       title = t('railspress.post.archive.title.tag', name: @archive.name) # sprintf( __( 'Tag: %s' ), single_tag_title( '', false ) )
-    # elsif ( is_author() )
-    #   # translators: Author archive title. %s: Author name
-    #   title = sprintf( __( 'Author: %s' ), '<span class="vcard">' + get_the_author() + '</span>' )
+    elsif @archive.is_a?(Railspress::User) # is_author()
+      # translators: Author archive title. %s: Author name
+      title = t('railspress.post.archive.title.author', name: content_tag(:span, @archive.display_name, class: 'vcard')) # sprintf( __( 'Author: %s' ), '<span class="vcard">' + get_the_author() + '</span>' )
     # elsif ( is_year() )
     #   # translators: Yearly archive title. %s: Year
     #   title = sprintf( __( 'Year: %s' ), get_the_date( _x( 'Y', 'yearly archives date format' ) ) )

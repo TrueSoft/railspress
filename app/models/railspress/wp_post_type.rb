@@ -12,6 +12,9 @@ module Railspress
 
     include Railspress::Functions
     include Railspress::Plugin
+    # include Railspress::Load
+    # include Railspress::OptionsHelper
+    include Railspress::TaxonomyLib
 
     # Post type key.
     attr_accessor :name

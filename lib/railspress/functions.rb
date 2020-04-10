@@ -452,6 +452,8 @@ module Railspress::Functions
     #  els
     if args.kind_of? Hash
       r = args
+    elsif args.kind_of? ActionController::Parameters
+      r = JSON.parse(args.to_s.gsub('=>', ':'))
     else
       r = Railspress::FormattingHelper.wp_parse_str(args)
     end
@@ -505,6 +507,20 @@ module Railspress::Functions
     util.output
   end
 
+  # Convert a value to non-negative integer.
+  #
+  # @param [mixed] maybeint Data you wish to have converted to a non-negative integer.
+  # @return [int] A non-negative integer.
+  def self.absint( maybeint )
+    intval = if maybeint.blank?
+               0
+             elsif maybeint.is_a?(Array) || maybeint.is_a?(Hash)
+               1
+             else
+               maybeint.to_i
+             end
+    intval.abs
+  end
 
   # Whether to force SSL used for the Administration Screens.
   #

@@ -437,6 +437,13 @@ module Railspress::TaxonomyLib
     labels
   end
 
+  def get_post_type_object(post_type) # copied from PostsHelper, because it could not access it otherwise
+    if !Railspress::PHP.is_scalar(post_type) || Railspress.GLOBAL.wp_post_types[post_type].blank?
+      return nil
+    end
+    Railspress.GLOBAL.wp_post_types[post_type]
+  end
+
   # Add an already registered taxonomy to an object type.
   #
   # @global array $wp_taxonomies The registered taxonomies.
