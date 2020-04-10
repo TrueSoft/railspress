@@ -12,6 +12,7 @@ class Railspress::WP_Query
   include Railspress::Functions
   include Railspress::FormattingHelper
   include Railspress::Plugin
+  include Railspress::TaxonomyLib
 
   # Holds the data for a single object that is queried.
   #
@@ -44,32 +45,36 @@ class Railspress::WP_Query
   # #
   # # @var bool
   # attr_accessible :in_the_loop = false;
+
+  # The current post.
   #
-  # # The current post.
-  # #
-  # # @var WP_Post
-  # attr_accessible :post;
+  # @var WP_Post
+  attr_accessor :post
+
+  # Signifies whether the current query is for a single post.
   #
-  #
-  # # Signifies whether the current query is for a single post.
-  # #
-  # # @var bool
-  # attr_accessible :is_single = false;
-  #
+  # @var bool
+  attr_accessor :is_single
+
   # # Signifies whether the current query is for a preview.
   # #
   # # @var bool
-  # attr_accessible :is_preview = false;
+  # attr_accessor :is_preview = false;
+
+  # Signifies whether the current query is for a page.
   #
-  # # Signifies whether the current query is for a page.
-  # #
-  # # @var bool
-  # attr_accessible :is_page = false;
+  # @var bool
+  attr_accessor :is_page
 
   # Signifies whether the current query is for an archive.
   #
   # @var bool
   attr_accessor :is_archive
+
+  # Signifies whether the current query is for an author archive.
+  #
+  # @var bool
+  attr_accessor :is_author
 
   # Signifies whether the current query is for a category archive.
   #
@@ -111,20 +116,20 @@ class Railspress::WP_Query
 
 
   def init_query_flags
-    # @is_single            = false
+    @is_single            = false
     # @is_preview           = false
-    # @is_page              = false
+    @is_page              = false
     @is_archive           = false
-    # @is_date              = false
-    # @is_year              = false
-    # @is_month             = false
-    # @is_day               = false
-    # @is_time              = false
-    # @is_author            = false
+    @is_date              = false
+    @is_year              = false
+    @is_month             = false
+    @is_day               = false
+    @is_time              = false
+    @is_author            = false
     @is_category          = false
     @is_tag               = false
     @is_tax               = false
-    # @is_search            = false
+    @is_search            = false
     # @is_feed              = false
     # @is_comment_feed      = false
     # @is_trackback         = false
@@ -136,8 +141,8 @@ class Railspress::WP_Query
     @is_attachment        = false
     @is_singular          = false
     # @is_robots            = false
-    # @is_posts_page        = false
-    # @is_post_type_archive = false
+    @is_posts_page        = false
+    @is_post_type_archive = false
   end
 
   def init
@@ -238,6 +243,8 @@ class Railspress::WP_Query
     array
   end
 
+  include Railspress::OptionsHelper
+
   # Parse a query string and set query type booleans.
   #
   # @param [string|array] query {
@@ -247,22 +254,97 @@ class Railspress::WP_Query
   def parse_query(p_query = '')
     if !p_query.blank?
       init
-      @query = @query_vars = wp_parse_args(p_query)
+      @query = @query_vars = Railspress::Functions.wp_parse_args(p_query)
     elsif @query.blank?
       @query = @query_vars
     end
     @query_vars         = fill_query_vars(@query_vars)
     @qv = @query_vars
+    # query_vars_changed = true
 
-    # TODO continue
+    # @is_robots = true unless @qv['robots']
+
+    if !Railspress::PHP.is_scalar(@qv['p']) || @qv['p'].to_i < 0
+      @qv['p'] = 0
+      @qv['error'] = '404'
+    else
+      @qv['p'] = @qv['p'].to_i
+    end
+
+    @qv['page_id']  = Railspress::Functions.absint @qv['page_id']
+    @qv['year']     = Railspress::Functions.absint @qv['year']
+    @qv['monthnum'] = Railspress::Functions.absint @qv['monthnum']
+    @qv['day']      = Railspress::Functions.absint @qv['day']
+    @qv['w']        = Railspress::Functions.absint @qv['w']
+    @qv['m']        = Railspress::PHP.is_scalar(@qv['m']) ? @qv['m'].gsub(/[^0-9]/, '') : ''
+    @qv['paged']    = Railspress::Functions.absint @qv['paged']
+    @qv['cat']      = @qv['cat'].gsub(/[^0-9,-]/, '')
+    @qv['author']   = @qv['author'].gsub(/[^0-9,-]/, '')
+    @qv['pagename'] = @qv['pagename'].strip
+    @qv['title']    = @qv['title'].strip
+    @qv['hour']     = Railspress::Functions.absint(@qv['hour']) unless @qv['hour'] == ''
+    @qv['minute']   = Railspress::Functions.absint(@qv['minute']) unless @qv['minute'] == ''
+    @qv['second']   = Railspress::Functions.absint(@qv['second']) unless @qv['second'] == ''
+    @qv['menu_order'] = Railspress::Functions.absint(@qv['menu_order']) unless @qv['menu_order'] == ''
+
+    # Fairly insane upper bound for search string lengths.
+    @qv['s'] = '' if !Railspress::PHP.is_scalar(@qv['s']) || !@qv['s'].blank? || @qv['s'].length > 1600
+
+    # Compat. Map subpost to attachment.
+    @qv['attachment'] = @qv['subpost'] unless @qv['subpost'] == ''
+    @qv['attachment_id'] = @qv['subpost_id'] unless @qv['subpost_id'] == ''
+    @qv['attachment_id'] = Railspress::Functions.absint @qv['attachment_id']
 
     if @qv['attachment'] != '' || !@qv['attachment_id'].blank?
       @is_single = true
       @is_attachment = true
     elsif @qv['name'] != ''
       @is_single = true
+    elsif @qv['p']
+      @is_single = true
+    elsif @qv['hour'] != '' && @qv['minute'] != '' && @qv['second'] != '' && @qv['year'] != '' && @qv['monthnum'] != '' && @qv['day'] != ''
+      # If year, month, day, hour, minute, and second are set, a single
+      # post is being queried.
+      @is_single = true
+    elsif @qv['pagename'] != '' || !@qv['page_id'].blank?
+      @is_page = true
+      @is_single = false
     else
+      # Look for archive queries. Dates, categories, authors, search, post type archives.
+      @is_search = true unless p_query['s'].blank?
 
+      if @qv['second'] != ''
+        @is_time = true
+        @is_date = true
+      end
+
+      if @qv['minute'] != ''
+        @is_time = true
+        @is_date = true
+      end
+
+      if @qv['hour'] != ''
+        @is_time = true
+        @is_date = true
+      end
+
+      if @qv['day']
+        # TODO continue with monthnum year m
+      end
+
+      @query_vars_hash = false
+      parse_tax_query(@qv)
+
+    end
+
+    # TS_INFO added:
+    if @qv['taxonomy'] == 'author'
+      @is_author = true
+      @query_vars['author'] = Railspress::User.where(user_nicename: @qv['slug']).pluck(:id).first
+    end
+    if @qv['taxonomy'] == 'category'
+      @is_category = true
+      @query_vars['cat'] = Railspress::Term.joins(:taxonomy).where(Railspress::Taxonomy.table_name => {taxonomy: @qv['taxonomy']}, slug: @qv['slug']).pluck(:term_id).first
     end
 
     # @is_feed = true unless @qv['feed'].blank?
@@ -287,7 +369,7 @@ class Railspress::WP_Query
       end
     end
 
-    if @qv['page_id']
+    unless @qv['page_id'].blank?
       if 'page' == get_option( 'show_on_front' ) && @qv['page_id'] == get_option( 'page_for_posts' )
         @is_page       = false
         @is_home       = true
@@ -310,6 +392,30 @@ class Railspress::WP_Query
     # TODO do_action_ref_array( 'parse_query', array( &$this ) )
   end
 
+  # Parses various taxonomy related query vars.
+  #
+  # @param [array] q The query variables.
+  def parse_tax_query(q)
+    if !q['tax_query'].blank? && q['tax_query'].is_a?(Array)
+      tax_query = q['tax_query']
+    else
+      tax_query = []
+    end
+
+    if !q['taxonomy'].blank? && !q['term'].blank?
+      tax_query << {
+          taxonomy: q['taxonomy'],
+          terms: [q['term'] ],
+          field: 'slug'
+      }
+    end
+
+    # TODO continue...
+
+    # Fires after taxonomy-related query vars have been parsed.
+    do_action( 'parse_tax_query', self )
+  end
+
   # Sets up the WordPress query by parsing query string.
   #
   # @param [string|array] query URL query string or array of query arguments.
@@ -320,25 +426,74 @@ class Railspress::WP_Query
     # TODO ? self.get_posts
   end
 
+  # Retrieve query variable.
+  #
+  # @param [string] query_var Query variable key.
+  # @param [mixed]  default   Optional. Value to return if the query variable is not set. Default empty.
+  # @return [mixed] Contents of the query variable.
+	def get( query_var, default = '' )
+    return @query_vars[ query_var ] unless @query_vars[ query_var ].nil?
+    default
+	end
+
+  # Set query variable.
+  #
+  # @param [string] query_var Query variable key.
+  # @param [mixed]  value     Query variable value.
+  def set( query_var, value )
+    @query_vars[ query_var ] = value
+  end
+
   # Retrieve queried object.
   #
   # If queried object is not set, then the queried object will be set from
   # the category, tag, taxonomy, posts page, single post, page, or author
   # query variable. After it is set up, it will be returned.
   def get_queried_object
-    return @queried_object unless @queried_object.nil?
+    return @queried_object unless @queried_object.blank?
 
     @queried_object = nil
     @queried_object_id = nil
 
     if @is_category || @is_tag || @is_tax
+      if @is_category
+        if get('cat')
+          term = get_term( get('cat'), 'category' )
+        elsif get('category_name')
+          term = get_term_by('slug', get('category_name'), 'category' )
+        end
+      elsif @is_tag
+        if get('tag_id')
+          term = get_term( get('tag_id'), 'post_tag' )
+        elsif get('tag')
+          term = get_term_by('slug', get('tag'), 'post_tag' )
+        end
+      else
+        #  For other tax queries, grab the first term from the first clause.
+        # TODO continue..
+      end
+
+      if !term.blank? && !term.is_a?(Railspress::WP_Error)
+        @queried_object = term
+        @queried_object_id = term.term_id
+      end
     elsif @is_post_type_archive
+      post_type = get('post_type')
+      if post_type.is_a?(Array)
+        # ??? $post_type = reset( $post_type );
+      end
+      @queried_object = get_post_type_object(post_type)
     elsif @is_posts_page
       page_for_posts = get_option('page_for_posts')
       @queried_object = get_post(page_for_posts)
       @queried_object_id = @queried_object.id
     elsif @is_singular && !@post.blank?
-    elsif @is_author
+      @queried_object = @post
+      @queried_object_id = @post.id
+    elsif is_author?
+      @queried_object_id = get('author').to_i
+      @queried_object    = Railspress::User.find(@queried_object_id) #  get_userdata(@queried_object_id)
+    else
     end
     @queried_object
   end
@@ -367,7 +522,50 @@ class Railspress::WP_Query
     @is_archive
   end
 
-# TODO is_post_type_archive is_attachment is_author
+  # Is the query for an existing post type archive page?
+  #
+  # @param [mixed] post_types Optional. Post type or array of posts types to check against.
+  # @return bool
+  def is_post_type_archive?(post_types = '')
+    return @is_post_type_archive if post_types.blank? || !@is_post_type_archive
+
+    post_type = get('post_type')
+    if post_type.is_a?(Array)
+      post_type = post_type.first
+    end
+    post_type_object = get_post_type_object(post_type)
+
+    post_types.include?(post_type_object.name)
+  end
+
+  # TODO  is_attachment
+
+  # Is the query for an existing author archive page?
+  #
+  # If the $author parameter is specified, this function will additionally
+  # check if the query is for one of the authors specified.
+  #
+  # @param [mixed] author Optional. User ID, nickname, nicename, or array of User IDs, nicknames, and nicenames
+  # @return bool
+  def is_author?( author = '' )
+    return false unless @is_author
+
+    return true if author.blank?
+
+    author_obj = get_queried_object
+
+    author = [author].map {|a| a.to_s}
+
+    if author.include?(author_obj.id.to_s)
+      return true
+    elsif author.include?(author_obj.nickname)
+      return true
+    elsif author.include?(author_obj.user_nicename)
+      return true
+    end
+    false
+  end
+
   # Is the query for an existing category archive page?
   #
   # If the $category parameter is specified, this function will additionally
@@ -378,22 +576,23 @@ class Railspress::WP_Query
   def is_category?( category = '' )
     return false unless @is_category
 
-    # return true if @archive.is_a?
-    # return true if category.blank?
-    #
-    # cat_obj = get_queried_object
-    #
-    # category = array_map( 'strval', (array) category )
-    #
-    # if ( in_array( (string) $cat_obj->term_id, $category ) )
-    #     return true;
-    # elsif ( in_array( $cat_obj->name, $category ) )
-    #   return true;
-    # elsif ( in_array( $cat_obj->slug, $category ) )
-    #   return true;
-    # end
+    return true if category.blank?
 
+    cat_obj = get_queried_object
+
+    category = [category].map {|a| a.to_s}
+
+    if category.include?(cat_obj.term_id.to_s)
+      return true
+    elsif category.include?(cat_obj.name)
+      return true
+    elsif category.include?(cat_obj.slug)
+      return true
+    end
     false
   end
 
+  # TODO is_tag is_tax
+
+  # TODO is_comments_popup is_date ...
 end
