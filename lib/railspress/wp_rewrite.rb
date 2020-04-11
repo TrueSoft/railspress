@@ -382,7 +382,25 @@ module Railspress
       false
     end
 
-    # TODO implement class-wp-rewrite.php get_author_permastruct, get_search_permastruct
+    # Retrieves the author permalink structure.
+    #
+    # The permalink structure is front property, author base, and finally
+    # '/%author%'. Will set the author_structure property and then return it
+    # without attempting to set the value again.
+    #
+    # @return string|false False if not found. Permalink structure string.
+    def get_author_permastruct
+      return @author_structure unless @author_structure.nil?
+
+      if @permalink_structure.blank?
+        @author_structure = ''
+        return false
+      end
+
+      @author_structure = @front + @author_base + '/%author%'
+    end
+
+    # TODO implement class-wp-rewrite.php get_search_permastruct
 
     # Retrieves the page permalink structure.
     #

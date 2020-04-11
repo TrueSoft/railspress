@@ -8,9 +8,8 @@
       </svg>
       <%= content_tag :span, t('railspress.post.show.posted_by'), class: 'screen-reader-text' %>
       <span class="author vcard">
-              <%= link_to post.author.display_name, '#', class: 'url fn n' # TODO get_author_posts_url( get_the_author_meta( 'ID' ) ) in author-template.php
-              %>
-            </span>
+        <%= link_to post.author.display_name, get_author_posts_url( get_the_author_meta( 'id',  post.author.id ), post.author.user_nicename ), class: 'url fn n' %>
+      </span>
     <% end %>
     <%= content_tag :span, class: 'posted-on' do %>
       <svg class="svg-icon" width="16" height="16" aria-hidden="true" role="img" focusable="false" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">

@@ -9,9 +9,8 @@
       </svg>
       <%= content_tag :span, t('railspress.post.show.posted_by'), class: 'screen-reader-text' %>
       <span class="author vcard">
-              <%= link_to post.author.display_name, '#', class: 'url fn n' # TODO get_author_posts_url( get_the_author_meta( 'ID' ) ) in author-template.php
-              %>
-            </span>
+        <%= link_to post.author.display_name, get_author_posts_url( get_the_author_meta( 'id',  post.author.id ), post.author.user_nicename ), class: 'url fn n' %>
+      </span>
     <% end %>
   <% end %>
 <% end %>
