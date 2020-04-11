@@ -522,6 +522,36 @@ module Railspress::Functions
     intval.abs
   end
 
+  # Validates a file name and path against an allowed set of rules.
+  #
+  # A return value of `1` means the file path contains directory traversal.
+  #
+  # A return value of `2` means the file path contains a Windows drive path.
+  #
+  # A return value of `3` means the file is not in the allowed files list.
+  #
+  # @param [string] file          File path.
+  # @param [array]  allowed_files Optional. List of allowed files.
+  # @return [int] 0 means nothing is wrong, greater than 0 means something was wrong.
+  def validate_file( file, allowed_files = [] )
+    # `../` on its own is not allowed:
+    return 1 if '../' == file
+
+    # More than one occurence of `../` is not allowed:
+    return 1 if file.scan(/\.\.\//).length > 1
+
+    # `../` which does not occur at the end of the path is not allowed:
+    return 1 if file.end_with?('../')
+
+    # Files not in the allowed file list are not allowed:
+    return 3 if !allowed_files.blank? && !allowed_files.include?(file)
+
+    # Absolute Windows drive paths are not allowed:
+    return 2 if file[1] == ':'
+
+    0
+    end
+
   # Whether to force SSL used for the Administration Screens.
   #
   # @param [string|bool] $force Optional. Whether to force SSL in admin screens. Default null.

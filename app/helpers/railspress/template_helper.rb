@@ -335,7 +335,52 @@ end
 def get_search_template()
 	get_query_template( 'search' )
 end
- 
-# TODO get_single_template get_embed_template get_singular_template get_attachment_template locate_template load_template
+
+ # Retrieve path of single template in current or parent template. Applies to single Posts,
+ # single Attachments, and single custom post types.
+ #
+ # The hierarchy for this template looks like:
+ #
+ # 1. {Post Type Template}
+ # 2. single-{post_type}-{post_name}
+ # 3. single-{post_type}
+ # 4. single
+ #
+ # An example of this is:
+ #
+ # 1. templates/full-width
+ # 2. single-post-hello-world
+ # 3. single-post
+ # 4. single
+ #
+ # The template hierarchy and template path are filterable via the {@see '$type_template_hierarchy'}
+ # and {@see '$type_template'} dynamic hooks, where `$type` is 'single'.
+ #
+ # @see get_query_template()
+ #
+ # @return [string] Full path to single template file.
+  def get_single_template
+    object = @wp_query.get_queried_object()
+
+    templates = []
+	unless object.post_type.blank?
+		template = get_page_template_slug( object )
+			
+		templates << template if !template.blank? && 0 == validate_file( template )
+		
+		name_decoded = CGI::unescape( object.post_name )
+		
+		templates << "single-#{object.post_type}-#{name_decoded}" unless name_decoded == object.post_name 
+
+		templates << "single-#{object.post_type}-#{object.post_name}"
+		templates << "single-#{object.post_type}"
+	end
+
+    templates << 'single'
+
+    get_query_template( 'single', templates )
+  end
+
+# TODO get_embed_template get_singular_template get_attachment_template locate_template load_template
 
 end

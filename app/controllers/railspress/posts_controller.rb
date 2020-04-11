@@ -29,8 +29,9 @@ module Railspress
       render action: :index
     end
 
-    def show
-      @post = Railspress::Post.published.where(post_name: params[:slug]).first!
+    def single
+      # @wp_query = Railspress::WP_Query.new(params)
+      @post = @wp_query.post # Railspress::Post.published.where(post_name: params[:slug]).first!
       @post_prev, @post_next = neighbours(@post)
       if Railspress.generate_breadcrumb
         @breadcrumb = {t('railspress.post.index.title') => main_app.all_posts_path}
@@ -86,8 +87,6 @@ module Railspress
       else
         @posts = post_class.published.descending.where(flt).paginate(page: params[:page], per_page: helpers.get_option('posts_per_page', nil))
       end
-      @wp_query = Railspress::WP_Query.new
-      @wp_query.parse_query params
 
       templates =
           case params[:taxonomy]
