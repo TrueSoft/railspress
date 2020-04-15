@@ -45,9 +45,6 @@ def get_query_template( type, templates = [] )
 	# Possible values for `$type` include: 'index', '404', 'archive', 'author', 'category', 'tag', 'taxonomy', 'date',
 	# 'embed', 'home', 'frontpage', 'privacypolicy', 'page', 'paged', 'search', 'single', 'singular', and 'attachment'.
 	#
-	# @since 1.5.0
-	# @since 4.8.0 The `$type` and `$templates` parameters were added.
-	#
 	# @param string $template  Path to the template. See locate_template().
 	# @param string $type      Sanitized filename without extension.
 	# @param array  $templates A list of template candidates, in descending order of priority.
@@ -106,20 +103,18 @@ end
  #
  # The hierarchy for this template looks like:
  #
- # 1. author-{nicename}.php
- # 2. author-{id}.php
- # 3. author.php
+ # 1. author-{nicename}
+ # 2. author-{id}
+ # 3. author
  #
  # An example of this is:
  #
- # 1. author-john.php
- # 2. author-1.php
- # 3. author.php
+ # 1. author-john
+ # 2. author-1
+ # 3. author
  #
  # The template hierarchy and template path are filterable via the {@see '$type_template_hierarchy'}
  # and {@see '$type_template'} dynamic hooks, where `$type` is 'author'.
- #
- # @since 1.5.0
  #
  # @see get_query_template()
  #
@@ -143,22 +138,18 @@ end
  #
  # The hierarchy for this template looks like:
  #
- # 1. category-{slug}.php
- # 2. category-{id}.php
- # 3. category.php
+ # 1. category-{slug}
+ # 2. category-{id}
+ # 3. category
  #
  # An example of this is:
  #
- # 1. category-news.php
- # 2. category-2.php
- # 3. category.php
+ # 1. category-news
+ # 2. category-2
+ # 3. category
  #
  # The template hierarchy and template path are filterable via the {@see '$type_template_hierarchy'}
  # and {@see '$type_template'} dynamic hooks, where `$type` is 'category'.
- #
- # @since 1.5.0
- # @since 4.7.0 The decoded form of `category-{slug}.php` was added to the top of the
- #              template hierarchy when the category slug contains multibyte characters.
  #
  # @see get_query_template()
  #
@@ -187,28 +178,24 @@ end
  #
  # The hierarchy for this template looks like:
  #
- # 1. tag-{slug}.php
- # 2. tag-{id}.php
- # 3. tag.php
+ # 1. tag-{slug}
+ # 2. tag-{id}
+ # 3. tag
  #
  # An example of this is:
  #
- # 1. tag-wordpress.php
- # 2. tag-3.php
- # 3. tag.php
+ # 1. tag-wordpress
+ # 2. tag-3
+ # 3. tag
  #
  # The template hierarchy and template path are filterable via the {@see '$type_template_hierarchy'}
  # and {@see '$type_template'} dynamic hooks, where `$type` is 'tag'.
- #
- # @since 2.3.0
- # @since 4.7.0 The decoded form of `tag-{slug}.php` was added to the top of the
- #              template hierarchy when the tag slug contains multibyte characters.
  #
  # @see get_query_template()
  #
  # @return string Full path to tag template file.
 def get_tag_template() 
-	tag = get_queried_object()
+	tag = @wp_query.get_queried_object()
 
 	templates = []
 
@@ -231,15 +218,15 @@ end
  #
  # The hierarchy for this template looks like:
  #
- # 1. taxonomy-{taxonomy_slug}-{term_slug}.php
- # 2. taxonomy-{taxonomy_slug}.php
- # 3. taxonomy.php
+ # 1. taxonomy-{taxonomy_slug}-{term_slug}
+ # 2. taxonomy-{taxonomy_slug}
+ # 3. taxonomy
  #
  # An example of this is:
  #
- # 1. taxonomy-location-texas.php
- # 2. taxonomy-location.php
- # 3. taxonomy.php
+ # 1. taxonomy-location-texas
+ # 2. taxonomy-location
+ # 3. taxonomy
  #
  # The template hierarchy and template path are filterable via the {@see '$type_template_hierarchy'}
  # and {@see '$type_template'} dynamic hooks, where `$type` is 'taxonomy'.
@@ -291,7 +278,7 @@ end
 def get_home_template() 
 	templates = ['home', 'index']
 
-	return get_query_template( 'home', templates )
+	get_query_template( 'home', templates )
 end
 
 # Retrieve path of front page template in current or parent template.
