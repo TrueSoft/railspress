@@ -19,6 +19,6 @@ Rails.application.routes.draw do
 
   # mount Railspress::Engine => "/railspress"
 
-  root 'railspress/pages#home'
+  root 'railspress/pages#index'
 
 end
