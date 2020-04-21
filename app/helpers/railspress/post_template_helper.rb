@@ -511,25 +511,25 @@ module Railspress::PostTemplateHelper
   # Misc
   #
 
- # Get the specific template name for a given post.
- #
- # @since 3.4.0
- # @since 4.7.0 Now works with any post type, not just pages.
- #
- # @param [int|WP_Post] post Optional. Post ID or WP_Post object. Default is global $post.
- # @return [string|false] Page template filename. Returns an empty string when the default page template
- #  is in use. Returns false if the post does not exist.
-def get_page_template_slug( post = nil ) 
-  post = get_post( post )
+  # Get the specific template name for a given post.
+  #
+  # @since 3.4.0
+  # @since 4.7.0 Now works with any post type, not just pages.
+  #
+  # @param [int|WP_Post] post Optional. Post ID or WP_Post object. Default is global $post.
+  # @return [string|false] Page template filename. Returns an empty string when the default page template
+  #  is in use. Returns false if the post does not exist.
+  def get_page_template_slug(post = nil)
+    post = get_post(post)
 
-  return false if post.nil?
+    return false if post.nil?
 
-  template = get_post_meta( post.id, '_wp_page_template', true )
+    template = get_post_meta(post.id, '_wp_page_template', true)
 
-  return '' if !template || 'default' == template 
+    return '' if !template || 'default' == template
 
-  template
-end
+    template
+  end
 
   # Display a list of a post's revisions.
   #
