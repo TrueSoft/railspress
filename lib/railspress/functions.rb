@@ -454,6 +454,8 @@ module Railspress::Functions
       r = args
     elsif args.kind_of? ActionController::Parameters
       r = JSON.parse(args.to_s.gsub('=>', ':'))
+    elsif args == ''
+      r = {}
     else
       r = Railspress::FormattingHelper.wp_parse_str(args)
     end
