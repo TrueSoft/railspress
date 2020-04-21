@@ -13,7 +13,7 @@ Railspress::Engine.routes.draw do
   get 'posts/category/:slug' => 'posts#archive', defaults: {taxonomy: 'category'}
   get 'posts/author/:slug' => 'posts#archive', defaults: {taxonomy: 'author'}, as: :authors_posts
 
-  get '*slug' => 'pages#show'
-  get '/' => 'pages#home'
+  get '*pagename' => 'pages#show'
+  get '/' => 'pages#index'
 
 end
