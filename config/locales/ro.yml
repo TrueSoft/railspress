@@ -80,6 +80,7 @@ ro:
         next_post: "Articolul următor"
         prev_post: "Articolul precedent"
         tags: "Etichete"
+        category: "Categorie"
 
         not_found: "Postarea cu numele '%{slug}' nu este gasită!"
         id_not_found: "Postarea cu id '%{id}' nu este gasită!"
