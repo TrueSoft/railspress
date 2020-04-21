@@ -23,7 +23,7 @@
        end
     %>
     <%= excerpt.html_safe %>
-    <% unless extended_entry_info[:extended].blank? %>
+    <% if !extended_entry_info[:extended].blank? || !post.post_excerpt.blank? %>
       <%= content_tag :div, class: 'text-sm-right' do %>
         <%= link_to post_link, class: 'more-link btn btn-primary d-block d-sm-inline' do %>
           <%= t('railspress.post.index.more') %>
