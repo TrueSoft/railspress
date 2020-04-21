@@ -1,0 +1,6 @@
+<%= content_tag :h1 do %>
+  <%= get_option 'blogname' %>
+  <%= content_tag :small, get_option('blogdescription', ''), class: 'text-muted' %>
+<% end %>
+
+<%= render template: 'railspress/pages/index' %>
