@@ -80,6 +80,15 @@ module Railspress::FormattingHelper
   string
   end
 
+  # Converts all accent characters to ASCII characters.
+  #
+  # If there are no accent characters, then the string given is just returned.
+  def remove_accents(string)
+    I18n.transliterate string
+  end
+
+  # TODO sanitize_file_name sanitize_user
+
   # Sanitizes a string key.
   #
   # Keys are used as internal identifiers. Lowercase alphanumeric characters, dashes and underscores are allowed.
