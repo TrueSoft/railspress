@@ -97,7 +97,23 @@ def get_archive_template()
 	get_query_template( 'archive', templates )
 end
 
-# TODO get_post_type_archive_template
+ # Retrieve path of post type archive template in current or parent template.
+ #
+ # The template hierarchy and template path are filterable via the {@see '$type_template_hierarchy'}
+ # and {@see '$type_template'} dynamic hooks, where `$type` is 'archive'.
+ #
+ # @return string Full path to archive template file.
+	def get_post_type_archive_template()
+		post_type = @wp_query.get( 'post_type' )
+
+		# ??? post_type = reset( post_type ) if post_type.is_a?(Array)
+
+		obj = get_post_type_object( post_type )
+
+		return '' if !(obj.is_a?(Railspress::WpPostType)) || !obj.has_archive
+
+		get_archive_template
+	end
 
  # Retrieve path of author template in current or parent template.
  #
@@ -235,7 +251,7 @@ end
  #
  # @return string Full path to custom taxonomy term template file.
 def get_taxonomy_template() 
-	term = get_queried_object()
+	term = @wp_query.get_queried_object()
 
 	templates = []
 
@@ -309,7 +325,53 @@ def get_privacy_policy_template()
 	get_query_template( 'privacypolicy', templates )
 end
 
-# TODO get_page_template
+   # Retrieve path of page template in current or parent template.
+   #
+   # The hierarchy for this template looks like:
+   #
+   # 1. {Page Template}
+   # 2. page-{page_name}
+   # 3. page-{id}
+   # 4. page
+   #
+   # An example of this is:
+   #
+   # 1. page-templates/full-width
+   # 2. page-about
+   # 3. page-4
+   # 4. page
+   #
+   # The template hierarchy and template path are filterable via the {@see '$type_template_hierarchy'}
+   # and {@see '$type_template'} dynamic hooks, where `$type` is 'page'.
+   #
+   # @see get_query_template()
+   #
+   # @return [string] Full path to page template file.
+  def get_page_template
+    id       = @wp_query.get_queried_object_id()
+		template = get_page_template_slug(id)
+    pagename = @wp_query.get('pagename' )  # get_query_var( 'pagename' )
+
+    if pagename.blank? && id
+      # If a static page is set as the front page, $pagename will not be set. Retrieve it from the queried object
+      post = @wp_query.get_queried_object()
+      pagename = post.post_name if post
+    end
+
+    templates = []
+    templates << template if !template.blank? && 0 == validate_file( template )
+
+    unless pagename.blank?
+      pagename_decoded =  CGI::unescape( pagename )
+      templates << "page-#{pagename_decoded}" unless pagename_decoded == pagename
+      templates << "page-#{pagename}"
+    end
+
+    templates << "page-#{id}" unless id.blank?
+    templates << 'page'
+
+    get_query_template( 'page', templates )
+  end
 
  # Retrieve path of search template in current or parent template.
  #
@@ -318,7 +380,7 @@ end
  #
  # @see get_query_template()
  #
- # @return string Full path to search template file.
+ # @return [string] Full path to search template file.
 def get_search_template()
 	get_query_template( 'search' )
 end

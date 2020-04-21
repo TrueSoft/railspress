@@ -12,7 +12,7 @@ module Railspress
 
     include Railspress::Functions
     include Railspress::Plugin
-    # include Railspress::Load
+    include Railspress::Load
     # include Railspress::OptionsHelper
     include Railspress::TaxonomyLib
 
