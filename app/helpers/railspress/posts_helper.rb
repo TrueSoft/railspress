@@ -799,6 +799,40 @@ module Railspress::PostsHelper
     value
    end
 
+  # Retrieves a page given its path.
+  #
+  # @param [string]       page_path Page path.
+  # @param [string]       output    Optional. The required return type. One of OBJECT, ARRAY_A, or ARRAY_N, which correspond to
+  #                                 a WP_Post object, an associative array, or a numeric array, respectively. Default OBJECT.
+  # @param [string|array] post_type Optional. Post type or array of post types. Default 'page'.
+  # @return [WP_Post|array|null] WP_Post (or array) on success, or null on failure.
+  def get_page_by_path(page_path, output = :OBJECT, post_type = 'page')
+    slugs = page_path.split('/')
+    ancestors = []
+    p_class = Railspress::WpPost.find_sti_class(post_type)
+    page = nil
+    begin
+      post_parent = 0
+      slugs.each do |slug|
+        begin
+          page = p_class.where(post_name: slug, post_parent: post_parent).first!
+          post_parent = page.id
+          ancestors << page
+        rescue ActiveRecord::RecordNotFound
+          page = nil
+          break
+        end
+      end
+    rescue ActiveRecord::RecordNotFound
+      page = if slugs.size == 1 # retry without considering the parent
+               p_class.where(post_name: params[:slug]).first
+             else
+               nil
+             end
+    end
+    page
+  end
+
   # Build the URI path for a page.
   #
   # Sub pages will be in the "directory" under the parent page post name.

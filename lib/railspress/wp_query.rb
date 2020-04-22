@@ -26,11 +26,11 @@ class Railspress::WP_Query
   # @var int
   attr_accessor :queried_object_id
 
-  # # List of posts.
-  # #
-  # # @var array
-  # attr_accessible :posts;
+  # List of posts.
   #
+  # @var array
+  attr_accessor :posts
+
   # # The amount of posts for the current query.
   # #
   # # @var int
@@ -244,6 +244,7 @@ class Railspress::WP_Query
   end
 
   include Railspress::OptionsHelper
+  include Railspress::PostsHelper
 
   # Parse a query string and set query type booleans.
   #
@@ -281,6 +282,7 @@ class Railspress::WP_Query
     @qv['cat']      = @qv['cat'].gsub(/[^0-9,-]/, '')
     @qv['author']   = @qv['author'].gsub(/[^0-9,-]/, '')
     @qv['pagename'] = @qv['pagename'].strip
+    @qv['name']     = @qv['name'].strip
     @qv['title']    = @qv['title'].strip
     @qv['hour']     = Railspress::Functions.absint(@qv['hour']) unless @qv['hour'] == ''
     @qv['minute']   = Railspress::Functions.absint(@qv['minute']) unless @qv['minute'] == ''
@@ -295,12 +297,12 @@ class Railspress::WP_Query
     @qv['attachment_id'] = @qv['subpost_id'] unless @qv['subpost_id'] == ''
     @qv['attachment_id'] = Railspress::Functions.absint @qv['attachment_id']
 
-    if @qv['attachment'] != '' || !@qv['attachment_id'].blank?
+    if @qv['attachment'] != '' || @qv['attachment_id'] != 0
       @is_single = true
       @is_attachment = true
     elsif @qv['name'] != ''
       @is_single = true
-    elsif @qv['p']
+    elsif @qv['p'] != 0
       @is_single = true
     elsif @qv['hour'] != '' && @qv['minute'] != '' && @qv['second'] != '' && @qv['year'] != '' && @qv['monthnum'] != '' && @qv['day'] != ''
       # If year, month, day, hour, minute, and second are set, a single
@@ -580,7 +582,8 @@ class Railspress::WP_Query
 
     cat_obj = get_queried_object
 
-    category = [category].map {|a| a.to_s}
+    category = [category] unless category.is_a?(Array)
+    category.map!(&:to_s)
 
     if category.include?(cat_obj.term_id.to_s)
       return true
@@ -592,7 +595,132 @@ class Railspress::WP_Query
     false
   end
 
-  # TODO is_tag is_tax
+  # Is the query for an existing tag archive page?
+  #
+  # If the tag parameter is specified, this function will additionally
+  # check if the query is for one of the tags specified.
+  #
+  # @param [int|string|int[]|string[]] tag Optional. Tag ID, name, slug, or array of such
+  #                                        to check against. Default empty.
+  # @return [bool]
+  def is_tag?( tag = '' )
+    return false unless @is_tag
+
+    return true if tag.blank?
+
+    tag_obj = get_queried_object
+
+    tag = [tag] unless tag.is_a?(Array)
+    tag.map!(&:to_s)
+
+    if tag.include?(tag_obj.term_id.to_s)
+      return true
+    elsif tag.include?(tag_obj.name)
+      return true
+    elsif tag.include?(tag_obj.slug)
+      return true
+    end
+    false
+  end
+
+  # TODO is_tax
 
   # TODO is_comments_popup is_date ...
+
+  # Is the query for the front page of the site?
+  #
+  # This is for what is displayed at your site's main URL.
+  #
+  # Depends on the site's "Front page displays" Reading Settings 'show_on_front' and 'page_on_front'.
+  #
+  # If you set a static page for the front page of your site, this function will return
+  # true when viewing that page.
+  #
+  # Otherwise the same as @see WP_Query::is_home()
+  #
+  # @return bool True, if front of site.
+  def is_front_page?
+    # Most likely case.
+    if 'posts' == get_option( 'show_on_front' ) && @is_home
+      true
+    elsif 'page' == get_option( 'show_on_front' ) && !get_option( 'page_on_front' ).blank? && is_page?( get_option( 'page_on_front' ) )
+      true
+    else
+      false
+    end
+  end
+
+  # Is the query for the blog homepage?
+  #
+  # This is the page which shows the time based blog content of your site.
+  #
+  # Depends on the site's "Front page displays" Reading Settings 'show_on_front' and 'page_for_posts'.
+  #
+  # If you set a static page for the front page of your site, this function will return
+  # true only on the page you set as the "Posts page".
+  #
+  # @see WP_Query::is_front_page()
+  #
+  # @return [bool] True if blog view homepage.
+  def is_home?
+    @is_home
+  end
+
+  # Is the query for the Privacy Policy page?
+  #
+  # This is the page which shows the Privacy Policy content of your site.
+  #
+  # Depends on the site's "Change your Privacy Policy page" Privacy Settings 'wp_page_for_privacy_policy'.
+  #
+  # This function will return true only on the page you set as the "Privacy Policy page".
+  #
+  # @return [bool] True, if Privacy Policy page.
+  def is_privacy_policy?
+    if !get_option( 'wp_page_for_privacy_policy' ).blank? && is_page?( get_option( 'wp_page_for_privacy_policy' ) )
+      true
+    else
+      false
+    end
+  end
+
+  # Is the query for an existing single page?
+  #
+  # If the page parameter is specified, this function will additionally
+  # check if the query is for one of the pages specified.
+  #
+  # @see WP_Query::is_single()
+  # @see WP_Query::is_singular()
+  #
+  # @param [int|string|int[]|string[]] page Optional. Page ID, title, slug, path, or array of such
+  #                                         to check against. Default empty.
+  # @return [bool] Whether the query is for an existing single page.
+  def is_page?(page = '')
+    return false unless @is_page
+
+    return true if page.blank?
+
+    page_obj = get_queried_object()
+
+    page = [page] unless page.is_a?(Array)
+    page.map!(&:to_s)
+
+    if page_obj.is_a?(Railspress::Page) && page.include?(page_obj.id.to_s)
+      return true
+    elsif page_obj.is_a?(Railspress::Page) && page.include?(page_obj.post_title)
+      return true
+    elsif page_obj.is_a?(Railspress::Page) && page.include?(page_obj.post_name)
+      return true
+    else
+      page.each do |pagepath|
+        next unless pagepath.include?('/')
+        pagepath_obj = get_page_by_path(pagepath)
+        if !pagepath_obj.blank? && pagepath_obj.id == page_obj.id
+          return true
+        end
+      end
+    end
+    false
+  end
+
+
 end

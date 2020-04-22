@@ -430,6 +430,97 @@ end
     get_query_template( 'single', templates )
   end
 
-# TODO get_embed_template get_singular_template get_attachment_template locate_template load_template
+  # Retrieves an embed template path in the current or parent template.
+  #
+  # The hierarchy for this template looks like:
+  #
+  # 1. embed-{post_type}-{post_format}
+  # 2. embed-{post_type}
+  # 3. embed
+  #
+  # An example of this is:
+  #
+  # 1. embed-post-audio
+  # 2. embed-post
+  # 3. embed
+  #
+  # The template hierarchy and template path are filterable via the {@see 'type_template_hierarchy'}
+  # and {@see 'type_template'} dynamic hooks, where `type` is 'embed'.
+  #
+  # @see get_query_template()
+  #
+  # @return [string] Full path to embed template file.
+  def get_embed_template
+	  object = get_queried_object
+
+	  templates = []
+
+	  unless object.post_type.blank?
+		  post_format = get_post_format( object )
+  		templates << "embed-#{object.post_type}-#{post_format}" unless post_format.blank?
+	  	templates << "embed-#{object.post_type}"
+	  end
+
+  	templates << 'embed'
+
+	  get_query_template('embed', templates )
+  end
+
+  # Retrieves the path of the singular template in current or parent template.
+  #
+  # The template hierarchy and template path are filterable via the {@see 'type_template_hierarchy'}
+  # and {@see 'type_template'} dynamic hooks, where `type` is 'singular'.
+  #
+  # @see get_query_template()
+  #
+  # @return string Full path to singular template file
+	def get_singular_template
+		get_query_template('singular')
+	end
+
+ # Retrieve path of attachment template in current or parent template.
+ #
+ # The hierarchy for this template looks like:
+ #
+ # 1. {mime_type}-{sub_type}
+ # 2. {sub_type}
+ # 3. {mime_type}
+ # 4. attachment
+ #
+ # An example of this is:
+ #
+ # 1. image-jpeg
+ # 2. jpeg
+ # 3. image
+ # 4. attachment
+ #
+ # The template hierarchy and template path are filterable via the {@see '$type_template_hierarchy'}
+ # and {@see '$type_template'} dynamic hooks, where `$type` is 'attachment'.
+ #
+ # @see get_query_template()
+ #
+ # @return string Full path to attachment template file.
+def get_attachment_template
+	attachment = get_queried_object()
+
+	templates = []
+
+	if attachment
+		if attachment.post_mime_type.include?('/')
+			type, subtype = attachment.post_mime_type.split('/')
+		else
+			type, subtype = attachment.post_mime_type, ''
+		end
+
+		unless subtype.blank?
+			templates << "#{type}-#{subtype}"
+			templates << "#{subtype}"
+		end
+		templates << "#{type}"
+	end
+	templates << 'attachment'
+
+	get_query_template('attachment', templates)
+end
 
 end

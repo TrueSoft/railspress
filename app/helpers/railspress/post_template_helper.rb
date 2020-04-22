@@ -257,7 +257,6 @@ module Railspress::PostTemplateHelper
     classes.uniq
   end
 
-
   # Displays the class names for the body element.
   #
   # @param [string|string[]] class_ Space-separated string or array of class names to add to the class list.
