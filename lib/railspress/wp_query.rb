@@ -290,7 +290,7 @@ class Railspress::WP_Query
     @qv['menu_order'] = Railspress::Functions.absint(@qv['menu_order']) unless @qv['menu_order'] == ''
 
     # Fairly insane upper bound for search string lengths.
-    @qv['s'] = '' if !Railspress::PHP.is_scalar(@qv['s']) || !@qv['s'].blank? || @qv['s'].length > 1600
+    @qv['s'] = '' if !Railspress::PHP.is_scalar(@qv['s']) || (!@qv['s'].blank? && Railspress::PHP.strlen(@qv['s']) > 1600)
 
     # Compat. Map subpost to attachment.
     @qv['attachment'] = @qv['subpost'] unless @qv['subpost'] == ''

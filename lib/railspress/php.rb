@@ -39,6 +39,14 @@ module Railspress::PHP
     output
   end
 
+  def self.strlen(string)
+    if string.nil?
+      0
+    else
+      string.to_s.length
+    end
+  end
+
   def stream_get_wrappers
     %w(https ftps compress.zlib php file glob data http ftp phar)
   end
