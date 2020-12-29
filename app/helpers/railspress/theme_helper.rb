@@ -272,16 +272,18 @@ module Railspress::ThemeHelper
   def get_theme_mods
     theme_slug = get_option( 'stylesheet' )
     mods       = get_option( "theme_mods_#{theme_slug}" )
-    unless mods
+    if mods
       theme_name = get_option( 'current_theme' )
       unless theme_name
         theme_name = wp_get_theme.get( 'Name' )
       end
-      mods = get_option( "mods_#{theme_name}" ) # Deprecated location.
+      # mods = get_option( "mods_#{theme_name}" ) # Deprecated location.
       # if is_admin() && false != mods
       #   update_option( "theme_mods_#{theme_slug}", mods )
       #   delete_option( "mods_#{theme_name}" )
       # end
+    else
+      mods = {}
     end
     mods
   end
