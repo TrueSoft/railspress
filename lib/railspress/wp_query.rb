@@ -433,10 +433,10 @@ class Railspress::WP_Query
   # @param [string] query_var Query variable key.
   # @param [mixed]  default   Optional. Value to return if the query variable is not set. Default empty.
   # @return [mixed] Contents of the query variable.
-	def get( query_var, default = '' )
+  def get( query_var, default = '' )
     return @query_vars[ query_var ] unless @query_vars[ query_var ].nil?
     default
-	end
+  end
 
   # Set query variable.
   #

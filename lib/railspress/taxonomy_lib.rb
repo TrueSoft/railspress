@@ -325,7 +325,7 @@ module Railspress::TaxonomyLib
     Railspress.GLOBAL.wp_taxonomies = {} if Railspress.GLOBAL.wp_taxonomies.nil?
     args = Railspress::Functions.wp_parse_args( args )
 
-    if ( taxonomy.blank? || taxonomy.length > 32 )
+    if taxonomy.blank? || taxonomy.length > 32
       # _doing_it_wrong( __FUNCTION__, __( 'Taxonomy names must be between 1 and 32 characters in length.' ), '4.2.0' )
       return Railspress::WP_Error.new( 'taxonomy_length_invalid', ( 'Taxonomy names must be between 1 and 32 characters in length.' ) )
     end
