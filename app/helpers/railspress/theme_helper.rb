@@ -22,7 +22,7 @@ module Railspress::ThemeHelper
         theme_root = Railspress.WP_CONTENT_DIR + theme_root
       end
     end
-    WP_Theme.new( stylesheet, theme_root )
+    Railspress::WP_Theme.new( stylesheet, theme_root )
   end
 
   # Whether a child theme is in use.
@@ -62,7 +62,7 @@ module Railspress::ThemeHelper
   #
   # @return string
   def get_stylesheet_directory_uri
-    stylesheet         = URI::escape(get_stylesheet).gsub('%2F', '/')
+    stylesheet         = Railspress::PHP.rawurlencode(get_stylesheet).gsub('%2F', '/')
     theme_root_uri     = get_theme_root_uri( stylesheet )
     stylesheet_dir_uri = "#{theme_root_uri}/#{stylesheet}"
 
