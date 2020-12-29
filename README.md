@@ -35,6 +35,21 @@ Or install it yourself as:
 $ gem install railspress
 ```
 
+In database.yml add an entry with the table prefix used in WordPress:
+
+```
+  prefix: wp
+```
+
+Add an initializer
+
+### Dependencies
+
+```ruby
+gem 'shortcode'
+gem 'will_paginate', '~> 3.1.1'
+```
+
 ## Contributing
 
 Contribution directions go here.
