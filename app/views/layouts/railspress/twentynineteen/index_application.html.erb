@@ -11,8 +11,11 @@
   <link rel='stylesheet' id='twentynineteen-style-css'  href='<%= get_bloginfo('stylesheet_url') %>' type='text/css' media='all' />
   <link rel='stylesheet' id='twentynineteen-print-style-css'  href='<%= get_stylesheet_directory_uri %>/print.css' type='text/css' media='all' />
   <%= javascript_include_tag 'application' %>
-  <% wp_site_icon.each do |link| %>
-    <%= link.html_safe %>
+  <% site_icons = wp_site_icon
+     unless site_icons.blank? %>
+    <% site_icons.each do |link| %>
+      <%= link.html_safe %>
+    <% end %>
   <% end %>
 </head>
 
