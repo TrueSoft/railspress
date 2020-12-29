@@ -1,0 +1,11 @@
+uncategorized:
+  term_taxonomy_id: 1
+  term_id: 1
+  taxonomy: 'category'
+  description: ''
+
+cat_a:
+  term_taxonomy_id: 2
+  term_id: 2
+  taxonomy: 'category'
+  description: ''

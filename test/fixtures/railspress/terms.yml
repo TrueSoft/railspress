@@ -1,0 +1,14 @@
+uncategorized:
+  term_id: 1
+  name: "Uncategorized"
+  slug: uncategorized
+
+cat_a:
+  term_id: 2
+  name: 'cat-a'
+  slug: 'cat-a'
+
+tag_a:
+  term_id: 3
+  name: 'Tag Named A'
+  slug: 'tag-a'

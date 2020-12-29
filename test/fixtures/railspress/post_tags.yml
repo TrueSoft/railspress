@@ -1,0 +1,5 @@
+tag_a:
+  term_taxonomy_id: 3
+  term_id: 3
+  taxonomy: 'post_tag'
+  description: ''

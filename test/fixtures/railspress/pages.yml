@@ -1,0 +1,97 @@
+services:
+  ID: 1
+  post_author: 1
+  post_content: Page content
+  post_excerpt: ' '
+  post_title: Services
+  post_name: services
+  post_type: page
+  post_content_filtered: ''
+  to_ping: ''
+  pinged: ''
+  post_modified: <%= DateTime.now.to_s(:db) %>
+  post_date: <%= 5.day.ago.to_s(:db) %>
+
+products:
+  ID: 2
+  post_author: 1
+  post_content: <table><tr><td>Product</td></tr></table>
+  post_excerpt: ''
+  post_title: Products
+  post_name: products
+  post_type: page
+  post_parent: 1
+  post_content_filtered: ''
+  to_ping: ''
+  pinged: ''
+  post_date: <%= 5.day.ago.to_s(:db) %>
+  post_modified: <%= DateTime.now.to_s(:db) %>
+
+about:
+  post_author: 1
+  post_content: 'Page for query_conditional_test'
+  post_excerpt: ''
+  post_title: 'about'
+  post_name: 'about'
+  post_type: page
+  post_content_filtered: ''
+  to_ping: ''
+  pinged: ''
+  post_date: <%= DateTime.now.to_s(:db) %>
+  post_modified: <%= DateTime.now.to_s(:db) %>
+
+parent_page:
+  ID: 2400
+  post_author: 1
+  post_content: 'Page for query_conditional_test'
+  post_excerpt: ''
+  post_title: 'parent-page'
+  post_name: 'parent-page'
+  post_type: page
+  post_content_filtered: ''
+  to_ping: ''
+  pinged: ''
+  post_date: <%= DateTime.now.to_s(:db) %>
+  post_modified: <%= DateTime.now.to_s(:db) %>
+
+child_page_1:
+  ID: 2401
+  post_content: 'Child page for query_conditional_test'
+  post_excerpt: ''
+  post_title: 'child-page-1'
+  post_name: 'child-page-1'
+  post_type: page
+  post_parent: 2400
+  post_content_filtered: ''
+  to_ping: ''
+  pinged: ''
+  post_date: <%= DateTime.now.to_s(:db) %>
+  post_modified: <%= DateTime.now.to_s(:db) %>
+
+child_page_2:
+  ID: 2402
+  post_author: 1
+  post_content: 'Child page for query_conditional_test'
+  post_excerpt: ''
+  post_title: 'child-page-2'
+  post_name: 'child-page-2'
+  post_type: page
+  post_parent: 2401
+  post_content_filtered: ''
+  to_ping: ''
+  pinged: ''
+  post_date: <%= DateTime.now.to_s(:db) %>
+  post_modified: <%= DateTime.now.to_s(:db) %>
+
+privacy_policy:
+  post_author: 1
+  post_content: Privacy policy page
+  post_excerpt: ''
+  post_title: 'Privacy Policy'
+  post_name: 'privacy-policy'
+  post_type: page
+  post_content_filtered: ''
+  to_ping: ''
+  pinged: ''
+  post_date: <%= DateTime.now.to_s(:db) %>
+  post_modified: <%= DateTime.now.to_s(:db) %>

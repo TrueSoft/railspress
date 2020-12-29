@@ -1,4 +1,19 @@
+siteurl:
+  option_name: siteurl
+  option_value: 'http://localhost:3000'
+  autoload: 'yes'
+
+home:
+  option_name: home
+  option_value: 'http://localhost:3000'
+  autoload: 'yes'
+
 permalink:
   option_name: permalink_structure
   option_value: /%postname%/
+  autoload: 'yes'
+
+show_on_front:
+  option_name: show_on_front
+  option_value: posts
   autoload: 'yes'
