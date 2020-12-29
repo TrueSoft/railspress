@@ -8,6 +8,7 @@ module Railspress::PostsHelper
   include Railspress::Plugin
   include Railspress::Load
   include Railspress::PHP
+  include Railspress::MetaHelper
 
   # Creates the initial post types when 'init' action is fired.
   def self.create_initial_post_types

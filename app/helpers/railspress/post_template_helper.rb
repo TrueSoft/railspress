@@ -6,6 +6,7 @@
  * file wp-includes\post-template.php
 =end
 module Railspress::PostTemplateHelper
+  include Railspress::PostsHelper
   include Railspress::TaxonomyLib
 
   # Display the ID of the current item in the WordPress Loop.
