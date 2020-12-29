@@ -39,6 +39,14 @@ module Railspress::PHP
     output
   end
 
+  def self.rawurlencode(string)
+    if string.blank?
+      ''
+    else
+      URI::escape(string)
+    end
+  end
+
   def self.strlen(string)
     if string.nil?
       0
