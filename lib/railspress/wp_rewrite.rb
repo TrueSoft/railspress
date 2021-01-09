@@ -559,7 +559,29 @@ module Railspress
       end
     end
 
-    # TS_INFO: set_permalink_structure, set_category_base, set_tag_base will not be called
+    # Sets the main permalink structure for the site.
+    #
+    # Will update the 'permalink_structure' option, if there is a difference
+    # between the current permalink structure and the parameter value. Calls
+    # WP_Rewrite::init() after the option is updated.
+    #
+    # Fires the {@see 'permalink_structure_changed'} action once the init call has
+    # processed passing the old and new values
+    #
+    # @param [string] permalink_structure Permalink structure.
+    def set_permalink_structure( permalink_structure )
+      if permalink_structure != @permalink_structure
+        old_permalink_structure = @permalink_structure
+        update_option( 'permalink_structure', permalink_structure )
+
+        init
+
+        # Fires after the permalink structure is updated.
+        do_action 'permalink_structure_changed', old_permalink_structure, permalink_structure
+      end
+    end
+
+    # TS_INFO: set_category_base, set_tag_base will not be called
 
   end
 end
