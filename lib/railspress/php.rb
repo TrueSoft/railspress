@@ -58,4 +58,10 @@ module Railspress::PHP
   def stream_get_wrappers
     %w(https ftps compress.zlib php file glob data http ftp phar)
   end
+
+  def self.parse_str(string)
+    require 'addressable/uri'
+    Addressable::URI.parse(string).query_values()
+  end
+
 end

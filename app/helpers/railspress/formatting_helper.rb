@@ -585,8 +585,7 @@ module Railspress::FormattingHelper
   # @param [string] string The string to be parsed.
   # @param [array]  array  Variables will be stored in this array.
   def wp_parse_str(string, array = nil)
-    require 'addressable/uri'
-    array = Addressable::URI.parse(string)
+    array = Railspress::PHP.parse_str string
     # TODO if ( get_magic_quotes_gpc() ) {
     #     $array = stripslashes_deep( array );
     # }
