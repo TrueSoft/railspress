@@ -14,6 +14,17 @@ class Railspress::WP_Query
   include Railspress::Plugin
   include Railspress::TaxonomyLib
 
+  # Query vars set by the user
+  attr_accessor :query
+
+  # Query vars, after parsing
+  attr_accessor :query_vars
+
+  # Taxonomy query, as passed to get_tax_sql()
+  #
+  # @var object WP_Tax_Query
+  attr_accessor :tax_query
+
   # Holds the data for a single object that is queried.
   #
   # Holds the contents of a post, page, category, attachment.
@@ -148,7 +159,7 @@ class Railspress::WP_Query
   def init
     # unset( $this->posts );
     # unset( $this->query );
-    # $this->query_vars = array();
+    @query_vars = {}
     @queried_object = nil
     @queried_object_id = nil
     # $this->post_count   = 0;
@@ -177,6 +188,7 @@ class Railspress::WP_Query
   # @param [array] array Defined query variables.
   # @return [array] Complete query variables with undefined ones filled in empty.
   def fill_query_vars(array)
+    array.stringify_keys!
     keys = [
         'error',
         'm',
@@ -279,7 +291,7 @@ class Railspress::WP_Query
     @qv['w']        = Railspress::Functions.absint @qv['w']
     @qv['m']        = Railspress::PHP.is_scalar(@qv['m']) ? @qv['m'].gsub(/[^0-9]/, '') : ''
     @qv['paged']    = Railspress::Functions.absint @qv['paged']
-    @qv['cat']      = @qv['cat'].gsub(/[^0-9,-]/, '')
+    @qv['cat']      = @qv['cat'].gsub(/[^0-9,-]/, '') if @qv['cat'].is_a?(String)
     @qv['author']   = @qv['author'].gsub(/[^0-9,-]/, '')
     @qv['pagename'] = @qv['pagename'].strip
     @qv['name']     = @qv['name'].strip
@@ -308,7 +320,7 @@ class Railspress::WP_Query
       # If year, month, day, hour, minute, and second are set, a single
       # post is being queried.
       @is_single = true
-    elsif @qv['pagename'] != '' || !@qv['page_id'].blank?
+    elsif @qv['pagename'] != '' || @qv['page_id'] != 0
       @is_page = true
       @is_single = false
     else
@@ -331,7 +343,29 @@ class Railspress::WP_Query
       end
 
       if @qv['day']
-        # TODO continue with monthnum year m
+        # TODO continue with day
+      end
+
+      if @qv['monthnum'] != '' && @qv['monthnum'] != 0
+        unless @is_date
+          if 12 < @qv['monthnum']
+            # $qv['error'] = '404';
+          else
+            @is_month = true
+            @is_date = true
+          end
+        end
+      end
+
+      if @qv['year'] != '' && @qv['year'] != 0
+        unless @is_date
+          @is_year = true
+          @is_date = true
+        end
+      end
+
+      if @qv['m']
+        # TODO continue with m
       end
 
       @query_vars_hash = false
@@ -355,10 +389,40 @@ class Railspress::WP_Query
     # @is_paged = true unless @qv['paged'].blank?
 
     # if we're previewing inside the write screen
+    # @is_preview = true if @qv['preview'] != ''
+
+    # @is_admin = true if is_admin()
+
+    @is_singular = @is_single || @is_page || @is_attachment
+
+    # if ( $this->is_feed && ( ! empty( $qv['withcomments'] ) || ( empty( $qv['withoutcomments'] ) && $this->is_singular ) ) ) {
+    # 			$this->is_comment_feed = true;
+    # }
+
+    unless @is_singular || @is_archive || @is_search # || @is_feed ||
+        # @is_trackback || @is_404 || @is_admin || @is_robots || @is_favicon
+      @is_home = true
+    end
+
+    # Correct `is_*` for page_on_front and page_for_posts
+    if @is_home && 'page' == get_option('show_on_front') && !get_option('page_on_front').blank?
+      _query = Railspress::Functions.wp_parse_args( @query )
+      # 'pagename' can be set and empty depending on matched rewrite rules. Ignore an empty 'pagename'.
+      if _query.blank? || (_query.keys.to_a - %w[preview page paged cpage]).blank? || _query.select{|_,v| !v.blank? && v != 0 }.blank? # TS_INFO: added
+        @is_page = true
+        @is_home = false
+        @qv['page_id'] = get_option('page_on_front')
+      end
+    end
 
     if @qv['pagename'] != ''
       queried_object = @page
 
+      if !@queried_object.blank?
+        @queried_object_id = @queried_object.id
+      else
+        @queried_object = nil
+      end
 
       if 'page' == get_option( 'show_on_front' ) && !@queried_object_id.nil? && @queried_object_id.to_s == get_option( 'page_for_posts' ).to_s
         @is_page       = false
@@ -366,25 +430,41 @@ class Railspress::WP_Query
         @is_posts_page = true
       end
 
-      if !@queried_object_id.nil? && @queried_object_id.to_s == get_option( 'wp_page_for_privacy_policy' ).to_s
+      if !@queried_object_id.nil? && @queried_object_id.to_s == get_option( 'wp_page_for_privacy_policy' )
         @is_privacy_policy = true
       end
     end
 
     unless @qv['page_id'].blank?
-      if 'page' == get_option( 'show_on_front' ) && @qv['page_id'] == get_option( 'page_for_posts' )
+      if 'page' == get_option( 'show_on_front' ) && @qv['page_id'].to_s == get_option( 'page_for_posts' )
         @is_page       = false
         @is_home       = true
         @is_posts_page = true
       end
 
-      if @qv['page_id'] == get_option( 'wp_page_for_privacy_policy' )
+      if @qv['page_id'].to_s == get_option( 'wp_page_for_privacy_policy' )
         @is_privacy_policy = true
       end
     end
 
     unless @qv['post_type'].blank?
+      if @qv['post_type'].kind_of? Array
+        @qv['post_type'].map!{ |pt| Railspress::FormattingHelper.sanitize_key(pt) }
+      else
+        @qv['post_type'] = Railspress::FormattingHelper.sanitize_key( @qv['post_type'] )
+      end
+    end
 
+    unless @qv['post_status'].blank?
+      if @qv['post_status'].kind_of? Array
+        @qv['post_status'].map! { |ps| sanitize_key(ps) }
+      else
+        @qv['post_status'] = @qv['post_status'].gsub(/[^a-z0-9_,-]/, '')
+      end
+    end
+
+    if @is_posts_page && @qv['withcomments'].blank?
+      @is_comment_feed = false
     end
 
     @is_singular = @is_single || @is_page || @is_attachment
@@ -413,6 +493,8 @@ class Railspress::WP_Query
     end
 
     # TODO continue...
+
+    @tax_query = Railspress::WpTaxQuery.new(tax_query)
 
     # Fires after taxonomy-related query vars have been parsed.
     do_action( 'parse_tax_query', self )
@@ -623,9 +705,65 @@ class Railspress::WP_Query
     false
   end
 
-  # TODO is_tax
+  # Is the query for an existing custom taxonomy archive page?
+  #
+  # If the $taxonomy parameter is specified, this function will additionally
+  # check if the query is for that specific $taxonomy.
+  #
+  # If the $term parameter is specified in addition to the $taxonomy parameter,
+  # this function will additionally check if the query is for one of the terms
+  # specified.
+  #
+  # @since 3.1.0
+  #
+  # @global array $wp_taxonomies
+  #
+  # @param [mixed] taxonomy Optional. Taxonomy slug or slugs.
+  # @param [mixed] term     Optional. Term ID, name, slug or array of Term IDs, names, and slugs.
+  # @return [Boolean] True for custom taxonomy archive pages, false for built-in taxonomies (category and tag archives).
+  def is_tax(taxonomy = '', term = '')
+    return false unless @is_tax
+    return true if taxonomy.blank?
 
-  # TODO is_comments_popup is_date ...
+    queried_object = get_queried_object
+
+    # TODO continue is_tax
+    # $tax_array      = array_intersect( array_keys( $wp_taxonomies ), (array) $taxonomy );
+    # $term_array     = (array) $term;
+    #
+    # 		// Check that the taxonomy matches.
+    # 		if ( ! ( isset( $queried_object->taxonomy ) && count( $tax_array ) && in_array( $queried_object->taxonomy, $tax_array ) ) ) {
+    # 			return false;
+    # 		}
+
+    # Only a Taxonomy provided.
+    return true if term.blank?
+
+    # 		return isset( $queried_object->term_id ) &&
+    # 			count(
+    # 				array_intersect(
+    # 					array( $queried_object->term_id, $queried_object->name, $queried_object->slug ),
+    # 					$term_array
+    # 				)
+    # 			);
+    false
+  end
+
+  # TODO is_comments_popup
+
+  # Is the query for an existing date archive?
+  #
+  # @return [Boolean]
+  def is_date
+    @is_date
+  end
+
+  # Is the query for an existing day archive?
+  #
+  # @return [Boolean]
+  def is_day
+    @is_day
+  end
 
   # Is the query for the front page of the site?
   #
