@@ -95,3 +95,16 @@ privacy_policy:
   pinged: ''
   post_date: <%= DateTime.now.to_s(:db) %>
   post_modified: <%= DateTime.now.to_s(:db) %>
+
+page_on_front:
+  post_author: 1
+  post_content: The front page
+  post_excerpt: ''
+  post_title: 'Welcome'
+  post_name: 'front'
+  post_type: page
+  post_content_filtered: ''
+  to_ping: ''
+  pinged: ''
+  post_date: <%= DateTime.now.to_s(:db) %>
+  post_modified: <%= DateTime.now.to_s(:db) %>
