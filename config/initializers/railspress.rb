@@ -5,4 +5,6 @@ module Railspress
     date_format gmt_offset permalink_structure widget_recent-posts WPLANG show_on_front)
   ::EDITABLE_OPTIONS = []
 
+  p "Clearing cache for Railspress::..."
+  Rails.cache.delete_matched 'Railspress::*'
 end
