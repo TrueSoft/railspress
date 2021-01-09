@@ -2,6 +2,8 @@ require_dependency "railspress/application_controller"
 
 module Railspress
   class PostsController < ApplicationController
+    include Railspress::TemplateHelper
+
     def index
       if Railspress.multi_language
         @posts = Railspress::Post.published.descending.joins(:languages).where(default_filter).paginate(page: params[:page], per_page: helpers.get_option('posts_per_page', nil))
@@ -31,7 +33,7 @@ module Railspress
 
     def single
       # @wp_query = Railspress::WP_Query.new(params)
-      @post = @wp_query.post # Railspress::Post.published.where(post_name: params[:slug]).first!
+      @post = @wp_query.post # Railspress::Post.published.where(post_name: params[:name]).first!
       @post_prev, @post_next = neighbours(@post)
       if Railspress.generate_breadcrumb
         @breadcrumb = {t('railspress.post.index.title') => main_app.all_posts_path}
