@@ -183,7 +183,6 @@ module Railspress::PostTemplateHelper
       clazz = []
     end
 
-
     classes << "post-#{post.ID}"
     classes << post.post_type unless is_admin
 
@@ -277,12 +276,144 @@ module Railspress::PostTemplateHelper
 
     classes = []
 
-    # classes << 'rtl' if is_rtl()
-    # classes << 'home' if is_front_page()
-    # classes << 'blog' if is_home()
-    # classes << 'privacy-policy' if is_privacy_policy()
-    classes << 'archive' if !@archive.nil? # is_archive()
-    # classes << 'date' if is_date()
+    unless @wp_query.nil? # can be nil for pages from the main_app
+      # classes << 'rtl' if is_rtl()
+      classes << 'home' if @wp_query.is_front_page?
+      classes << 'blog' if @wp_query.is_home?
+      classes << 'privacy-policy' if @wp_query.is_privacy_policy?
+      classes << 'archive' if @wp_query.is_archive
+      classes << 'date' if @wp_query.is_date
+      # if @wp_query.is_search
+      #   classes << 'search'
+      #   classes << @wp_query.blank? ? 'search-no-results' : 'search-results'
+      # end
+      # classes << 'paged' if @wp_query.paged
+      classes << 'attachment' if @wp_query.is_attachment
+
+      if @wp_query.is_singular
+        post_id   = @wp_query.get_queried_object_id
+        post      = @wp_query.get_queried_object
+        post_type = post.post_type
+
+        if is_page_template
+          classes << "#{post_type}-template"
+
+          template_slug = get_page_template_slug(post)
+          template_parts = template_slug.split('/')
+
+          template_parts.each do |part|
+            classes << "#{post_type}-template-" + sanitize_html_class(basename(part, '.php').gsub(/\.\//, '-'))
+          end
+          classes << "#{post_type}-template-" + sanitize_html_class(template_slug.gsub('.', '-'))
+        else
+          classes << "#{post_type}-template-default"
+        end
+
+        if @wp_query.is_single
+          classes << 'single'
+          # if ( isset( $post->post_type ) ) {
+          # 				$classes[] = 'single-' . sanitize_html_class( $post->post_type, $post_id );
+          # 				$classes[] = 'postid-' . $post_id;
+          #
+          # 				// Post Format
+          # 				if ( post_type_supports( $post->post_type, 'post-formats' ) ) {
+          # 					$post_format = get_post_format( $post->ID );
+          #
+          # 					if ( $post_format && ! is_wp_error( $post_format ) ) {
+          # 						$classes[] = 'single-format-' . sanitize_html_class( $post_format );
+          # 					} else {
+          # 						$classes[] = 'single-format-standard';
+          # 					}
+          # 				}
+          # }
+        end
+
+        if @wp_query.is_attachment
+          # $mime_type   = get_post_mime_type( $post_id );
+          #	$mime_prefix = array( 'application/', 'image/', 'text/', 'audio/', 'video/', 'music/' );
+          classes << "attachmentid-#{post_id}"
+          #	$classes[]   = 'attachment-' . str_replace( $mime_prefix, '', $mime_type );
+        elsif @wp_query.is_page
+          classes << 'page'
+
+          page_id = @wp_query.get_queried_object_id
+
+          # $post = get_post( $page_id );
+
+          classes << "page-id-#{page_id}"
+
+          # if ( get_pages(
+          # 				array(
+          # 					'parent' => $page_id,
+          # 					'number' => 1,
+          # 				)
+          # 			) ) {
+          # 				$classes[] = 'page-parent';
+          # 			}
+
+          unless post.post_parent.blank?
+            classes << 'page-child'
+            classes << "parent-pageid-#{post.post_parent}"
+          end
+        end
+
+      elsif @wp_query.is_archive
+        if @wp_query.is_post_type_archive?
+          classes << 'post-type-archive'
+          # $post_type = get_query_var( 'post_type' );
+          # 			if ( is_array( $post_type ) ) {
+          # 				$post_type = reset( $post_type );
+          # 			}
+          # 			$classes[] = 'post-type-archive-' . sanitize_html_class( $post_type );
+        elsif @wp_query.is_author
+          # $author    = $wp_query->get_queried_object();
+          # 			$classes[] = 'author';
+          # 			if ( isset( $author->user_nicename ) ) {
+          # 				$classes[] = 'author-' . sanitize_html_class( $author->user_nicename, $author->ID );
+          # 				$classes[] = 'author-' . $author->ID;
+          # 			}
+        elsif @wp_query.is_category
+          # $cat       = $wp_query->get_queried_object();
+          # $classes[] = 'category';
+          # if ( isset( $cat->term_id ) ) {
+          #   $cat_class = sanitize_html_class( $cat->slug, $cat->term_id );
+          # if ( is_numeric( $cat_class ) || ! trim( $cat_class, '-' ) ) {
+          #   $cat_class = $cat->term_id;
+          # }
+          #
+          # $classes[] = 'category-' . $cat_class;
+          # $classes[] = 'category-' . $cat->term_id;
+          # }
+        elsif @wp_query.is_tag
+          # $tag       = $wp_query->get_queried_object();
+          # $classes[] = 'tag';
+          # if ( isset( $tag->term_id ) ) {
+          #   $tag_class = sanitize_html_class( $tag->slug, $tag->term_id );
+          # if ( is_numeric( $tag_class ) || ! trim( $tag_class, '-' ) ) {
+          #   $tag_class = $tag->term_id;
+          # }
+          #
+          # $classes[] = 'tag-' . $tag_class;
+          # $classes[] = 'tag-' . $tag->term_id;
+          # }
+        elsif @wp_query.is_tax
+          # $term = $wp_query->get_queried_object();
+          # if ( isset( $term->term_id ) ) {
+          #   $term_class = sanitize_html_class( $term->slug, $term->term_id );
+          # if ( is_numeric( $term_class ) || ! trim( $term_class, '-' ) ) {
+          #   $term_class = $term->term_id;
+          # }
+          #
+          # $classes[] = 'tax-' . sanitize_html_class( $term->taxonomy );
+          # $classes[] = 'term-' . $term_class;
+          # $classes[] = 'term-' . $term->term_id;
+          # }
+        end
+      end
+    end
+
+    # cannot determine this:
+    # classes << 'logged-in' if is_user_logged_in
 
     # TODO continue get_body_class
 
@@ -503,13 +634,46 @@ module Railspress::PostTemplateHelper
   ## Attachments
   ##
 
+  # TODO the_attachment_link, wp_get_attachment_link, prepend_attachment
+
   ##
   ## Misc
   ##
 
+  # TODO get_the_password_form
+
+  # Determines whether currently in a page template.
   #
-  # Misc
+  # This template tag allows you to determine if you are in a page template.
+  # You can optionally provide a template name or array of template names
+  # and then the check will be specific to that template.
   #
+  # For more information on this and similar theme functions, check out
+  # the {@link https://developer.wordpress.org/themes/basics/conditional-tags/
+  # Conditional Tags} article in the Theme Developer Handbook.
+  #
+  # @since 2.5.0
+  # @since 4.2.0 The `template` parameter was changed to also accept an array of page templates.
+  # @since 4.7.0 Now works with any post type, not just pages.
+  #
+  # @param [String|Array] template The specific template name or array of templates to match.
+  # @return [Boolean] True on success, false on failure.
+  def is_page_template(template = '')
+    return false unless @wp_query.is_singular
+    page_template = get_page_template_slug @wp_query.get_queried_object_id
+
+    return ActiveModel::Type::Boolean.new.cast(page_template) if template.blank?
+
+    return true if template == page_template
+
+    if template.is_a? Array
+      if (template.include?('default') && !page_template) || template.include?(page_template)
+        return true
+      end
+    end
+
+    'default' == template && ! page_template
+  end
 
   # Get the specific template name for a given post.
   #
@@ -542,30 +706,30 @@ module Railspress::PostTemplateHelper
     post = get_post post_id
     return if post.nil?
 
-	# $args array with (parent, format, right, left, type) deprecated since 3.6
-	if type.is_a? Hash
-		type = type['type'].blank? ? type : type['type']
-		# _deprecated_argument( __FUNCTION__, '3.6.0' );
-	end
+    # $args array with (parent, format, right, left, type) deprecated since 3.6
+    if type.is_a? Hash
+      type = type['type'].blank? ? type : type['type']
+      # _deprecated_argument( __FUNCTION__, '3.6.0' );
+    end
 
-  revisions = wp_get_post_revisions(post.id)
-  return if revisions.blank?
+    revisions = wp_get_post_revisions(post.id)
+    return if revisions.blank?
 
-	rows = ''
-  echo = ''
-  revisions.each do |revision|
-		next unless current_user_can('read_post', revision.id)
+    rows = ''
+    echo = ''
+    revisions.each do |revision|
+      next unless current_user_can('read_post', revision.id)
 
-		is_autosave = wp_is_post_autosave(revision)
-    next if ( ( 'revision' == type && is_autosave ) || ( 'autosave' == type && ! is_autosave ) )
+      is_autosave = wp_is_post_autosave(revision)
+      next if ( ( 'revision' == type && is_autosave ) || ( 'autosave' == type && ! is_autosave ) )
 
-		rows += "\t<li>" + wp_post_revision_title_expanded( revision ) + "</li>\n"
-	end
+      rows += "\t<li>" + wp_post_revision_title_expanded( revision ) + "</li>\n"
+    end
 
-	echo += "<div class='hide-if-js'><p>" + __( 'JavaScript must be enabled to use this feature.' ) + "</p></div>\n"
+    echo += "<div class='hide-if-js'><p>" + __( 'JavaScript must be enabled to use this feature.' ) + "</p></div>\n"
 
-	echo += "<ul class='post-revisions hide-if-no-js'>\n"
-	echo += rows
-	echo += '</ul>'
-end
+    echo += "<ul class='post-revisions hide-if-no-js'>\n"
+    echo += rows
+    echo += '</ul>'
+  end
 end
