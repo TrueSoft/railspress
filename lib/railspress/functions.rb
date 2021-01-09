@@ -572,6 +572,33 @@ module Railspress::Functions
     true
   end
 
+  # Retrieve metadata from a file.
+  #
+  # Searches for metadata in the first 8kiB of a file, such as a plugin or theme.
+  # Each piece of metadata must be on its own line. Fields can not span multiple
+  # lines, the value will get cut at the end of the first line.
+  #
+  # If the file data is not within that first 8kiB, then the author should correct
+  # their plugin file and move the data headers to the top.
+  #
+  # @link https://codex.wordpress.org/File_Header
+  #
+  # @param [string] file            Absolute path to the file.
+  # @param [Hash]  default_headers List of headers, in the format `{HeaderKey: 'Header Name'}`.
+  # @param [string] context         Optional. If specified adds filter hook {@see 'extra_$context_headers'}.
+  #                                Default empty.
+  # @return [array] Array of file headers in `HeaderKey => Header Value` format.
+  def self.get_file_data(file, default_headers, context = '')
+    # We don't need to write to the file, so just open for reading.
+    # $fp = fopen( $file, 'r' );
+    #
+    # Pull only the first 8kiB of the file in.
+    # $file_data = fread( $fp, 8192 );
+    # TODO continue
+    all_headers = {}
+
+    all_headers
+  end
 
   # Retrieve a list of protocols to allow in HTML attributes.
   #
