@@ -416,7 +416,18 @@ class Railspress::WP_Query
     end
 
     if @qv['pagename'] != ''
-      queried_object = @page
+      @queried_object = get_page_by_path(@qv['pagename'])
+      if !@queried_object.nil? && @queried_object.post_type == 'attachment'
+        # TODO continue if ( preg_match( '/^[^%]*%(?:postname)%/', get_option( 'permalink_structure' ) ) ) {
+        # 					// See if we also have a post with the same slug.
+        # 					$post = get_page_by_path( $qv['pagename'], OBJECT, 'post' );
+        # 					if ( $post ) {
+        # 						$this->queried_object = $post;
+        # 						$this->is_page        = false;
+        # 						$this->is_single      = true;
+        # 					}
+        # 				}
+      end
 
       if !@queried_object.blank?
         @queried_object_id = @queried_object.id
@@ -492,6 +503,111 @@ class Railspress::WP_Query
       }
     end
 
+    get_taxonomies({}, 'objects').each do |taxonomy, t|
+      next if taxonomy == 'post_tag' #  Handled further down in the $q['tag'] block
+      if !t.query_var.blank? && !q[t.query_var].blank?
+        tax_query_defaults = {taxonomy: taxonomy, field: 'slug'}
+
+        # if ( isset( $t->rewrite['hierarchical'] ) && $t->rewrite['hierarchical'] ) {
+        #   $q[ $t->query_var ] = wp_basename( $q[ $t->query_var ] );
+        # }
+
+        term = q[t.query_var]
+
+        term = term.join(',') if term.is_a? Array
+
+        if term.include? '+'
+           terms = term.split(/[+]+/)
+           terms.each do |term|
+             tax_query << tax_query_defaults.merge({terms: [term]})
+           end
+        else
+          tax_query << tax_query_defaults.merge({terms: term.split(/[,]+/)})
+        end
+      end
+
+      # If querystring 'cat' is an array, implode it.
+      q['cat'] = q['cat'].join(',') if q['cat'].is_a?(Array)
+      # Category stuff
+      if !q['cat'].blank? && !@is_singular
+        cat_in = cat_not_in = []
+
+        cat_array = CGI.unescape(q['cat'].to_s).split(/[,\s]+/)
+        cat_array.map! { |num| num.to_i }
+        q['cat'] = cat_array.join(',')
+
+        cat_array.each do |cat|
+          if cat > 0
+            cat_in << cat
+          elsif cat < 0
+            cat_not_in << cat.abs
+          end
+        end
+        unless cat_in.blank?
+          tax_query << {
+            taxonomy: 'category',
+            terms: cat_in,
+            field: 'term_id',
+            include_children: true,
+          }
+        end
+        unless cat_not_in.blank?
+          tax_query << {
+            taxonomy: 'category',
+            terms: cat_not_in,
+            field: 'term_id',
+            operator: 'NOT IN',
+            include_children: true,
+          }
+        end
+      end
+    end
+
+    # TODO continue...
+    # if ( ! empty( $q['category__and'] ) && 1 === count( (array) $q['category__and'] ) ) {
+    # 			$q['category__and'] = (array) $q['category__and'];
+    # 			if ( ! isset( $q['category__in'] ) ) {
+    # 				$q['category__in'] = array();
+    # 			}
+    # 			$q['category__in'][] = absint( reset( $q['category__and'] ) );
+    # 			unset( $q['category__and'] );
+    # 		}
+    #
+    # 		if ( ! empty( $q['category__in'] ) ) {
+    # 			$q['category__in'] = array_map( 'absint', array_unique( (array) $q['category__in'] ) );
+    # 			$tax_query[]       = array(
+    # 				'taxonomy'         => 'category',
+    # 				'terms'            => $q['category__in'],
+    # 				'field'            => 'term_id',
+    # 				'include_children' => false,
+    # 			);
+    # 		}
+    #
+    # 		if ( ! empty( $q['category__not_in'] ) ) {
+    # 			$q['category__not_in'] = array_map( 'absint', array_unique( (array) $q['category__not_in'] ) );
+    # 			$tax_query[]           = array(
+    # 				'taxonomy'         => 'category',
+    # 				'terms'            => $q['category__not_in'],
+    # 				'operator'         => 'NOT IN',
+    # 				'include_children' => false,
+    # 			);
+    # 		}
+    #
+    # 		if ( ! empty( $q['category__and'] ) ) {
+    # 			$q['category__and'] = array_map( 'absint', array_unique( (array) $q['category__and'] ) );
+    # 			$tax_query[]        = array(
+    # 				'taxonomy'         => 'category',
+    # 				'terms'            => $q['category__and'],
+    # 				'field'            => 'term_id',
+    # 				'operator'         => 'AND',
+    # 				'include_children' => false,
+    # 			);
+    # 		}
+
+    #  If querystring 'tag' is array, implode it.
+    q['tag'] = q['tag'].join(',') if q['tag'].is_a?(Array)
+    # Tag stuff
+
     # TODO continue...
 
     @tax_query = Railspress::WpTaxQuery.new(tax_query)
@@ -500,14 +616,14 @@ class Railspress::WP_Query
     do_action( 'parse_tax_query', self )
   end
 
-  # Sets up the WordPress query by parsing query string.
+  # Generates SQL for the WHERE clause based on passed search terms.
   #
-  # @param [string|array] query URL query string or array of query arguments.
-  # @return [WP_Post[]|int[]] Array of post objects or post IDs.
-  def query(query)
-    init
-    @query = @query_vars = Railspress::Functions.wp_parse_args(query)
-    # TODO ? self.get_posts
+  # @global wpdb $wpdb WordPress database abstraction object.
+  #
+  # @param [Hash] q Query variables.
+  # @return string WHERE clause.
+  def parse_search(q)
+    # TODO continue
   end
 
   # Retrieve query variable.
