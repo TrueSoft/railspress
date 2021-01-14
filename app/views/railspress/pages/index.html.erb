@@ -1,9 +1,0 @@
-<% unless @page.nil? %>
-  <%= content_tag :article, id: "post-#{@page.id}", class: get_post_class('', @page).join(' ') do %>
-    <%= render partial: 'railspress/pages/template-parts/entry-header' %>
-
-    <%= content_tag :div, class: "entry-content p-2 #{@post_class}" do %>
-      <%= content_html @page.post_content %>
-    <% end %>
-  <% end %>
-<% end %>
