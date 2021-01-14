@@ -277,6 +277,58 @@ class Railspress::WP_Query
 
     # @is_robots = true unless @qv['robots']
 
+    # ---- TRANSFORM RAILS PARAMS TO WP ---------------------------------
+    # if @qv['controller'] == 'railspress/posts' && @qv['action'] == 'single' && !@qv['slug'].blank?
+    #   if @qv['slug'] =~ /^(author)\/.+/
+    #     @qv['taxonomy'] == 'author'
+    #     @qv['action'] = 'archive'
+    #     @qv['slug'] = @qv['slug'].gsub(/^(author)\//, '')
+    #   end
+    # end
+    if @qv['controller'] == 'railspress/posts' && @qv['action'] == 'single' && !@qv['slug'].blank?
+      if @qv['slug'].include? '/'
+        page_by_path = get_page_by_path @qv['slug']
+        p_type = page_by_path.post_type unless page_by_path.nil?
+      else
+        p_type = Railspress::WpPost.published.where(post_name: @qv['slug']).pluck(:post_type).first
+      end
+      case p_type
+      when 'post'
+        @qv['name'] = @qv['slug']
+      when 'page'
+        @qv['pagename'] = @qv['slug']
+      else
+        @qv['name'] = @qv['slug']
+      end
+      @qv.delete 'controller'
+      @qv.delete 'action'
+      @qv.delete 'slug'
+    elsif @qv['controller'] == 'railspress/pages' && @qv['action'] == 'index'
+      @qv.delete 'controller'
+      @qv.delete 'action'
+    elsif @qv['controller'] == 'railspress/posts' && @qv['action'] == 'by_year' && !@qv['year'].blank?
+
+    elsif @qv['controller'] == 'railspress/posts' && @qv['action'] == 'by_month' && !@qv['month'].blank?
+      @qv['monthnum'] = @qv['month']
+      @qv.delete 'month'
+    elsif @qv['controller'] == 'railspress/posts' && @qv['action'] == 'archive' && !@qv['slug'].blank?
+      @is_archive = true
+      if @qv['taxonomy'] == 'category'
+        @is_category = true
+        @query_vars['cat'] = Railspress::Term.joins(:taxonomy).where(Railspress::Taxonomy.table_name => {taxonomy: @qv['taxonomy']}, slug: @qv['slug']).pluck(:term_id).first
+        # set category_name?
+        @qv.delete 'slug'
+      elsif @qv['taxonomy'] == 'post_tag'
+        @is_tag = true
+        @query_vars['tag_id'] = Railspress::Term.joins(:taxonomy).where(Railspress::Taxonomy.table_name => {taxonomy: @qv['taxonomy']}, slug: @qv['slug']).pluck(:term_id).first
+        @qv.delete 'slug'
+      elsif @qv['taxonomy'] == 'author'
+        @is_author = true
+      end
+    end
+
+    # -------------------------------------------------------------------
+
     if !Railspress::PHP.is_scalar(@qv['p']) || @qv['p'].to_i < 0
       @qv['p'] = 0
       @qv['error'] = '404'
@@ -371,16 +423,37 @@ class Railspress::WP_Query
       @query_vars_hash = false
       parse_tax_query(@qv)
 
-    end
+      @tax_query.queries.each do |tax_query|
+        next unless tax_query.is_a? Hash
 
-    # TS_INFO added:
-    if @qv['taxonomy'] == 'author'
-      @is_author = true
-      @query_vars['author'] = Railspress::User.where(user_nicename: @qv['slug']).pluck(:id).first
-    end
-    if @qv['taxonomy'] == 'category'
-      @is_category = true
-      @query_vars['cat'] = Railspress::Term.joins(:taxonomy).where(Railspress::Taxonomy.table_name => {taxonomy: @qv['taxonomy']}, slug: @qv['slug']).pluck(:term_id).first
+        if !tax_query['operator'].blank? && tax_query['operator'] != 'NOT IN'
+          case tax_query['taxonomy']
+          when 'category'
+            @is_category = true
+          when 'post_tag'
+            @is_tag = true
+          else
+            @is_tax = true
+          end
+        end
+      end
+
+      if @qv['author'] == '' || @qv['author'].to_s == '0'
+        @is_author = false
+      else
+        @is_author = true
+      end
+
+      @is_author = true unless @qv['author_name'].blank?
+
+      if !@qv['post_type'].blank? && !@qv['post_type'].is_a?(Array)
+        post_type_obj = get_post_type_object( @qv['post_type'] )
+        @is_post_type_archive = true unless post_type_obj.has_archive.blank?
+      end
+
+      if @is_post_type_archive || @is_date || @is_author || @is_category || @is_tag || @is_tax
+        @is_archive = true
+      end
     end
 
     # @is_feed = true unless @qv['feed'].blank?
@@ -480,6 +553,10 @@ class Railspress::WP_Query
 
     @is_singular = @is_single || @is_page || @is_attachment
     # Done correcting is_* for page_on_front and page_for_posts
+
+    # set_404() if @qv['error'] == '404'
+
+    @is_embed = @is_embed && ( @is_singular || @is_404 )
 
     # Fires after the main query vars have been parsed.
     # TODO do_action_ref_array( 'parse_query', array( &$this ) )
@@ -642,6 +719,177 @@ class Railspress::WP_Query
   # @param [mixed]  value     Query variable value.
   def set( query_var, value )
     @query_vars[ query_var ] = value
+  end
+
+  def get_posts
+    parse_query
+
+    # do_action_ref_array( 'pre_get_posts', array( &$this ) );
+
+    # Shorthand.
+    q = @query_vars
+
+    where_cond = []
+    where_hash = {}
+
+    unless @qv['title'].blank? # about line 1995
+      where_cond << "post_title = :title"
+      where_hash[:title] = @qv['title'].gsub("\\", "") # = stripslashes
+    end
+
+    # Parameters related to 'post_name'.
+    if !@qv['name'].blank?
+      where_cond << "post_name = :name"
+      where_hash[:name] = @qv['name']
+    elsif !@qv['pagename'].blank?
+      if !@queried_object_id.nil?
+        reqpage = @queried_object_id
+      else
+        if 'page' != @qv['post_type']
+          # foreach ( (array) $q['post_type'] as $_post_type ) {
+          #   $ptype_obj = get_post_type_object( $_post_type );
+          # if ( ! $ptype_obj || ! $ptype_obj->hierarchical ) {
+          #   continue;
+          # }
+          #
+          # $reqpage = get_page_by_path( $q['pagename'], OBJECT, $_post_type );
+          # if ( $reqpage ) {
+          #   break;
+          # }
+          # }
+          # unset( $ptype_obj );
+        else
+          reqpage = get_page_by_path( @qv['pagename'] )
+        end
+        if !reqpage.nil?
+          reqpage = reqpage.id
+        else
+          reqpage = 0
+        end
+      end
+      page_for_posts = get_option( 'page_for_posts' )
+      if ( 'page' != get_option( 'show_on_front' ) ) || page_for_posts.blank? || ( reqpage != page_for_posts )
+        @qv['pagename'] = sanitize_title_for_query( wp_basename( @qv['pagename'] ) )
+        @qv['name']     = @qv['pagename']
+        where_cond << "id = :reqpage"
+        where_hash[:reqpage] = reqpage
+      # $reqpage_obj   = get_post( $reqpage );
+      # if ( is_object( $reqpage_obj ) && 'attachment' == $reqpage_obj->post_type ) {
+      #   $this->is_attachment = true;
+      # $post_type           = $q['post_type'] = 'attachment';
+      # $this->is_page       = true;
+      # $q['attachment_id']  = $reqpage;
+      # }
+      end
+
+      # where_cond << "post_name = :pagename"
+      # where_hash[:pagename] = @qv['pagename']
+    elsif !@qv['attachment'].blank?
+      @qv['attachment'] = sanitize_title_for_query( wp_basename( @qv['attachment'] ) )
+      @qv['name']       = @qv['attachment']
+      where_cond << "post_name = :attachment"
+      where_hash[:attachment] = @qv['attachment']
+    elsif false # post_name__in
+      # TODO line 2046 post_name__in
+    end
+
+    # If an attachment is requested by number, let it supersede any post number.
+    @qv['p'] = Railspress::Functions.absint @qv['attachment_id'] unless @qv['attachment_id'].blank?
+
+    # If a post number is specified, load that post
+    if !@qv['p'].blank? && @qv['p'].to_s != '0' # about line 1995
+      where_cond << "id = :p"
+      where_hash[:p] = @qv['p']
+    else
+      # TODO post__in post__not_in line 2060
+    end
+
+    if !@qv['post_parent'].blank? && @qv['post_parent'].to_s =~ /\d+/ # about line 2068
+      where_cond << "post_parent = :post_parent"
+      where_hash[:post_parent] = @qv['post_parent']
+    else
+      # TODO post_parent__in post_parent__not_in line 2060
+    end
+
+    if !@qv['page_id'].blank? && @qv['page_id'].to_s != '0'
+      if 'page' != get_option( 'show_on_front' ) || @qv['page_id'].to_s != get_option( 'page_for_posts' )
+        @qv['p'] = @qv['page_id']
+        where_cond << "id = :page_id"
+        where_hash[:page_id] = @qv['page_id']
+      end
+    end
+
+    # If a search pattern is specified, load the posts that match.
+    search = parse_search(@qv) unless @qv['s'].blank?
+
+    unless @qv['suppress_filters']
+      # Filters the search SQL that is used in the WHERE clause of WP_Query.
+      # $search = apply_filters_ref_array( 'posts_search', array( $search, &$this ) )
+    end
+
+    # Taxonomies
+    unless is_singular
+      parse_tax_query @qv
+
+      clauses = @tax_query.get_sql Railspress::WpPost.table_name, 'ID'
+    end
+
+    # Author/user stuff
+    if @qv['taxonomy'] == 'author'
+      @is_author = true
+      @query_vars['author'] = Railspress::User.where(user_nicename: @qv['slug']).pluck(:id).first
+    end
+
+    unless @qv['author'].blank?
+        where_cond << "post_author = :author"
+        where_hash[:author] = Railspress::Functions.absint @qv['author']
+    end
+
+    # about lines 2391-2412 where post_type is added to query
+    if @qv['post_type'].blank?
+      custom_post_class = Railspress::WpPost
+    elsif @qv['post_type'] == 'post'
+      custom_post_class = Railspress::Post
+    elsif @qv['post_type'] == 'page'
+      custom_post_class = Railspress::Page
+    else
+      custom_post_class = Class.new(Railspress::WpPost) {
+        @@custom_post_type = ''
+        def self.find_sti_class(type_name)
+          self
+        end
+        def self.sti_name
+          @@custom_post_type
+        end
+        def self.set_custom_post_type(post_type)
+          @@custom_post_type = post_type
+        end
+      }
+      custom_post_class.set_custom_post_type @qv['post_type']
+    end
+    @posts = custom_post_class.published.where(where_cond.join(' AND '), where_hash)
+
+    if !@posts.blank?
+      @post = @posts.first
+    else
+      @post = nil
+      if where_hash.size == 1
+        raise ActiveRecord::RecordNotFound.new(nil, custom_post_class, where_hash.keys.first, where_hash.values.first)
+      else
+        raise ActiveRecord::RecordNotFound.new(nil, custom_post_class)
+      end
+    end
+    @posts
+  end
+
+  # Sets up the WordPress query by parsing query string.
+  #
+  # @param [string|array] query URL query string or array of query arguments.
+  # @return [WP_Post[]|int[]] Array of post objects or post IDs.
+  def query(query)
+    init
+    @query = @query_vars = Railspress::Functions.wp_parse_args(query)
+    get_posts
   end
 
   # Retrieve queried object.
