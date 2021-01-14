@@ -39,16 +39,20 @@ module Railspress
     end
 
     def neighbours(post)
-      if Railspress.multi_language
-        [
+      if post.post_type == 'post'
+        if Railspress.multi_language
+          [
             Railspress::Post.published.joins(:languages).where(default_filter).where('post_date < ?', post.post_date).order(post_date: :desc).first,
             Railspress::Post.published.joins(:languages).where(default_filter).where('post_date > ?', post.post_date).order(post_date: :asc).first
-        ]
-      else
-        [
+          ]
+        else
+          [
             Railspress::Post.published.where(default_filter).where('post_date < ?', post.post_date).order(post_date: :desc).first,
             Railspress::Post.published.where(default_filter).where('post_date > ?', post.post_date).order(post_date: :asc).first
-        ]
+          ]
+        end
+      else
+        []
       end
     end
   end

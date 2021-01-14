@@ -511,6 +511,9 @@ module Railspress::LinkTemplateHelper
     # }
     # @return string Markup for post links.
     def get_the_post_navigation( args = {} )
+      if !@post.nil? && @post.post_type != 'post'
+        return ''
+      end
       args = Railspress::Functions.wp_parse_args(
           args,
           {
