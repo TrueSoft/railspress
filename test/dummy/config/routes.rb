@@ -9,13 +9,17 @@ Rails.application.routes.draw do
     get ':taxonomy/:slug' => 'railspress/posts#archive'
   end
 
-  get 'page/*slug' => 'railspress/pages#show', as: :show_page
+  get 'category/:slug' => 'railspress/posts#archive', defaults: {taxonomy: 'category'}
+  get 'tag/:slug' => 'railspress/posts#archive', defaults: {taxonomy: 'post_tag'}
+  get 'author/:slug' => 'railspress/posts#archive', defaults: {taxonomy: 'author'}
 
   scope :admin do
     resources :options, controller: 'railspress/options' , as: :admin_options
   end
 
   get 'test' => 'railspress/pages#test'
+
+  get '*slug' => 'railspress/posts#single', as: :show_page
 
   # mount Railspress::Engine => "/railspress"
 
