@@ -301,14 +301,41 @@ module Railspress::NavMenuTemplateHelper
            classes << 'current_page_item'
         end
 
-             active_parent_item_ids << menu_item.menu_item_parent.to_i
-             active_parent_object_ids << menu_item.post_parent.to_i
-             active_object              = menu_item.object
+        active_parent_item_ids << menu_item.menu_item_parent.to_i
+        active_parent_object_ids << menu_item.post_parent.to_i
+        active_object              = menu_item.object
 
        # if the menu item corresponds to the currently-queried post type archive
-       else
+      elsif 'post_type_archive' == menu_item.type && @wp_query.is_post_type_archive?(menu_item.object)
+        classes << 'current-menu-item'
+        menu_item.current = true
+        _anc_id                     = menu_item.db_id.to_i
+
+        # 			while (
+        # 				( $_anc_id = get_post_meta( $_anc_id, '_menu_item_menu_item_parent', true ) ) &&
+        # 				! in_array( $_anc_id, $active_ancestor_item_ids )
+        # 			) {
+        # 				$active_ancestor_item_ids[] = $_anc_id;
+        # 			}
+        active_parent_item_ids << menu_item.menu_item_parent.to_i
+        #  if the menu item corresponds to the currently-requested URL
+      elsif 'custom' == menu_item.object # && isset( $_SERVER['HTTP_HOST']
+        _root_relative_current = untrailingslashit request.env['REQUEST_URI']
+
+        # if it is the customize page then it will strips the query var off the url before entering the comparison block.
+        # if ( is_customize_preview() ) {
+        # 				$_root_relative_current = strtok( untrailingslashit( $_SERVER['REQUEST_URI'] ), '?' );
+        # 			}
+
+        current_url        = set_url_scheme( 'http://' + request.env['HTTP_HOST'] + _root_relative_current )
+        raw_item_url       =  menu_item.url.include?('#') ? menu_item.url.slice(0, menu_item.url.index('#') ) : menu_item.url
+        item_url           = set_url_scheme( untrailingslashit( raw_item_url ) )
+        # $_indexless_current = untrailingslashit( preg_replace( '/' . preg_quote( $wp_rewrite->index, '/' ) . '$/', '', $current_url ) );
+
+        # TODO continue...
+
+        classes << 'menu-item-home' if untrailingslashit(item_url) == home_url
       end
-      # TODO ...
 
       # back-compat with wp_page_menu: add "current_page_parent" to static home page link for any non-page query
       if !home_page_id.blank? && 'post_type' == menu_item.type && # ?wp_query.is_page.blank? &&
@@ -328,6 +355,7 @@ module Railspress::NavMenuTemplateHelper
       # parent_item.current_item_ancestor = false
       # parent_item.current_item_parent = false
 
+      # TODO continue...
 
       parent_item.classes = classes.uniq
     end
