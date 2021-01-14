@@ -1,11 +1,11 @@
 <%= content_tag :h2 do %>
-  <%= t('railspress.post.index.title') %>
+  <%= t('railspress.home.index.title') %>
   <%= ' &ndash; '.html_safe + content_tag(:small, @year) unless @year.nil? %>
   <%= ' &ndash; '.html_safe + content_tag(:small, @tag.name) unless @tag.nil? %>
 <% end %>
 
 <% @posts.each do |post| %>
-  <%= render partial: 'content_excerpt', locals: {post: post} %>
+  <%= render partial: 'railspress/posts/content_excerpt', locals: { post: post } %>
 <% end %>
 
 <%= content_tag :nav, class: 'navigation pagination', role: 'navigation' do %>

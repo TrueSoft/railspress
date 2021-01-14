@@ -327,6 +327,8 @@ module Railspress::NavMenuHelper
               if mi_post_obj.post_type == 'page'
                 if menu_item.object_id_.to_s == get_option('page_for_posts').to_s
                   menu_item.url = main_app.all_posts_path
+                elsif menu_item.object_id_.to_s == get_option('page_on_front').to_s
+                  menu_item.url = main_app.root_path
                 else
                   menu_item.url = railspress_engine.show_page_path(slug: untrailingslashit(wp_url_to_relative_url(get_permalink(mi_post_obj)).gsub(/^\//, '')))
                 end

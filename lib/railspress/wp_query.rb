@@ -303,7 +303,7 @@ class Railspress::WP_Query
       @qv.delete 'controller'
       @qv.delete 'action'
       @qv.delete 'slug'
-    elsif @qv['controller'] == 'railspress/pages' && @qv['action'] == 'index'
+    elsif @qv['controller'] == 'railspress/home' && @qv['action'] == 'index'
       @qv.delete 'controller'
       @qv.delete 'action'
     elsif @qv['controller'] == 'railspress/posts' && @qv['action'] == 'by_year' && !@qv['year'].blank?

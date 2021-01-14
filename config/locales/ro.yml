@@ -15,6 +15,9 @@ ro:
   #    order: [ :day, :month, :year ]
 
   railspress:
+    home:
+      index:
+        title: "Articole"
     embed:
       continue_reading_html: "Continue reading <span class=\"screen-reader-text\">%{title}</span>"
     option:
@@ -45,7 +48,6 @@ ro:
         read_more: "Mai multe detalii"
     post:
       index:
-        title: "Articole"
         more: "Citește mai mult"
         type_archive: "Arhivă tip de articol"
         navigation: "Navigare în articole"

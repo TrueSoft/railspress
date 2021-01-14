@@ -4,14 +4,6 @@ module Railspress
   class PostsController < ApplicationController
     include Railspress::TemplateHelper
 
-    def index
-      if Railspress.multi_language
-        @posts = Railspress::Post.published.descending.joins(:languages).where(default_filter).paginate(page: params[:page], per_page: helpers.get_option('posts_per_page', nil))
-      else
-        @posts = Railspress::Post.published.descending.where(default_filter).paginate(page: params[:page], per_page: helpers.get_option('posts_per_page', nil))
-      end
-    end
-
     def by_year
       @year = params[:year].to_i
       if Railspress.multi_language
@@ -36,7 +28,7 @@ module Railspress
       @post = @wp_query.post # Railspress::Post.published.where(post_name: params[:name]).first!
       @post_prev, @post_next = neighbours(@post)
       if Railspress.generate_breadcrumb
-        @breadcrumb = {t('railspress.post.index.title') => main_app.all_posts_path}
+        @breadcrumb = {t('railspress.home.index.title') => main_app.all_posts_path}
         @breadcrumb[@post.post_date.year] = news_of_year_path(year: @post.post_date.year) unless @post.post_date.year == Date.current.year
         @breadcrumb[@post.post_title] = nil
       end
@@ -91,7 +83,7 @@ module Railspress
         @archive = Railspress::Term.joins(:taxonomy).where(Railspress::Taxonomy.table_name => {taxonomy: params[:taxonomy]}, slug: params[:slug]).first!
       end
       if Railspress.generate_breadcrumb
-        @breadcrumb = {t('railspress.post.index.title') => main_app.all_posts_path}
+        @breadcrumb = {t('railspress.home.index.title') => main_app.all_posts_path}
         @breadcrumb[@archive.name] = nil
       end
 
@@ -174,15 +166,6 @@ module Railspress
       super
     end
 
-    def default_filter
-      if Railspress.multi_language
-        parsed_locale = params[:language] || I18n.default_locale
-        tt_id = Railspress::Language.joins(:term).where(Railspress::Term.table_name => {slug: parsed_locale}).pluck(:term_taxonomy_id)
-        {Railspress::Taxonomy.table_name => {term_id: tt_id.empty? ? 0 : tt_id.first }}
-      else
-        {}
-      end
-    end
 
     def neighbours(post)
       if Railspress.multi_language
