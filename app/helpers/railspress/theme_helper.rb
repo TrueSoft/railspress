@@ -111,7 +111,7 @@ module Railspress::ThemeHelper
   #
   # @return string Template directory URI.
   def get_template_directory_uri
-    template = rawurlencode(get_template).gsub('%2F', '/')
+    template = Railspress::PHP.rawurlencode(get_template).gsub('%2F', '/')
     theme_root_uri = get_theme_root_uri(template)
     template_dir_uri = "#{theme_root_uri}/#{template}"
 
