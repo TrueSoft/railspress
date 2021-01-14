@@ -40,8 +40,48 @@ module Railspress
         @breadcrumb[@post.post_date.year] = news_of_year_path(year: @post.post_date.year) unless @post.post_date.year == Date.current.year
         @breadcrumb[@post.post_title] = nil
       end
+      templates = if @wp_query.is_front_page?
+                    get_front_page_template
+                  elsif @wp_query.is_home
+                    get_home_template
+                  elsif @wp_query.is_privacy_policy
+                    get_privacy_policy_template
+                  elsif @wp_query.is_post_type_archive?
+                    get_post_type_archive_template
+                  elsif @wp_query.is_tax
+                    get_taxonomy_template
+                  elsif @wp_query.is_attachment
+                    get_attachment_template
+                  elsif @wp_query.is_single
+                    get_single_template
+                  elsif @wp_query.is_page
+                    get_page_template
+                  elsif @wp_query.is_singular
+                    get_singular_template
+                  elsif @wp_query.is_category
+                    get_category_template
+                  elsif @wp_query.is_tag
+                    get_tag_template
+                  elsif @wp_query.is_author
+                    get_author_template
+                  elsif @wp_query.is_date
+                    get_date_template
+                  elsif @wp_query.is_archive
+                    get_archive_template
+                  else
+                    []
+                  end
+      templates.each do |tmpl|
+        begin
+          render action: tmpl
+          return
+        rescue ActionView::MissingTemplate
+          next
+        end
+      end
+      render action: :single # if no other template was found until now
     rescue ActiveRecord::RecordNotFound
-      redirect_to main_app.all_posts_path, alert: t('railspress.post.show.not_found', slug: params[:slug])
+      redirect_to main_app.all_posts_path, alert: t('railspress.post.show.not_found', slug: params[:name])
     end
 
     def archive
@@ -124,6 +164,15 @@ module Railspress
     end
 
     private
+
+    def init_wp_query
+      # post_type
+      # args.kind_of? ActionController::Parameters
+      params_as_hash = JSON.parse(params.to_s.gsub('=>', ':'))
+
+      # @wp_query = Railspress::WP_Query.new
+      super
+    end
 
     def default_filter
       if Railspress.multi_language
