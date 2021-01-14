@@ -1,5 +1,5 @@
 <%= content_tag :h2 do %>
-  <%= t('railspress.home.index.title') %>
+  <%= t('railspress.home.posts.title') %>
   <%= ' &ndash; '.html_safe + content_tag(:small, @year) unless @year.nil? %>
   <%= ' &ndash; '.html_safe + content_tag(:small, @tag.name) unless @tag.nil? %>
 <% end %>

@@ -28,41 +28,11 @@ module Railspress
       @post = @wp_query.post # Railspress::Post.published.where(post_name: params[:name]).first!
       @post_prev, @post_next = neighbours(@post)
       if Railspress.generate_breadcrumb
-        @breadcrumb = {t('railspress.home.index.title') => main_app.all_posts_path}
+        @breadcrumb = {t('railspress.home.posts.title') => main_app.all_posts_path}
         @breadcrumb[@post.post_date.year] = news_of_year_path(year: @post.post_date.year) unless @post.post_date.year == Date.current.year
         @breadcrumb[@post.post_title] = nil
       end
-      templates = if @wp_query.is_front_page?
-                    get_front_page_template
-                  elsif @wp_query.is_home
-                    get_home_template
-                  elsif @wp_query.is_privacy_policy
-                    get_privacy_policy_template
-                  elsif @wp_query.is_post_type_archive?
-                    get_post_type_archive_template
-                  elsif @wp_query.is_tax
-                    get_taxonomy_template
-                  elsif @wp_query.is_attachment
-                    get_attachment_template
-                  elsif @wp_query.is_single
-                    get_single_template
-                  elsif @wp_query.is_page
-                    get_page_template
-                  elsif @wp_query.is_singular
-                    get_singular_template
-                  elsif @wp_query.is_category
-                    get_category_template
-                  elsif @wp_query.is_tag
-                    get_tag_template
-                  elsif @wp_query.is_author
-                    get_author_template
-                  elsif @wp_query.is_date
-                    get_date_template
-                  elsif @wp_query.is_archive
-                    get_archive_template
-                  else
-                    []
-                  end
+      templates = determine_templates
       templates.each do |tmpl|
         begin
           render action: tmpl
@@ -83,7 +53,7 @@ module Railspress
         @archive = Railspress::Term.joins(:taxonomy).where(Railspress::Taxonomy.table_name => {taxonomy: params[:taxonomy]}, slug: params[:slug]).first!
       end
       if Railspress.generate_breadcrumb
-        @breadcrumb = {t('railspress.home.index.title') => main_app.all_posts_path}
+        @breadcrumb = {t('railspress.home.posts.title') => main_app.all_posts_path}
         @breadcrumb[@archive.name] = nil
       end
 

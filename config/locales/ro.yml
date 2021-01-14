@@ -16,7 +16,7 @@ ro:
 
   railspress:
     home:
-      index:
+      posts:
         title: "Articole"
     embed:
       continue_reading_html: "Continue reading <span class=\"screen-reader-text\">%{title}</span>"
