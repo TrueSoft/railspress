@@ -41,4 +41,7 @@
   </tbody>
 </table>
 
+<%= content_tag :h5, "wp_rewrite.extra_permastructs" %>
 <%= content_tag :pre, Railspress::PHP.print_r(Railspress.GLOBAL.wp_rewrite.extra_permastructs)  %>
+<%= content_tag :h5, "GLOBAL.wp_taxonomies" %>
+<%= content_tag :pre, Railspress::PHP.print_r(Railspress.GLOBAL.wp_taxonomies)  %>
