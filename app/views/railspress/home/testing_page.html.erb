@@ -15,7 +15,7 @@
   <%#= content_tag :li, 'get_bloginfo(language)'   + get_bloginfo('language', filter) %>
   <%= content_tag :li, 'get_bloginfo(stylesheet_url)'     + get_bloginfo('stylesheet_url', filter) %>
   <%= content_tag :li, 'get_bloginfo(stylesheet_directory)'   + get_bloginfo('stylesheet_directory', filter) %>
-  <%#= content_tag :li, 'get_bloginfo(template_url)'   + get_bloginfo('template_url', filter) %>
+  <%= content_tag :li, 'get_bloginfo(template_url)'   + get_bloginfo('template_url', filter) %>
   <%#= content_tag :li, 'get_bloginfo(pingback_url)'   + get_bloginfo('pingback_url', filter) %>
   <%#= content_tag :li, 'get_bloginfo(atom_url)'   + get_bloginfo('atom_url', filter) %>
   <%#= content_tag :li, 'get_bloginfo(rdf_url)'    + get_bloginfo('rdf_url', filter) %>
@@ -23,6 +23,9 @@
   <%#= content_tag :li, 'get_bloginfo(rss2_url)'   + get_bloginfo('rss2_url', filter) %>
   <%#= content_tag :li, 'get_bloginfo(comments_atom_url)'  + get_bloginfo('comments_atom_url', filter) %>
   <%#= content_tag :li, 'get_bloginfo(comments_rss2_url)'  + get_bloginfo('comments_rss2_url', filter) %>
+  <%= content_tag :li, 'get_option(my_option)'  +      "#{get_option('my_option')}" %>
+  <%= content_tag :li, 'get_option(with_prefix_44)'  + "#{get_option('with_prefix_44')}" %>
+  <%= content_tag :li, 'get_object_taxonomies(post)'  + "#{get_object_taxonomies('post')}" %>
 <% end %>
 
 <table style="width:auto;">

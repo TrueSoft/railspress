@@ -99,4 +99,7 @@ class Railspress::HomeController < Railspress::ApplicationController
     render action: :home # if no other template was found until now
   end
 
+  def testing_page
+  end
+
 end
