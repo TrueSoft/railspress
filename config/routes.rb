@@ -3,14 +3,14 @@ Railspress::Engine.routes.draw do
   resources :options
 
   # get 'posts' => 'railspress/home#posts'
-  get 'posts/:year' => 'posts#by_year', constraints: {year: /20[12]\d/}, as: :news_of_year
-  get 'posts/:year/:month' => 'posts#by_month', constraints: {year: /20[12]\d/, month: /(0?\d)|10|11|12/} # replace with monthnum?
+  get 'posts/:year' => 'railspress/archive#year_archive', constraints: {year: /20[12]\d/}, as: :year_archive_posts
+  get 'posts/:year/:monthnum' => 'railspress/archive#month_archive', constraints: {year: /20[12]\d/, monthnum: /(0?\d)|10|11|12/}
 
-  get 'archive/:taxonomy/:slug' => 'railspress/posts#archive'
-  get 'tag/:slug' => 'railspress/posts#archive', defaults: {taxonomy: 'post_tag'}
-  get 'category/:slug' => 'railspress/posts#archive', defaults: {taxonomy: 'category'}
-  get 'author/:slug/page/:page' => 'railspress/posts#archive', defaults: {taxonomy: 'author'}
-  get 'author/:slug' => 'railspress/posts#archive', defaults: {taxonomy: 'author'}, as: :authors_posts
+  get 'archive/:taxonomy/:slug' => 'railspress/archive#taxonomy'
+  get 'tag/:slug' => 'railspress/archive#taxonomy', defaults: {taxonomy: 'post_tag'}
+  get 'category/:slug' => 'railspress/archive#taxonomy', defaults: {taxonomy: 'category'}, as: :category_posts
+  get 'author/:slug/page/:page' => 'railspress/archive#author', defaults: {taxonomy: 'author'}
+  get 'author/:slug' => 'railspress/archive#author', defaults: {taxonomy: 'author'}, as: :authors_posts
 
   get 'posts/:name' => 'posts#single'
 

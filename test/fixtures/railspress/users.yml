@@ -1,3 +1,4 @@
 user_a:
   ID: 1
   user_login: 'user-a'
+  user_nicename: 'user-a'

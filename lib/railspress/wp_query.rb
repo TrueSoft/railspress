@@ -278,13 +278,6 @@ class Railspress::WP_Query
     # @is_robots = true unless @qv['robots']
 
     # ---- TRANSFORM RAILS PARAMS TO WP ---------------------------------
-    # if @qv['controller'] == 'railspress/posts' && @qv['action'] == 'single' && !@qv['slug'].blank?
-    #   if @qv['slug'] =~ /^(author)\/.+/
-    #     @qv['taxonomy'] == 'author'
-    #     @qv['action'] = 'archive'
-    #     @qv['slug'] = @qv['slug'].gsub(/^(author)\//, '')
-    #   end
-    # end
     if @qv['controller'] == 'railspress/posts' && @qv['action'] == 'single' && !@qv['slug'].blank?
       if @qv['slug'].include? '/'
         page_by_path = get_page_by_path @qv['slug']
@@ -306,12 +299,14 @@ class Railspress::WP_Query
     elsif @qv['controller'] == 'railspress/home' && @qv['action'] == 'index'
       @qv.delete 'controller'
       @qv.delete 'action'
-    elsif @qv['controller'] == 'railspress/posts' && @qv['action'] == 'by_year' && !@qv['year'].blank?
+    elsif @qv['controller'] == 'railspress/archive' && @qv['action'] == 'year_archive' && !@qv['year'].blank?
 
-    elsif @qv['controller'] == 'railspress/posts' && @qv['action'] == 'by_month' && !@qv['month'].blank?
-      @qv['monthnum'] = @qv['month']
-      @qv.delete 'month'
-    elsif @qv['controller'] == 'railspress/posts' && @qv['action'] == 'archive' && !@qv['slug'].blank?
+    elsif @qv['controller'] == 'railspress/archive' && @qv['action'] == 'month_archive' && !@qv['monthnum'].blank?
+
+    elsif @qv['controller'] == 'railspress/archive' && @qv['action'] == 'author' && !@qv['slug'].blank?
+      @is_archive = true
+      @is_author = true
+    elsif @qv['controller'] == 'railspress/archive' && @qv['action'] == 'taxonomy' && !@qv['slug'].blank?
       @is_archive = true
       if @qv['taxonomy'] == 'category'
         @is_category = true
@@ -1224,5 +1219,12 @@ class Railspress::WP_Query
     false
   end
 
+  def is_year
+    @is_year
+  end
+
+  def is_month
+    @is_month
+  end
 
 end

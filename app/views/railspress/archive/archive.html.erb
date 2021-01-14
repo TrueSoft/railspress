@@ -4,10 +4,10 @@
   <% end %>
 
   <% @posts.each do |post| %>
-    <%= render partial: 'content_excerpt', locals: {post: post} %>
+    <%= render partial: 'railspress/posts/content_excerpt', locals: {post: post} %>
   <% end %>
 <% else %>
-  <%= render partial: 'content_none' %>
+  <%= render partial: 'railspress/posts/content_none' %>
 <% end %>
 
 <%= content_tag :nav, class: 'navigation pagination', role: 'navigation' do %>

@@ -286,12 +286,12 @@ module Railspress::GeneralTemplateHelper
     elsif @archive.is_a?(Railspress::User) # is_author()
       # translators: Author archive title. %s: Author name
       title = t('railspress.post.archive.title.author', name: content_tag(:span, @archive.display_name, class: 'vcard')) # sprintf( __( 'Author: %s' ), '<span class="vcard">' + get_the_author() + '</span>' )
-    # elsif ( is_year() )
-    #   # translators: Yearly archive title. %s: Year
-    #   title = sprintf( __( 'Year: %s' ), get_the_date( _x( 'Y', 'yearly archives date format' ) ) )
-    # elsif ( is_month() )
-    #   # translators: Monthly archive title. %s: Month name and year
-    #   title = sprintf( __( 'Month: %s' ), get_the_date( _x( 'F Y', 'monthly archives date format' ) ) )
+    elsif @wp_query.is_year
+      # translators: Yearly archive title. %s: Year
+      title = t('railspress.post.archive.title.year', name: @year) # 'yearly archives date format'
+    elsif @wp_query.is_month
+      # translators: Monthly archive title. %s: Month name and year
+      title = t('railspress.post.archive.title.month', name: I18n.l(@year_month, format: '%B %Y')) # 'monthly archives date format'
     # elsif ( is_day() )
     #   # translators: Daily archive title. %s: Date
     #   title = sprintf( __( 'Day: %s' ), get_the_date( _x( 'F j, Y', 'daily archives date format' ) ) )
