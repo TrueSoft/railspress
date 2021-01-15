@@ -57,7 +57,7 @@ class Railspress::ArchiveController < Railspress::ApplicationController
 
   def prepare_vars
     if Railspress.generate_breadcrumb
-      @breadcrumb = {t('railspress.home.posts.title') => main_app.all_posts_path}
+      @breadcrumb = {t('railspress.home.posts.title') => railspress_engine.all_posts_path}
       @breadcrumb[@archive.name] = nil
     end
 
@@ -125,6 +125,6 @@ class Railspress::ArchiveController < Railspress::ApplicationController
                     else
                       t('railspress.taxonomy.not_found', taxonomy: params[:taxonomy], slug: params[:slug])
                     end
-    redirect_to main_app.all_posts_path, alert: alert_message
+    redirect_to railspress_engine.all_posts_path, alert: alert_message
   end
 end

@@ -6,7 +6,7 @@ module Railspress
 
 #  config_accessor :post_type_meta_caps, :wp_rewrite, :multi_language
 
-  config_accessor :multi_language, :links_to_wp, :generate_breadcrumb
+  config_accessor :multi_language, :links_to_wp, :generate_breadcrumb, :posts_permalink_prefix
 
 #  self.post_type_meta_caps = {}
 
@@ -15,6 +15,8 @@ module Railspress
   self.multi_language = false
   self.links_to_wp = false
   self.generate_breadcrumb = false
+
+  self.posts_permalink_prefix = nil
 
 
 end

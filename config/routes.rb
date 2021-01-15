@@ -2,17 +2,29 @@ Railspress::Engine.routes.draw do
 
   resources :options
 
-  # get 'posts' => 'railspress/home#posts'
-  get 'posts/:year' => 'railspress/archive#year_archive', constraints: {year: /20[12]\d/}, as: :year_archive_posts
-  get 'posts/:year/:monthnum' => 'railspress/archive#month_archive', constraints: {year: /20[12]\d/, monthnum: /(0?\d)|10|11|12/}
+  if !Railspress.posts_permalink_prefix.nil?
+    scope path: Railspress.posts_permalink_prefix do
+      get '' => 'railspress/home#posts', as: :all_posts
+      get 'page/:page' => 'railspress/home#posts'
+      get ':year' => 'railspress/archive#year_archive', constraints: {year: /20[12]\d/}, as: :year_archive_posts
+      get ':year/:monthnum' => 'railspress/archive#month_archive', constraints: {year: /20[12]\d/, monthnum: /(0?\d)|10|11|12/}
 
-  get 'archive/:taxonomy/:slug' => 'railspress/archive#taxonomy'
-  get 'tag/:slug' => 'railspress/archive#taxonomy', defaults: {taxonomy: 'post_tag'}
-  get 'category/:slug' => 'railspress/archive#taxonomy', defaults: {taxonomy: 'category'}, as: :category_posts
-  get 'author/:slug/page/:page' => 'railspress/archive#author', defaults: {taxonomy: 'author'}
-  get 'author/:slug' => 'railspress/archive#author', defaults: {taxonomy: 'author'}, as: :authors_posts
+      get 'tag/:slug' => 'railspress/archive#taxonomy', defaults: {taxonomy: 'post_tag'}
+      get 'category/:slug' => 'railspress/archive#taxonomy', defaults: {taxonomy: 'category'}, as: :category_posts
+      get 'author/:slug' => 'railspress/archive#author', defaults: {taxonomy: 'author'}, as: :authors_posts
+      get ':taxonomy/:slug' => 'railspress/archive#taxonomy'
 
-  get 'posts/:name' => 'posts#single'
+      get ':name' => 'railspress/posts#single'
+    end
+  else
+    get 'archive/:taxonomy/:slug' => 'railspress/archive#taxonomy'
+    get 'tag/:slug' => 'railspress/archive#taxonomy', defaults: {taxonomy: 'post_tag'}
+    get 'category/:slug' => 'railspress/archive#taxonomy', defaults: {taxonomy: 'category'}, as: :category_posts
+    get 'author/:slug/page/:page' => 'railspress/archive#author', defaults: {taxonomy: 'author'}
+    get 'author/:slug' => 'railspress/archive#author', defaults: {taxonomy: 'author'}, as: :authors_posts
+  end
+
+  # get 'posts/:name' => 'railspress/posts#single'
 
   get '*slug' => 'railspress/posts#single', as: :show_page
   # get '*pagename' => 'pages#index'

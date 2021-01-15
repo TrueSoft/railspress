@@ -9,9 +9,14 @@ module Railspress
       @post = @wp_query.post # Railspress::Post.published.where(post_name: params[:name]).first!
       @post_prev, @post_next = neighbours(@post)
       if Railspress.generate_breadcrumb
-        @breadcrumb = {t('railspress.home.posts.title') => main_app.all_posts_path}
-        @breadcrumb[@post.post_date.year] = year_archive_posts_path(year: @post.post_date.year) unless @post.post_date.year == Date.current.year
-        @breadcrumb[@post.post_title] = nil
+        if @post.post_type == 'post'
+          @breadcrumb = {t('railspress.home.posts.title') => railspress_engine.all_posts_path}
+          @breadcrumb[@post.post_date.year] = year_archive_posts_path(year: @post.post_date.year) unless @post.post_date.year == Date.current.year
+          @breadcrumb[@post.post_title] = nil
+        else
+          @breadcrumb = {}
+
+        end
       end
       templates = determine_templates
       templates.each do |tmpl|
@@ -24,7 +29,7 @@ module Railspress
       end
       render action: :single # if no other template was found until now
     rescue ActiveRecord::RecordNotFound
-      redirect_to main_app.all_posts_path, alert: t('railspress.post.show.not_found', slug: params[:name])
+      redirect_to railspress_engine.all_posts_path, alert: t('railspress.post.show.not_found', slug: params[:name])
     end
 
     private
