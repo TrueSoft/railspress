@@ -286,6 +286,17 @@ module Railspress::LinkTemplateHelper
       end
     end
   end
+
+  # Copied from controller
+  def default_filter
+    if Railspress.multi_language
+      parsed_locale = params[:language] || I18n.default_locale
+      tt_id = Railspress::Language.joins(:term).where(Railspress::Term.table_name => {slug: parsed_locale}).pluck(:term_taxonomy_id)
+      {Railspress::Taxonomy.table_name => {term_id: tt_id.empty? ? 0 : tt_id.first }}
+    else
+      {}
+    end
+  end
   # TODO get_adjacent_post_rel_link adjacent_posts_rel_link adjacent_posts_rel_link_wp_head next_post_rel_link prev_post_rel_link get_boundary_post
 
   # Retrieves the previous post link that is adjacent to the current post.
