@@ -279,19 +279,19 @@ module Railspress::GeneralTemplateHelper
   def get_the_archive_title()
     if @archive.is_a?(Railspress::Term) && @archive.taxonomy.is_a?(Railspress::Category) # is_category()
       # translators: Category archive title. %s: Category name
-      title = t('railspress.post.archive.title.category', name: @archive.name) # sprintf( __( 'Category: %s' ), single_cat_title( '', false ) )
+      title = t('railspress.post.archive.title.category', name: content_tag(:span, @archive.name, class: 'page-description')) # sprintf( __( 'Category: %s' ), single_cat_title( '', false ) )
     elsif @archive.is_a?(Railspress::Term) && @archive.taxonomy.is_a?(Railspress::PostTag) # is_tag()
       # translators: Tag archive title. %s: Tag name
-      title = t('railspress.post.archive.title.tag', name: @archive.name) # sprintf( __( 'Tag: %s' ), single_tag_title( '', false ) )
+      title = t('railspress.post.archive.title.tag', name: content_tag(:span, @archive.name, class: 'page-description')) # sprintf( __( 'Tag: %s' ), single_tag_title( '', false ) )
     elsif @archive.is_a?(Railspress::User) # is_author()
       # translators: Author archive title. %s: Author name
-      title = t('railspress.post.archive.title.author', name: content_tag(:span, @archive.display_name, class: 'vcard')) # sprintf( __( 'Author: %s' ), '<span class="vcard">' + get_the_author() + '</span>' )
+      title = t('railspress.post.archive.title.author', name: content_tag(:span, @archive.display_name, class: 'page-description')) # sprintf( __( 'Author: %s' ), '<span class="vcard">' + get_the_author() + '</span>' )
     elsif @wp_query.is_year
       # translators: Yearly archive title. %s: Year
-      title = t('railspress.post.archive.title.year', name: @year) # 'yearly archives date format'
+      title = t('railspress.post.archive.title.year', name: content_tag(:span, @year, class: 'page-description')) # 'yearly archives date format'
     elsif @wp_query.is_month
       # translators: Monthly archive title. %s: Month name and year
-      title = t('railspress.post.archive.title.month', name: I18n.l(@year_month, format: '%B %Y')) # 'monthly archives date format'
+      title = t('railspress.post.archive.title.month', name: content_tag(:span, I18n.l(@year_month, format: '%B %Y'), class: 'page-description')) # 'monthly archives date format'
     # elsif ( is_day() )
     #   # translators: Daily archive title. %s: Date
     #   title = sprintf( __( 'Day: %s' ), get_the_date( _x( 'F j, Y', 'daily archives date format' ) ) )
