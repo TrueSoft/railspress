@@ -1,4 +1,5 @@
 <%= content_tag :header, class: 'entry-header' do %>
+  <%= hidden_field_tag "railspress_current_template_entry_header", 'app/views/railspress/posts/template-parts/_entry-header.html.erb' if Railspress.WP_DEBUG %>
       <%= content_tag :h3, @page.post_title, class: 'entry-title' %>
       <%= if @is_revision
             content_tag :h4, class: 'revision-parent px-2 text-muted' do

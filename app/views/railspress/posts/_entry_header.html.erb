@@ -1,5 +1,6 @@
 <%# get_template_part( 'template-parts/header/entry', 'header' ) %>
 <%= content_tag :header, class: 'entry-header' do %>
+  <%= hidden_field_tag "railspress_current_template_entry_header", 'app/views/railspress/posts/_entry_header.html.erb' if Railspress.WP_DEBUG %>
   <%= content_tag :h2, post.post_title, class: 'entry-title' %>
   <%= content_tag :div, class: 'entry-meta' do %>
     <%= content_tag :span, class: 'byline' do %>

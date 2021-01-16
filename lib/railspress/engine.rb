@@ -33,6 +33,8 @@ module Railspress
     mattr_accessor :WPINC
     # In WordPress, it can be set in wp-config.php like this: define('UPLOADS', 'images');
     mattr_accessor :UPLOADS
+    # When this flag is set, some debug information is written in templates as hidden inputs, or in the console.
+    mattr_accessor :WP_DEBUG
     # WP_CONTENT_DIR = ABSPATH + 'wp-content'
     mattr_accessor :WP_CONTENT_DIR
     # WP_PLUGIN_DIR = WP_CONTENT_DIR . '/plugins'
@@ -59,6 +61,7 @@ module Railspress
     # add default values of more config vars here
     self.WPINC = "wp-includes"
     self.UPLOADS = nil # must be nil if the constant is not set in WordPress in wp-config.php
+    self.WP_DEBUG = false
     self.WP_PLUGIN_DIR = "wp-content/plugins"
     self.GLOBAL = Railspress::GlobalVars.new
   end
