@@ -2,29 +2,29 @@ class Railspress::HomeController < Railspress::ApplicationController
   include Railspress::TemplateHelper
 
   def index
-    @page = @wp_query.get_queried_object
-    if @page.nil?
+    @post = @wp_query.get_queried_object
+    if @post.nil?
       if Railspress.multi_language
         @posts = Railspress::Post.published.descending.joins(:languages).where(default_filter).paginate(page: params[:page], per_page: helpers.get_option('posts_per_page', nil))
       else
         @posts = Railspress::Post.published.descending.where(default_filter).paginate(page: params[:page], per_page: helpers.get_option('posts_per_page', nil))
       end
     else
-      if @page.post_status == 'private'
+      if @post.post_status == 'private'
         event_check_si = Railspress.main_app_hook.on_check_signed_in
-        if !event_check_si.nil? && !event_check_si.on(:signed_in?, @page, session)
+        if !event_check_si.nil? && !event_check_si.on(:signed_in?, @post, session)
           redirect_to main_app.root_path, alert: t('railspress.pages.show.no_public', slug: params[:pagename])
           return
         end
       end
-      orig_page_id = @page.id
+      orig_page_id = @post.id
       if Railspress.multi_language
         # ---- Get the translated version if it is the case
-        @page = helpers.get_translated_page @page, params[:language] || I18n.default_locale.to_s
-        if orig_page_id != @page.id
+        @post = helpers.get_translated_page @post, params[:language] || I18n.default_locale.to_s
+        if orig_page_id != @post.id
           parsed_locale = params[:language] || I18n.default_locale.to_s
-          logger.info "Redirecting to translated version (#{@page.post_name}/#{parsed_locale})"
-          redirect_to show_page_path(helpers.get_page_uri(@page), language: parsed_locale == I18n.default_locale.to_s ? nil : params[:language])  # TODO de verificat
+          logger.info "Redirecting to translated version (#{@post.post_name}/#{parsed_locale})"
+          redirect_to show_page_path(helpers.get_page_uri(@post), language: parsed_locale == I18n.default_locale.to_s ? nil : params[:language])  # TODO de verificat
           return
         end
       end
@@ -55,7 +55,7 @@ class Railspress::HomeController < Railspress::ApplicationController
         end
       end
       Railspress.main_app_hook.on_show_wp_page.each do |event|
-        unless event.on(:show_page, @page, session)
+        unless event.on(:show_page, @post, session)
           redirect_to main_app.root_path, alert: (event.temp_message || t('railspress.pages.show.not_allowed', slug: params[:pagename]))
           return
         end
@@ -65,7 +65,7 @@ class Railspress::HomeController < Railspress::ApplicationController
       else
         @latest_posts = Railspress::Post.published.descending.where(default_filter).first(2)
       end
-      @post_class = @page.metas.select {|meta| meta.meta_key == 'post-class'}.map {|meta| meta.meta_value}.first
+      @post_class = @post.metas.select {|meta| meta.meta_key == 'post-class'}.map {|meta| meta.meta_value}.first
     end
     templates = determine_templates
     logger.debug "TS_DEBUG: There are #{templates.length} possible templates: #{templates.to_s}" if Railspress.WP_DEBUG
