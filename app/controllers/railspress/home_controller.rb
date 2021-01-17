@@ -28,32 +28,32 @@ class Railspress::HomeController < Railspress::ApplicationController
           return
         end
       end
-      @is_revision = params[:rev] && params[:token] == helpers.ts_token(params[:rev])
-      if @is_revision
-        rev = helpers.wp_get_post_revisions(@page.id, include: params[:rev])
-        if rev.blank?
-          @is_revision = false
-        else
-          @main_post = @page
-          @page = rev.values.first
-        end
-      end
-      if @is_revision
-        @revision_post_date_title_format = '%B %Y'
-        prdtf = @main_post.metas.select { |meta|  meta.meta_key == 'revision_post_date_title_format' }
-        @revision_post_date_title_format = prdtf.first.meta_value unless prdtf.empty?
-      end
-      unless @is_revision
+      # @is_revision = params[:rev] && params[:token] == helpers.ts_token(params[:rev])
+      # if @is_revision
+      #   rev = helpers.wp_get_post_revisions(@post.id, include: params[:rev])
+      #   if rev.blank?
+      #     @is_revision = false
+      #   else
+      #     @main_post = @post
+      #     @post = rev.values.first
+      #   end
+      # end
+      # if @is_revision
+      #   @revision_post_date_title_format = '%B %Y'
+      #   prdtf = @main_post.metas.select { |meta|  meta.meta_key == 'revision_post_date_title_format' }
+      #   @revision_post_date_title_format = prdtf.first.meta_value unless prdtf.empty?
+      # end
+      # unless @is_revision
         if Railspress.generate_breadcrumb
-          has_breadcrumb = (@page.metas.select {|meta| meta.meta_key == 'breadcrumb' and meta.meta_value == '0'}.empty?)
-          if has_breadcrumb
-            @breadcrumb = {}
-            ancestors.each do |page|
-              @breadcrumb[page.post_title] = main_app.show_page_path(helpers.get_page_uri(page))
-            end
-          end
+          # has_breadcrumb = (@post.metas.select {|meta| meta.meta_key == 'breadcrumb' and meta.meta_value == '0'}.empty?)
+          # if has_breadcrumb
+          #   @breadcrumb = {}
+          #   ancestors.each do |page|
+          #     @breadcrumb[page.post_title] = main_app.show_page_path(helpers.get_page_uri(page))
+          #   end
+          # end
         end
-      end
+      # end
       Railspress.main_app_hook.on_show_wp_page.each do |event|
         unless event.on(:show_page, @post, session)
           redirect_to main_app.root_path, alert: (event.temp_message || t('railspress.pages.show.not_allowed', slug: params[:pagename]))
@@ -71,7 +71,7 @@ class Railspress::HomeController < Railspress::ApplicationController
     logger.debug "TS_DEBUG: There are #{templates.length} possible templates: #{templates.to_s}" if Railspress.WP_DEBUG
     templates.each do |tmpl|
       begin
-        # tmpl = tmpl.gsub(/\.php$/, '')
+        tmpl = tmpl.gsub(/\.php$/, '')
         render action: tmpl
         return
       rescue ActionView::MissingTemplate
