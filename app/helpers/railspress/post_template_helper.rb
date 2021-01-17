@@ -389,8 +389,8 @@ module Railspress::PostTemplateHelper
           if tag_class.is_a?(Numeric) || tag_class.gsub(/^-+|-+$/, '').blank?
             tag_class = tag.term_id
           end
-          classes <<  'tag-' + tag_class
-          classes <<  'tag-' + tag.term_id
+          classes <<  "tag-#{tag_class}"
+          classes <<  "tag-#{tag.term_id}"
           end
         elsif @wp_query.is_tax
           term = @wp_query.get_queried_object
@@ -400,8 +400,8 @@ module Railspress::PostTemplateHelper
               term_class = term.term_id
             end
             classes << 'tax-' + sanitize_html_class(term.taxonomy)
-            classes << 'term-' + term_class
-            classes << 'term-' + term.term_id
+            classes << "term-#{term_class}"
+            classes << "term-#{term.term_id}"
           end
         end
       end
