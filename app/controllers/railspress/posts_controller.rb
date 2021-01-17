@@ -18,6 +18,7 @@ module Railspress
         end
       end
       templates = determine_templates
+      logger.debug "TS_DEBUG: There are #{templates.length} possible templates: #{templates.to_s}" if Railspress.WP_DEBUG
       templates.each do |tmpl|
         begin
           render action: tmpl

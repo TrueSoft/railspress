@@ -68,6 +68,7 @@ class Railspress::HomeController < Railspress::ApplicationController
       @post_class = @page.metas.select {|meta| meta.meta_key == 'post-class'}.map {|meta| meta.meta_value}.first
     end
     templates = determine_templates
+    logger.debug "TS_DEBUG: There are #{templates.length} possible templates: #{templates.to_s}" if Railspress.WP_DEBUG
     templates.each do |tmpl|
       begin
         # tmpl = tmpl.gsub(/\.php$/, '')
