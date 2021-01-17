@@ -251,7 +251,7 @@ module Railspress::FormattingHelper
     # Limit to A-Z,a-z,0-9,_,-
     sanitized = sanitized.gsub( /[^A-Za-z0-9_-]/, '' )
 
-    return sanitize_html_class( fallback ) if (sanitized.blank? && fallback )
+    return sanitize_html_class( fallback ) if (sanitized.blank? && !fallback.blank? )
 
     # Filters a sanitized HTML class string.
     #

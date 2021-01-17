@@ -302,7 +302,7 @@ module Railspress::PostTemplateHelper
           template_parts = template_slug.split('/')
 
           template_parts.each do |part|
-            classes << "#{post_type}-template-" + sanitize_html_class(basename(part, '.php').gsub(/\.\//, '-'))
+            classes << "#{post_type}-template-" + sanitize_html_class(File.basename(part, '.php').gsub(/\.\//, '-'))
           end
           classes << "#{post_type}-template-" + sanitize_html_class(template_slug.gsub('.', '-'))
         else
@@ -311,21 +311,19 @@ module Railspress::PostTemplateHelper
 
         if @wp_query.is_single
           classes << 'single'
-          # if ( isset( $post->post_type ) ) {
-          # 				$classes[] = 'single-' . sanitize_html_class( $post->post_type, $post_id );
-          # 				$classes[] = 'postid-' . $post_id;
-          #
-          # 				// Post Format
-          # 				if ( post_type_supports( $post->post_type, 'post-formats' ) ) {
-          # 					$post_format = get_post_format( $post->ID );
-          #
-          # 					if ( $post_format && ! is_wp_error( $post_format ) ) {
-          # 						$classes[] = 'single-format-' . sanitize_html_class( $post_format );
-          # 					} else {
-          # 						$classes[] = 'single-format-standard';
-          # 					}
-          # 				}
-          # }
+          unless post.post_type.blank?
+            classes << "single-#{sanitize_html_class(post.post_type, post_id)}"
+            classes << "postid-#{post_id}"
+            # Post Format
+            if post_type_supports(post.post_type, 'post-formats')
+              post_format = get_post_format(post.ID)
+              if post_format && !(post_format.is_a? Railspress::WP_Error)
+                classes << 'single-format-' + sanitize_html_class(post_format)
+              else
+                classes << 'single-format-standard';
+              end
+            end
+          end
         end
 
         if @wp_query.is_attachment
@@ -351,7 +349,7 @@ module Railspress::PostTemplateHelper
           # 				$classes[] = 'page-parent';
           # 			}
 
-          unless post.post_parent.blank?
+          if !post.post_parent.blank? && post.post_parent != 0
             classes << 'page-child'
             classes << "parent-pageid-#{post.post_parent}"
           end
@@ -360,54 +358,51 @@ module Railspress::PostTemplateHelper
       elsif @wp_query.is_archive
         if @wp_query.is_post_type_archive?
           classes << 'post-type-archive'
-          # $post_type = get_query_var( 'post_type' );
-          # 			if ( is_array( $post_type ) ) {
-          # 				$post_type = reset( $post_type );
-          # 			}
-          # 			$classes[] = 'post-type-archive-' . sanitize_html_class( $post_type );
+          post_type = @wp_query.get('post_type') # get_query_var( 'post_type' );
+          if post_type.is_a? Array
+            post_type = post_type.first
+          end
+          classes << 'post-type-archive-' + sanitize_html_class( post_type )
         elsif @wp_query.is_author
           # $author    = $wp_query->get_queried_object();
-          # 			$classes[] = 'author';
+          classes << 'author'
           # 			if ( isset( $author->user_nicename ) ) {
           # 				$classes[] = 'author-' . sanitize_html_class( $author->user_nicename, $author->ID );
           # 				$classes[] = 'author-' . $author->ID;
           # 			}
         elsif @wp_query.is_category
-          # $cat       = $wp_query->get_queried_object();
-          # $classes[] = 'category';
-          # if ( isset( $cat->term_id ) ) {
-          #   $cat_class = sanitize_html_class( $cat->slug, $cat->term_id );
-          # if ( is_numeric( $cat_class ) || ! trim( $cat_class, '-' ) ) {
-          #   $cat_class = $cat->term_id;
-          # }
-          #
-          # $classes[] = 'category-' . $cat_class;
-          # $classes[] = 'category-' . $cat->term_id;
-          # }
+          cat       = @wp_query.get_queried_object
+          classes << 'category'
+          unless cat.term_id.blank?
+            cat_class = sanitize_html_class( cat.slug, cat.term_id )
+            if cat_class.is_a?(Numeric) || cat_class.gsub(/^-+|-+$/, '').blank?
+              cat_class = cat.term_id
+            end
+            classes << "category-#{cat_class}"
+            classes << "category-#{cat.term_id}"
+          end
         elsif @wp_query.is_tag
-          # $tag       = $wp_query->get_queried_object();
-          # $classes[] = 'tag';
-          # if ( isset( $tag->term_id ) ) {
-          #   $tag_class = sanitize_html_class( $tag->slug, $tag->term_id );
-          # if ( is_numeric( $tag_class ) || ! trim( $tag_class, '-' ) ) {
-          #   $tag_class = $tag->term_id;
-          # }
-          #
-          # $classes[] = 'tag-' . $tag_class;
-          # $classes[] = 'tag-' . $tag->term_id;
-          # }
+          tag = @wp_query.get_queried_object
+          classes << 'tag'
+          unless tag.term_id.blank?
+          tag_class = sanitize_html_class( tag.slug, tag.term_id )
+          if tag_class.is_a?(Numeric) || tag_class.gsub(/^-+|-+$/, '').blank?
+            tag_class = tag.term_id
+          end
+          classes <<  'tag-' + tag_class
+          classes <<  'tag-' + tag.term_id
+          end
         elsif @wp_query.is_tax
-          # $term = $wp_query->get_queried_object();
-          # if ( isset( $term->term_id ) ) {
-          #   $term_class = sanitize_html_class( $term->slug, $term->term_id );
-          # if ( is_numeric( $term_class ) || ! trim( $term_class, '-' ) ) {
-          #   $term_class = $term->term_id;
-          # }
-          #
-          # $classes[] = 'tax-' . sanitize_html_class( $term->taxonomy );
-          # $classes[] = 'term-' . $term_class;
-          # $classes[] = 'term-' . $term->term_id;
-          # }
+          term = @wp_query.get_queried_object
+          unless term.term_id.blank?
+            term_class = sanitize_html_class(term.slug, term.term_id)
+            if term_class.is_a?(Numeric) || term_class.gsub(/^-+|-+$/, '').blank?
+              term_class = term.term_id
+            end
+            classes << 'tax-' + sanitize_html_class(term.taxonomy)
+            classes << 'term-' + term_class
+            classes << 'term-' + term.term_id
+          end
         end
       end
     end
