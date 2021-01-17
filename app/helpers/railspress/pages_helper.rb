@@ -102,29 +102,5 @@ module Railspress
       output
     end
 
-    def get_translated_page(orig_page, required_language)
-      return nil if orig_page.nil?
-      page_lang = if orig_page.languages.empty?
-                    nil
-                  else
-                    orig_page.languages.first.term.slug
-                  end
-      if required_language != page_lang
-        logger.info "Current page language(#{orig_page.post_name}/#{page_lang}) does not match with #{required_language}"
-        translations = orig_page.relationships.select {|rel| rel.taxonomy.taxonomy == 'post_translations'}
-        if translations.empty?
-          logger.error "Page (#{orig_page.post_name}) does not have a translation for #{required_language}!"
-        else
-          translation_info = Railspress::Functions.maybe_unserialize(translations.first.taxonomy.description)
-          translation_id = translation_info[required_language]
-          if translation_id.nil?
-            logger.error "Page (#{orig_page.post_name}) does not have a translation for #{required_language}"
-          else # The translated version of orig_page
-            return Railspress::Page.find(translation_info[required_language])
-          end
-        end
-      end
-      orig_page
-    end
   end
 end
