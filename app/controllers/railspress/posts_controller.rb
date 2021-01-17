@@ -10,8 +10,8 @@ module Railspress
       @post_prev, @post_next = neighbours(@post)
       if Railspress.generate_breadcrumb
         if @post.post_type == 'post'
-          @breadcrumb = {t('railspress.home.posts.title') => railspress_engine.all_posts_path}
-          @breadcrumb[@post.post_date.year] = year_archive_posts_path(year: @post.post_date.year) unless @post.post_date.year == Date.current.year
+          @breadcrumb[t('railspress.home.posts.title')] = railspress_engine.all_posts_path
+          @breadcrumb[@post.post_date.year] = railspress_engine.year_archive_posts_path(year: @post.post_date.year) unless @post.post_date.year == Date.current.year
           @breadcrumb[@post.post_title] = nil
         else
           @breadcrumb = {}

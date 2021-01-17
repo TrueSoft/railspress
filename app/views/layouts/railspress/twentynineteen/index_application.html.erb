@@ -29,6 +29,7 @@
   <div id="content" class="site-content">
     <section id="primary" class="content-area">
       <main id="main" class="site-main">
+        <%= display_breadcrumb @breadcrumb if Railspress.generate_breadcrumb %>
         <%= yield %>
       </main>
     </section>

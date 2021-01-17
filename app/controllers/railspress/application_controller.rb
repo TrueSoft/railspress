@@ -4,6 +4,7 @@ module Railspress
 
     before_action :set_app_language
     before_action :init_wp_query
+    before_action { @breadcrumb = Railspress.generate_breadcrumb ? breadcrumb_items : nil }
 
     private
 
@@ -70,5 +71,10 @@ module Railspress
         {}
       end
     end
+
+    def breadcrumb_items
+      {}
+    end
+
   end
 end
