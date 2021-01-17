@@ -57,6 +57,7 @@ class Railspress::WalkerNavMenu < ::Railspress::Walker
     classes = item.classes.blank? ? [] : item.classes
     classes << 'menu-item-' + item.id.to_s
 
+    classes << 'menu-item-has-children' if args[:has_children]
     # Filters the arguments for a single nav menu item.
     args = apply_filters('nav_menu_item_args', args, item, depth)
 
