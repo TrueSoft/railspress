@@ -278,7 +278,7 @@ class Railspress::WP_Query
     # @is_robots = true unless @qv['robots']
 
     # ---- TRANSFORM RAILS PARAMS TO WP ---------------------------------
-    if @qv['controller'] == 'railspress/posts' && @qv['action'] == 'single' && !@qv['slug'].blank?
+    if @qv['controller'] == 'railspress/posts' && @qv['action'] == 'singular' && !@qv['slug'].blank?
       if @qv['slug'].include? '/'
         page_by_path = get_page_by_path @qv['slug']
         p_type = page_by_path.post_type unless page_by_path.nil?

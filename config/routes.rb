@@ -14,7 +14,7 @@ Railspress::Engine.routes.draw do
       get 'author/:slug' => 'railspress/archive#author', defaults: {taxonomy: 'author'}, as: :authors_posts
       get ':taxonomy/:slug' => 'railspress/archive#taxonomy'
 
-      get ':name' => 'railspress/posts#single'
+      get ':name' => 'railspress/posts#singular'
     end
   else
     get 'archive/:taxonomy/:slug' => 'railspress/archive#taxonomy'
@@ -24,9 +24,9 @@ Railspress::Engine.routes.draw do
     get 'author/:slug' => 'railspress/archive#author', defaults: {taxonomy: 'author'}, as: :authors_posts
   end
 
-  # get 'posts/:name' => 'railspress/posts#single'
+  # get 'posts/:name' => 'railspress/posts#singular'
 
-  get '*slug' => 'railspress/posts#single', as: :show_page
+  get '*slug' => 'railspress/posts#singular', as: :show_page
   # get '*pagename' => 'pages#index'
 
   get '/' => 'railspress/home#index'

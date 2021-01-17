@@ -4,7 +4,7 @@ module Railspress
   class PostsController < ApplicationController
     include Railspress::TemplateHelper
 
-    def single
+    def singular
       # @wp_query = Railspress::WP_Query.new(params)
       @post = @wp_query.post # Railspress::Post.published.where(post_name: params[:name]).first!
       @post_prev, @post_next = neighbours(@post)
@@ -15,7 +15,6 @@ module Railspress
           @breadcrumb[@post.post_title] = nil
         else
           @breadcrumb = {}
-
         end
       end
       templates = determine_templates
@@ -27,7 +26,7 @@ module Railspress
           next
         end
       end
-      render action: :single # if no other template was found until now
+      render action: :singular # if no other template was found until now
     rescue ActiveRecord::RecordNotFound
       redirect_to railspress_engine.all_posts_path, alert: t('railspress.post.show.not_found', slug: params[:name])
     end

@@ -10,7 +10,7 @@ Rails.application.routes.draw do
 
   get 'test' => 'railspress/home#testing_page'
 
-  # get '*slug' => 'railspress/posts#single', as: :show_page
+  # get '*slug' => 'railspress/posts#singular', as: :show_page
 
   mount Railspress::Engine => '/'
 
