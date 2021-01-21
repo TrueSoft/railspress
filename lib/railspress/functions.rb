@@ -36,6 +36,7 @@ module Railspress::Functions
   def self.maybe_unserialize(original)
     if is_serialized(original) # don't attempt to unserialize data that wasn't serialized going in
       # PHP.unserialize original
+      original.gsub! /\bstdClass\b/, 'StdClass'
       PhpSerialization.load(original)
     else
       original
