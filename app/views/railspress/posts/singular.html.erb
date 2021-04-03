@@ -1,4 +1,4 @@
-<%= content_tag :article, id: "post-#{@post.id}", class: get_post_class('', @post).join(' ')  do %>
+<%= content_tag :article, id: "post-#{@post.id}", class: get_post_class(@post_class, @post).join(' ')  do %>
   <%= hidden_field_tag "railspress_current_template_article", 'app/views/railspress/posts/singular.html.erb' if Railspress.WP_DEBUG %>
   <%= render partial: 'entry_header',  locals: {post: @post} %>
   <%= content_tag :div, class: 'entry-content' do %>
