@@ -24,10 +24,13 @@ Railspress::Engine.routes.draw do
     get 'author/:slug' => 'railspress/archive#author', defaults: {taxonomy: 'author'}, as: :authors_posts
   end
 
-  # get 'posts/:name' => 'railspress/posts#singular'
-
-  get '*slug' => 'railspress/posts#singular', as: :show_page
-  # get '*pagename' => 'pages#index'
+  if !Railspress.pages_permalink_prefix.nil?
+    scope path: Railspress.pages_permalink_prefix do
+      get '*slug' => 'railspress/posts#singular', as: :show_page
+    end
+  else
+    get '*slug' => 'railspress/posts#singular', as: :show_page
+  end
 
   get '/' => 'railspress/home#index'
 
