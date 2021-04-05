@@ -12,6 +12,16 @@ class Railspress::WPHook
   # @var array
   attr_accessor :callbacks
 
+  # The priority keys of actively running iterations of a hook.
+  #
+  # @var array
+  attr_accessor :iterations
+
+  # The current priority of actively running iterations of a hook.
+  #
+  # @var array
+  attr_accessor :current_priority
+
   # Number of levels this hook can be recursively called.
   #
   # @var int
@@ -24,6 +34,8 @@ class Railspress::WPHook
 
   def initialize
     @callbacks = {}
+    @iterations = {}
+    @current_priority = {}
     @nesting_level = 0
     @doing_action = false
   end
@@ -38,7 +50,7 @@ class Railspress::WPHook
   #                                   in the order in which they were added to the action.
   # @param [int]      accepted_args   The number of arguments the function accepts.
   def add_filter( tag, function_to_add, priority, accepted_args )
-    # idx =  _wp_filter_build_unique_id( tag, function_to_add, priority )
+    idx =  _wp_filter_build_unique_id( tag, function_to_add, priority )
     priority_existed = !@callbacks[ priority ].nil?
 
     @callbacks[ priority ] = [] unless priority_existed
@@ -48,13 +60,15 @@ class Railspress::WPHook
     #		if ( ! $priority_existed && count( $this->callbacks ) > 1 ) {
     #			ksort( $this->callbacks, SORT_NUMERIC );
     #		}
-    #
-    #		if ( $this->nesting_level > 0 ) {
-    #			$this->resort_active_iterations( $priority, $priority_existed );
-    #		}
+
+    resort_active_iterations( priority, priority_existed ) if @nesting_level > 0
   end
 
-  # TODO resort_active_iterations  remove_filter has_filter has_filters remove_all_filters
+  def resort_active_iterations(new_priority = false, priority_existed = false)
+    # TODO resort_active_iterations
+  end
+
+  # TODO remove_filter has_filter has_filters remove_all_filters
   # Calls the callback functions added to a filter hook.
   #
   # @param [mixed] value The value to filter.
@@ -64,31 +78,28 @@ class Railspress::WPHook
     return value if @callbacks.blank?
 
     @nesting_level += 1
-# TODO
-#		@iterations[ nesting_level ] = array_keys( @callbacks );
-#		$num_args = count( $args );
-#
-#		do {
-#			$this->current_priority[ $nesting_level ] = $priority = current( $this->iterations[ $nesting_level ] );
-#
-#			foreach ( $this->callbacks[ $priority ] as $the_ ) {
-#				if( ! $this->doing_action ) {
-#					$args[ 0 ] = $value;
-#				}
-#
-#				# Avoid the array_slice if possible.
-#				if ( $the_['accepted_args'] == 0 ) {
-#					value = call_user_func_array( $the_['function'], array() );
-#				} elseif ( $the_['accepted_args'] >= $num_args ) {
-#					value = call_user_func_array( $the_['function'], $args );
-#				} else {
-#					value = call_user_func_array( $the_['function'], array_slice( $args, 0, (int)$the_['accepted_args'] ) );
-#				}
-#			}
-#		} while ( false !== next( $this->iterations[ $nesting_level ] ) );
-#
-#		unset( $this->iterations[ $nesting_level ] );
-#		unset( $this->current_priority[ $nesting_level ] );
+    @iterations[@nesting_level] = @callbacks.keys
+    num_args = args.length
+
+    @iterations[@nesting_level].each do |priority|
+      @current_priority[@nesting_level] = priority
+
+      @callbacks[priority].each do |the_|
+
+        args[0] = value unless @doing_action
+
+        # Avoid the array_slice if possible.
+        if the_[:accepted_args] == 0
+          value = the_[:function].call
+        elsif the_[:accepted_args] >= num_args
+          value = the_[:function].call(args)
+        else
+          value = the_[:function].call(args.slice(0, the_[:accepted_args]))
+        end
+      end
+    end
+    @iterations.delete(@nesting_level)
+    @current_priority.delete(@nesting_level)
 
     @nesting_level -= 1
 

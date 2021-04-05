@@ -253,6 +253,54 @@ module Railspress::Plugin
     Railspress.GLOBAL.wp_filter['all'].do_all_hook(args)
   end
 
-  # TODO _wp_filter_build_unique_id
+  #  Build Unique ID for storage and retrieval.
+  #
+  #  The old way to serialize the callback caused issues and this function is the
+  #  solution. It works by checking for objects and creating a new property in
+  #  the class to keep track of the object and new objects of the same class that
+  #  need to be added.
+  #
+  #  It also allows for the removal of actions and filters for objects after they
+  #  change class properties. It is possible to include the property $wp_filter_id
+  #  in your class and set it to "null" or a number to bypass the workaround.
+  #  However this will prevent you from adding new classes and any new classes
+  #  will overwrite the previous hook by the same class.
+  #
+  #  Functions and static method callbacks are just returned as strings and
+  #  shouldn't have any speed penalty.
+  #
+  #  @link https://core.trac.wordpress.org/ticket/3875
+  #
+  #  @since 2.2.3
+  #  @since 5.3.0 Removed workarounds for spl_object_hash().
+  #               `$tag` and `$priority` are no longer used,
+  #               and the function always returns a string.
+  #  @access private
+  #
+  #  @param [String]   tag      Unused. The name of the filter to build ID for.
+  #  @param [callable] function The function to generate ID for.
+  #  @param [Integer]  priority Unused. The order in which the functions
+  #                             associated with a particular action are executed.
+  #  @return [String] Unique function ID for usage as array key.
+  def _wp_filter_build_unique_id(tag, function, priority)
+    return function if function.is_a?(String)
+
+    # TODO continue
+    if !function.is_a?(Array) # is_object( function )
+      # Closures are currently implemented as objects.
+      function = [function, '']
+    else
+      # function = (array) function;
+    end
+
+    if !function.is_a?(Array) # is_object( function[0] )
+      # Object class calling.
+      ( function[0].object_id.to_s ) + function[1] # spl_object_hash
+    elsif function[0].is_a? String
+      # Static calling.
+      function[0] + '::' + function[1]
+    end
+
+  end
 
 end
