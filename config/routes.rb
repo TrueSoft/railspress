@@ -14,7 +14,7 @@ Railspress::Engine.routes.draw do
       get 'author/:slug' => 'railspress/archive#author', defaults: {taxonomy: 'author'}, as: :authors_posts
       get ':taxonomy/:slug' => 'railspress/archive#taxonomy'
 
-      get ':name' => 'railspress/posts#singular'
+      get ':name' => 'railspress/posts#singular', as: :show_post
     end
   else
     get 'archive/:taxonomy/:slug' => 'railspress/archive#taxonomy'
