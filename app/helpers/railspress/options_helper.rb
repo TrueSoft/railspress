@@ -119,6 +119,18 @@ module Railspress::OptionsHelper
     apply_filters( 'alloptions', alloptions )
   end
 
+  def update_option_to_db(option, value, autoload = nil)
+    option_obj = Railspress::Option.where(option_name: option).first
+    if option_obj.nil?
+      option_obj = Railspress::Option.new(option_name: option, option_value: value, autoload: autoload == 'yes' ? 'yes' : 'no')
+      option_obj.save
+    elsif option_obj.option_value != value
+      option_obj.update_attribute(:option_value, value)
+    else
+      false # no change
+    end
+  end
+
   def update_option(option, value, autoload = nil)
     option = option.strip
     return false if option.blank?
