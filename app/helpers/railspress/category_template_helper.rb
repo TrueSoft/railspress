@@ -5,7 +5,20 @@
 =end
 module Railspress::CategoryTemplateHelper
 
-  # TODO get_category_link
+  # Retrieve category link URL.
+  #
+  # @param [Int|object] category Category ID or object.
+  # @return [string] Link on success, empty string if category does not exist.
+  def get_category_link(category)
+    # if ( ! is_object( category ) )
+    #   category = (int) category
+    # end
+
+    category = get_term_link( category )
+    return '' if category.is_a? Railspress::WP_Error # is_wp_error
+
+    return category
+  end
 
   # Retrieve category parents with separator.
   #
@@ -47,6 +60,63 @@ module Railspress::CategoryTemplateHelper
 
     # Filters the array of categories to return for a post.
     apply_filters( 'get_the_categories', categories, id )
+  end
+
+  # get_the_category_by_ID
+
+  def get_the_category_list(separator = '', parents = '', post_id = false)
+    return apply_filters('the_category', '', separator, parents) unless is_object_in_taxonomy(post_id.post_type, 'category')
+    # Filters the categories before building the category list.
+    categories = apply_filters('the_category_list', get_the_category(post_id), post_id)
+    return apply_filters('the_category', t('railspress.category.uncategorized'), separator, parents) if categories.blank?
+
+    rel = true || using_permalinks ? 'rel="category tag"' : 'rel="category"'
+
+    thelist = ''
+    if '' == separator
+      thelist += '<ul class="post-categories">'
+      categories.each do |category|
+        case parents.downcase
+        when 'multiple'
+          if category.parent
+            thelist += get_category_parents( category.parent, true, separator )
+          end
+          thelist += '<a href="' + esc_url( get_category_link( category.term_id ) ) + '" ' + rel + '>' + category.name + '</a></li>'
+        when 'single'
+          thelist += '<a href="' + esc_url(get_category_link(category.term_id)) + '"  ' + rel + '>'
+          if category.parent
+            thelist += get_category_parents(category.parent, false, separator)
+          end
+          thelist += category.name + '</a></li>'
+        else
+          thelist += '<a href="' + esc_url(get_category_link(category.term_id)) + '" ' + rel + '>' + category.name + '</a></li>'
+        end
+      end
+      thelist += '</ul>'
+    else
+      i = 0
+      categories.each do |category|
+        thelist += separator if 0 < i
+        case parents.downcase
+        when 'multiple'
+          if category.parent
+            thelist += get_category_parents(category.parent, true, separator)
+          end
+          thelist += '<a href="' + esc_url(get_category_link(category.term_id)) + '" ' + rel + '>' + category.name + '</a>'
+        when 'single'
+          thelist += '<a href="' + esc_url(get_category_link(category.term_id)) + '" ' + rel + '>'
+          if category.parent
+            thelist += get_category_parents(category.parent, false, separator)
+          end
+          thelist += category.name + "</a>"
+        else
+          thelist += '<a href="' + esc_url(get_category_link(category.term_id)) + '" ' + rel + '>' + category.name + '</a></li>'
+        end
+        i += 1
+      end
+    end
+    # Filters the category or list of categories.
+    apply_filters('the_category', thelist, separator, parents)
   end
 
   # Retrieve the tags for a post.
