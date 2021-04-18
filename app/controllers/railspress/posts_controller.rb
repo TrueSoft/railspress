@@ -20,7 +20,7 @@ module Railspress
         if orig_page_id != @post.id
           parsed_locale = params[:language] || I18n.default_locale.to_s
           logger.info "Redirecting to translated version (#{@post.post_name}/#{parsed_locale})"
-          redirect_to show_page_path(helpers.get_page_uri(@post), language: parsed_locale == I18n.default_locale.to_s ? nil : params[:language])
+          redirect_to railspress_engine.show_page_path(helpers.get_page_uri(@post), language: parsed_locale == I18n.default_locale.to_s ? nil : params[:language])
           return
         end
         @is_revision = params[:rev] && params[:token] == helpers.ts_token(params[:rev])

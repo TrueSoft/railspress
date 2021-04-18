@@ -24,7 +24,7 @@ class Railspress::HomeController < Railspress::ApplicationController
         if orig_page_id != @post.id
           parsed_locale = params[:language] || I18n.default_locale.to_s
           logger.info "Redirecting to translated version (#{@post.post_name}/#{parsed_locale})"
-          redirect_to show_page_path(helpers.get_page_uri(@post), language: parsed_locale == I18n.default_locale.to_s ? nil : params[:language])  # TODO de verificat
+          redirect_to railspress_engine.show_page_path(helpers.get_page_uri(@post), language: parsed_locale == I18n.default_locale.to_s ? nil : params[:language])  # TODO de verificat
           return
         end
       end
