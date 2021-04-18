@@ -147,7 +147,7 @@ module Railspress::OptionsHelper
     # @param mixed  $value     The new, unserialized option value.
     # @param mixed  $old_value The old option value.
     # @param string $option    Option name.
-    value = apply_filters( "pre_update_option_{$option}", value, old_value, option )
+    value = apply_filters( "pre_update_option_#{option}", value, old_value, option )
 
     # Filters an option before its value is (maybe) serialized and updated.
     #

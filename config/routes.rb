@@ -1,6 +1,6 @@
 Railspress::Engine.routes.draw do
 
-  resources :options
+  resources :options, controller: 'railspress/options'
 
   if !Railspress.posts_permalink_prefix.nil?
     scope path: Railspress.posts_permalink_prefix do
