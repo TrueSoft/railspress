@@ -136,4 +136,25 @@ class Railspress::WPHook
 #		unset( $this->iterations[ $nesting_level ] );
     @nesting_level -= 1
   end
+
+  def _wp_filter_build_unique_id(tag, function, priority)
+    return function if function.is_a?(String)
+
+    # TODO continue
+    if !function.is_a?(Array) # is_object( function )
+      # Closures are currently implemented as objects.
+      function = [function, '']
+    else
+      # function = (array) function;
+    end
+
+    if !function.is_a?(Array) # is_object( function[0] )
+      # Object class calling.
+      ( function[0].object_id.to_s ) + function[1] # spl_object_hash
+    elsif function[0].is_a? String
+      # Static calling.
+      function[0] + '::' + function[1]
+    end
+
+  end
 end
