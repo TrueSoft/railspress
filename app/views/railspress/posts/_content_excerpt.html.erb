@@ -1,4 +1,5 @@
 <%= content_tag :article, id: "post-#{post.id}", class: get_post_class('', post).join(' ')  do %>
+  <%= hidden_field_tag "railspress_current_template_article", 'app/views/railspress/posts/_content_excerpt.html.erb' if Railspress.WP_DEBUG %>
   <header class="entry-header">
     <%# php
 		if ( is_sticky() && is_home() && ! is_paged() ) {
