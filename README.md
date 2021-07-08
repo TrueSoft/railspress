@@ -14,6 +14,7 @@ layout.
 - 2 custom shortcodes:
   - `ts_revisions` - shows the page revisions for website visitors
   - `ts_childpages` - displays links of the child pages into the parent page
+- set a prefix for all articles e.g. `config.posts_permalink_prefix = 'news'`
 
 ## Usage
 How to use the engine

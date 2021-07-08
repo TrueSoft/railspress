@@ -16,6 +16,7 @@ module Railspress
   self.links_to_wp = false
   self.generate_breadcrumb = false
 
+  # see permalink_structure/get_post_type_archive_link('post')
   self.posts_permalink_prefix = nil
 
   self.pages_permalink_prefix = nil
