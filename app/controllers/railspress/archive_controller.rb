@@ -13,6 +13,8 @@ class Railspress::ArchiveController < Railspress::ApplicationController
       @archive = Railspress::Term.joins(:taxonomy).where(Railspress::Taxonomy.table_name => {taxonomy: params[:taxonomy]}, slug: params[:slug]).first!
     end
     prepare_vars
+  rescue ActiveRecord::RecordNotFound
+    redirect_to main_app.root_path, alert: t('railspress.tag.not_found', slug: params[:slug])
   end
 
   def year_archive
