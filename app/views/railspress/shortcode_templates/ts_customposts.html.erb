@@ -2,8 +2,8 @@
   # normalize attribute keys, lowercase
   ts_atts = @attributes.transform_keys!(&:downcase)
   # override default attributes with user attributes
-  ts_atts = {sort_column: 'menu_order', sort_order: 'asc', no_content: false }.merge(ts_atts)
-  childpages = get_posts({post_parent: 0, post_type: ts_atts[:post_type].to_s, post_status: 'publish', orderby: ts_atts[:sort_column], order: ts_atts[:sort_order].to_sym})
+  ts_atts = {sort_column: 'menu_order', sort_order: 'asc', no_content: false, numberposts: 5 }.merge(ts_atts)
+  childpages = get_posts({post_parent: 0, post_type: ts_atts[:post_type].to_s, post_status: 'publish', numberposts: ts_atts[:numberposts].to_i, orderby: ts_atts[:sort_column], order: ts_atts[:sort_order].to_sym})
 %>
 
 <%= @content %>
