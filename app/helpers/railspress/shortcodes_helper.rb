@@ -48,12 +48,12 @@ module Railspress::ShortcodesHelper
 
   def content(c)
     shortcode = Shortcode.new
-    shortcode.configuration.self_closing_tags = [:ts_childpages, :ts_revisions]
+    shortcode.configuration.self_closing_tags = [:ts_childpages, :ts_revisions, :ts_customposts]
     shortcode.configuration.helpers = [ActionView::Helpers::TagHelper, Railspress::FormattingHelper,
                                        Railspress::LinkTemplateHelper, Railspress::MediaHelper, Railspress::MetaHelper,
                                        Railspress::OptionsHelper, Railspress::PostsHelper, Railspress::PostTemplateHelper,
                                        Railspress::PostThumbnailTemplateHelper, Railspress::RevisionHelper, Railspress::ShortcodesHelper]
-    shortcode.register_presenter(Railspress::PagePresenter, Railspress::RevisionsPresenter)
+    shortcode.register_presenter(Railspress::PagePresenter, Railspress::RevisionsPresenter, Railspress::CustomPostPresenter)
     processed_c = shortcode.process(c, page: @post, main_post: @main_post)
     process_video_blocks processed_c
   end
@@ -125,8 +125,8 @@ module Railspress::ShortcodesHelper
     if has_post_thumbnail(page)
       output += get_the_post_thumbnail(page, 'medium', { class: 'card-img-top', alt: esc_attr(page.post_title)})
     end
+    output += content_tag(:h5, page.post_title, class: 'card-header card-title')
     output += '<div class="card-body">'
-    output += content_tag(:h5, page.post_title, class: 'card-title')
 
     unless no_content
       if page.post_excerpt.blank?
