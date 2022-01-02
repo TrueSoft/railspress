@@ -190,7 +190,7 @@ module Railspress::CategoryTemplateHelper
     terms.each do |term|
       link = get_term_link(term, taxonomy)
       return link if link.is_a? Railspress::WP_Error
-      links << '<a href="' + esc_url(link) + '" rel="tag" class="badge badge-secondary">' + term.name + '</a>' # TODO make a filter for the class
+      links << '<a href="' + esc_url(link) + '" rel="tag" class="badge bg-secondary text-light text-decoration-none">' + term.name + '</a>' # TODO make a filter for the class
     end
 
     # Filters the term links for a given taxonomy.
