@@ -52,7 +52,7 @@ module Railspress
           #   if has_breadcrumb
           ancestors = []
           post_parent = 0
-          slugs = params[:slug].split('/')
+          slugs = params[:slug].nil? ? [] : params[:slug].split('/')
           if slugs.length > 1
             slugs.each do |slug|
               page = Railspress::Page.where(post_name: slug, post_parent: post_parent).first!
