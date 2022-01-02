@@ -48,6 +48,7 @@ module Railspress::ShortcodesHelper
 
   def content(c)
     shortcode = Shortcode.new
+    shortcode.configuration.template_path = "app/views/railspress/shortcode_templates"
     shortcode.configuration.self_closing_tags = [:ts_childpages, :ts_revisions, :ts_customposts]
     shortcode.configuration.helpers = [ActionView::Helpers::TagHelper, Railspress::FormattingHelper,
                                        Railspress::LinkTemplateHelper, Railspress::MediaHelper, Railspress::MetaHelper,
