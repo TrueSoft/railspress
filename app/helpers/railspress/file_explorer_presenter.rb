@@ -35,6 +35,7 @@ class Railspress::FileExplorerPresenter
     r_path = (Railspress.SERVERPATH + (Railspress.UPLOADS.nil? ? 'uploads' : Railspress.UPLOADS ) + '/' + ts_atts[:directory])
     @initial_directory = Pathname.new(r_path)
     @subdirs, @files = directory_contents(@initial_directory, ts_atts[:only], ts_atts[:except])
+    @subdirs.sort_by!{|sd| sd.basename.to_s}
     @subdirs.reverse! if ts_atts[:sort_order] == 'desc'
     @tablist = ''
     if !@files.empty? && !@subdirs.empty?
@@ -112,7 +113,7 @@ class Railspress::FileExplorerPresenter
 
   def render_file_in_explorer(file)
     file_type = File.extname(file.basename).strip.downcase[1..-1]
-    link_to(path_join(wp_get_upload_dir[:baseurl], file.to_path), class: "file-link file-type-#{file_type}", title: file.basename) do
+    link_to(path_join(wp_get_upload_dir[:baseurl], file.to_path[Railspress.SERVERPATH.to_s.length..-1]), class: "file-link file-type-#{file_type}", title: file.basename) do
       content_tag(:span, fabi_icon(icon_for_filetype(file_type)), class: 'file-icon') +
         content_tag(:span, class: 'file-name') do
           concat file.basename.sub_ext('')
