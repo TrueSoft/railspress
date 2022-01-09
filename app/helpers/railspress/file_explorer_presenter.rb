@@ -6,8 +6,6 @@ class Railspress::FileExplorerPresenter
   include ActionView::Context
   include Railspress::Functions
   include Railspress::OptionsHelper
-  include Railspress::Plugin
-  include Railspress::Load
   include Railspress::FormattingHelper
   include ApplicationHelper
 
@@ -113,7 +111,7 @@ class Railspress::FileExplorerPresenter
 
   def render_file_in_explorer(file)
     file_type = File.extname(file.basename).strip.downcase[1..-1]
-    link_to(path_join(wp_get_upload_dir[:baseurl], file.to_path[Railspress.SERVERPATH.to_s.length..-1]), class: "file-link file-type-#{file_type}", title: file.basename) do
+    link_to((get_option('siteurl').gsub(/[\/]+$/, '') + '/' + file.to_path[Railspress.SERVERPATH.to_s.length..-1].gsub(/^[\/]+/, '')), class: "file-link file-type-#{file_type}", title: file.basename) do
       content_tag(:span, fabi_icon(icon_for_filetype(file_type)), class: 'file-icon') +
         content_tag(:span, class: 'file-name') do
           concat file.basename.sub_ext('')
