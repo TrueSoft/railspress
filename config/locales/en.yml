@@ -100,6 +100,9 @@ en:
     shortcodes:
       revisions:
         title_html: "The archive from %{date} for %{post}"
+      fileexplorer:
+        hint_selection: "Please select an item above to view more"
+        created_at: " - uploaded on %{date}"
 
     layouts:
       footer:

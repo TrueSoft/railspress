@@ -11,10 +11,11 @@ layout.
 - Displays the pages, posts and menus from a WordPress site using the rails layouts
 - Works for multi-language sites also
 - Configure additional options using the same WordPress table
-- 3 custom shortcodes:
+- 4 custom shortcodes:
   - `ts_revisions` - shows the page revisions for website visitors
   - `ts_childpages` - displays links of the child pages into the parent page
   - `ts_customposts` - displays links of the custom post types into a page
+  - `ts_fileexplorer` - displays a directory tree with files and subdirectories
 - set a prefix for all articles e.g. `config.posts_permalink_prefix = 'news'`
 
 ## Usage

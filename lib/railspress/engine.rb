@@ -30,6 +30,7 @@ module Railspress
 
   class << self
     mattr_accessor :ABSPATH
+    mattr_accessor :SERVERPATH
     mattr_accessor :WPINC
     # In WordPress, it can be set in wp-config.php like this: define('UPLOADS', 'images');
     mattr_accessor :UPLOADS
@@ -61,6 +62,7 @@ module Railspress
     # add default values of more config vars here
     self.WPINC = "wp-includes"
     self.UPLOADS = nil # must be nil if the constant is not set in WordPress in wp-config.php
+    self.SERVERPATH = nil
     self.WP_DEBUG = false
     self.WP_PLUGIN_DIR = "wp-content/plugins"
     self.GLOBAL = Railspress::GlobalVars.new

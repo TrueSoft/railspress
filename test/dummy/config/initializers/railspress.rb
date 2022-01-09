@@ -1,5 +1,6 @@
 Railspress.setup do |config|
   config.ABSPATH = "https://blog.truesoft.ro/"   # Wordpress URL
+  # config.SERVERPATH = ""
   config.WPINC =  "wp-includes"
   # config.UPLOADS = "images"
   config.WP_CONTENT_DIR = "https://blog.truesoft.ro/wp-content"

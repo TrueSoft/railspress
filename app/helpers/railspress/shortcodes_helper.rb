@@ -49,12 +49,12 @@ module Railspress::ShortcodesHelper
   def content(c)
     shortcode = Shortcode.new
     shortcode.configuration.template_path = "app/views/railspress/shortcode_templates"
-    shortcode.configuration.self_closing_tags = [:ts_childpages, :ts_revisions, :ts_customposts]
+    shortcode.configuration.self_closing_tags = [:ts_childpages, :ts_revisions, :ts_customposts, :ts_fileexplorer]
     shortcode.configuration.helpers = [ActionView::Helpers::TagHelper, Railspress::FormattingHelper,
                                        Railspress::LinkTemplateHelper, Railspress::MediaHelper, Railspress::MetaHelper,
                                        Railspress::OptionsHelper, Railspress::PostsHelper, Railspress::PostTemplateHelper,
                                        Railspress::PostThumbnailTemplateHelper, Railspress::RevisionHelper, Railspress::ShortcodesHelper]
-    shortcode.register_presenter(Railspress::PagePresenter, Railspress::RevisionsPresenter, Railspress::CustomPostPresenter)
+    shortcode.register_presenter(Railspress::PagePresenter, Railspress::RevisionsPresenter, Railspress::CustomPostPresenter, Railspress::FileExplorerPresenter)
     processed_c = shortcode.process(c, page: @post, main_post: @main_post)
     process_video_blocks processed_c
   end
