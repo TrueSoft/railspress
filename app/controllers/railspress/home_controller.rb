@@ -87,6 +87,9 @@ class Railspress::HomeController < Railspress::ApplicationController
     else
       @posts = Railspress::Post.published.descending.where(default_filter).paginate(page: params[:page], per_page: helpers.get_option('posts_per_page', nil))
     end
+    if Railspress.generate_breadcrumb
+      @breadcrumb = {t('railspress.home.posts.title') => railspress_engine.all_posts_path}
+    end
     templates = determine_templates
     templates.each do |tmpl|
       begin
