@@ -106,6 +106,7 @@ class Railspress::FileExplorerPresenter
         files << Pathname.new(path)
       end
     end
+    files.sort_by!{|file| file.basename.to_s}
     [subdirs, files]
   end
 

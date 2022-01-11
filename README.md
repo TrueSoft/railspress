@@ -15,7 +15,7 @@ layout.
   - `ts_revisions` - shows the page revisions for website visitors
   - `ts_childpages` - displays links of the child pages into the parent page
   - `ts_customposts` - displays links of the custom post types into a page
-  - `ts_fileexplorer` - displays a directory tree with files and subdirectories
+  - `ts_fileexplorer` - displays a directory with its files and direct subdirectories
 - set a prefix for all articles e.g. `config.posts_permalink_prefix = 'news'`
 
 ## Usage
