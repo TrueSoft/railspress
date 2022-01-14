@@ -7,7 +7,7 @@
     }
     the_title( sprintf( '<h2 class="entry-title"><a href="%s" rel="bookmark">', esc_url( get_permalink() ) ), '</a></h2>' );
     %>
-    <h3 class="entry-title px-2 pt-2 mb-0 border-bottom">
+    <h3 class="entry-title">
       <% post_link = (Railspress.links_to_wp ? get_permalink(post) : wp_url_to_relative_url(get_permalink(post))) %>
       <%= link_to post.post_title, post_link, rel: 'bookmark' %>
     </h3>
