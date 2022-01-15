@@ -27,10 +27,12 @@
     %>
     <%= excerpt.html_safe %>
     <% if !extended_entry_info[:extended].blank? || !post.post_excerpt.blank? %>
+      <%= content_tag :div, class: 'read-more-wrapper' do %>
         <%= link_to post_link, class: 'more-link ' do %>
           <%= t('railspress.post.index.more') %>
           <%= content_tag :span, '„' + post.post_title + '”', class: 'screen-reader-text' %>
         <% end %>
+      <% end %>
     <% end %>
   </div><!-- .entry-content -->
 
