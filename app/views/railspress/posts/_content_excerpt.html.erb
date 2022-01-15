@@ -1,4 +1,6 @@
-<%= content_tag :article, id: "post-#{post.id}", class: get_post_class('', post).join(' ')  do %>
+<% content_tag_options = {id: "post-#{post.id}", class: get_post_class('', post).join(' ')}
+   content_tag_options.merge!(other_options) if defined? other_options %>
+<%= content_tag :article, content_tag_options do %>
   <%= hidden_field_tag "railspress_current_template_article", 'app/views/railspress/posts/_content_excerpt.html.erb' if Railspress.WP_DEBUG %>
   <header class="entry-header">
     <%# php
