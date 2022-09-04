@@ -335,6 +335,9 @@ module Railspress::NavMenuHelper
               else
                 menu_item.url = wp_url_to_relative_url(get_permalink(mi_post_obj))
               end
+              if params[:language] && params[:language] != I18n.default_locale.to_s
+                menu_item.url = menu_item.url + (menu_item.url.include?('?') ? '&' : '?') + {language: params[:language]}.to_query
+              end
             end
 
           original_object = get_post( menu_item.object_id_ )
