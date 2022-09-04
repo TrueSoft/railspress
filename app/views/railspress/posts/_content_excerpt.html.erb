@@ -10,7 +10,11 @@
     the_title( sprintf( '<h2 class="entry-title"><a href="%s" rel="bookmark">', esc_url( get_permalink() ) ), '</a></h2>' );
     %>
     <h3 class="entry-title">
-      <% post_link = (Railspress.links_to_wp ? get_permalink(post) : wp_url_to_relative_url(get_permalink(post))) %>
+      <% post_link = (Railspress.links_to_wp ? get_permalink(post) : wp_url_to_relative_url(get_permalink(post)))
+         if params[:language] && params[:language] != I18n.default_locale.to_s
+           post_link = post_link + (post_link.include?('?') ? '&' : '?') + {language: params[:language]}.to_query
+         end
+      %>
       <%= link_to post.post_title, post_link, rel: 'bookmark' %>
     </h3>
   </header><!-- .entry-header -->
