@@ -66,21 +66,21 @@ module Railspress::ShortcodesHelper
   def process_video_blocks(c)
     original_content = c
     begin
-      regex_start = /(<!-- wp:core-embed\/(vimeo|youtube)\s*(\{.*\})\s*-->)/
-      regex_end = /(<!-- \/wp:core-embed\/(vimeo|youtube)\s*-->)/
+      regex_start = /(<!-- wp:embed\s*(\{.*\})\s*-->)/
+      regex_end = /(<!-- \/wp:embed\s*-->)/
       starts_of_blocks = c.scan(regex_start)
       ends_of_blocks = c.scan(regex_end)
       replacements = []
       if !starts_of_blocks.blank? && starts_of_blocks.length == ends_of_blocks.length
         cursor = 0
         starts_of_blocks.each_with_index do |start_of_block, si|
-          v_params = JSON.parse(start_of_block[2]).symbolize_keys
+          v_params = JSON.parse(start_of_block[1]).symbolize_keys
           s_index = c.index(start_of_block[0], cursor)
           cursor = s_index + start_of_block[0].length
           e_index = c.index(ends_of_blocks[si][0], cursor)
           cursor = e_index + ends_of_blocks[si][0].length
           block_content_indices = [s_index + start_of_block[0].length, e_index - 1]
-          unless v_params[:url].blank?
+          if v_params[:url].present? && v_params[:type] == 'video'
             to_replace_start = c.index(v_params[:url], block_content_indices.first)
             raise "Video url #{v_params[:url]} not found in block." if to_replace_start > block_content_indices.last
             replacement = case v_params[:providerNameSlug]
