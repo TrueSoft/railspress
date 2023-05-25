@@ -331,6 +331,9 @@ module Railspress::NavMenuHelper
                   menu_item.url = main_app.root_path
                 else
                   menu_item.url = railspress_engine.show_page_path(slug: untrailingslashit(wp_url_to_relative_url(get_permalink(mi_post_obj)).gsub(/^\//, '')))
+                  if menu_item.url =~ /^\/https:\/\w/
+                    menu_item.url = menu_item.url.gsub(/^\/https:\//, 'https://')
+                  end
                 end
               else
                 menu_item.url = wp_url_to_relative_url(get_permalink(mi_post_obj))
