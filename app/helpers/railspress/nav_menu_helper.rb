@@ -327,6 +327,9 @@ module Railspress::NavMenuHelper
               if mi_post_obj.post_type == 'page'
                 if menu_item.object_id_.to_s == get_option('page_for_posts').to_s
                   menu_item.url = railspress_engine.all_posts_path
+                  if menu_item.url =~ /^\/https:\/\w/
+                    menu_item.url = menu_item.url.gsub(/^\/https:\//, 'https://')
+                  end
                 elsif menu_item.object_id_.to_s == get_option('page_on_front').to_s
                   menu_item.url = main_app.root_path
                 else
