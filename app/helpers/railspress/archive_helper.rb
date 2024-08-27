@@ -1,2 +1,5 @@
-module Railspress::ArchiveHelper
+module Railspress
+  module ArchiveHelper
+
+  end
 end
