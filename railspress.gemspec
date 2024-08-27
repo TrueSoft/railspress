@@ -30,7 +30,7 @@ Gem::Specification.new do |spec|
 
   spec.add_dependency 'addressable', '~> 2.7'
 
-  spec.add_dependency 'sass-rails', '~> 5.0'
+  spec.add_dependency 'sass-rails', '>= 6'
   spec.add_dependency 'php-serialization', '~> 1.0.0'
   spec.add_dependency 'shortcode', '~> 2.0.0'
   spec.add_dependency 'will_paginate', '~> 3.1.0'
