@@ -7,8 +7,8 @@
  *
  * file wp-includes\meta.php
 =end
-module Railspress::MetaHelper
-
+module Railspress
+  module MetaHelper
   require 'php_serialization'
 
   # Retrieve metadata for the specified object.
@@ -41,6 +41,6 @@ module Railspress::MetaHelper
       single ? values[0] : values
     end
   end
-
+  end
 
 end

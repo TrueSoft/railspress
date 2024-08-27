@@ -15,7 +15,8 @@
  *
  * file wp-includes\plugin.php
 =end
-module Railspress::Plugin
+module Railspress
+  module Plugin
   # Hook a function or method to a specific filter action.
   #
   # WordPress offers filter hooks to allow plugins to modify
@@ -302,5 +303,5 @@ module Railspress::Plugin
     end
 
   end
-
+  end
 end

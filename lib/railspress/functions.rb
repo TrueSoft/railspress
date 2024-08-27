@@ -3,8 +3,9 @@
  *
  * file wp-includes\functions.php
 =end
-module Railspress::Functions
+module Railspress
 
+  module Functions
   # Retrieve the current time based on specified type.
   #
   # The 'mysql' type will return the time in the format for MySQL DATETIME field.
@@ -659,4 +660,5 @@ module Railspress::Functions
     end
   end
 
+  end
 end

@@ -6,7 +6,8 @@ require 'railspress/plugin'
  *
  * file wp-includes\formatting.php
 =end
-module Railspress::FormattingHelper
+module Railspress
+  module FormattingHelper
   include Railspress::Plugin
 
   # Converts a number of special characters into their HTML entities.
@@ -672,5 +673,5 @@ module Railspress::FormattingHelper
   def wp_basename(path, suffix = '')
     CGI::unescape( File.basename( CGI.escape(path).gsub(/%2F|%5C/, '/'), suffix ))
   end
-
+  end
 end

@@ -3,7 +3,8 @@
  *
  * file wp-includes\media.php
 =end
-module Railspress::MediaHelper
+module Railspress
+  module MediaHelper
   include Railspress::Functions
 
   # Retrieve additional image sizes.
@@ -539,5 +540,5 @@ end
     # Filters the image src result.
     apply_filters( 'wp_get_attachment_image_src', image, attachment_id, size, icon)
   end
-
+  end
 end

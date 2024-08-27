@@ -3,8 +3,8 @@
  *
  * file wp-includes\general-template.php
 =end
-module Railspress::GeneralTemplateHelper
-
+module Railspress
+  module GeneralTemplateHelper
 
   # Displays information about the current site.
   #
@@ -481,5 +481,5 @@ end
       apply_filters( 'wp_admin_css', "<link rel='stylesheet' href='" . esc_url( wp_admin_css_uri( "#{file}-rtl" ) ) + "' type='text/css' />\n", "#{file}-rtl" )
     end
   end
-
+  end
 end

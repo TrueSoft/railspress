@@ -3,7 +3,8 @@
  *
  * file wp-includes\template.php
 =end
-module Railspress::TemplateHelper
+module Railspress
+	module PostTemplateHelper
 	include Railspress::PostTemplateHelper
 
  # Retrieve path to a template
@@ -523,5 +524,5 @@ def get_attachment_template
 
 	get_query_template('attachment', templates)
 end
-
+	end
 end

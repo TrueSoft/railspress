@@ -7,8 +7,9 @@
  *
  * file wp-includes\author-template.php
 =end
-module Railspress::AuthorTemplateHelper
+module Railspress
 
+  module AuthorTemplateHelper
   # Retrieve the author of the current post.
   #
   # @global object $authordata The current author's DB object.
@@ -126,5 +127,6 @@ module Railspress::AuthorTemplateHelper
   end
 
   # TODO wp_list_authors is_multi_author __clear_multi_author_cache
+  end
 
 end

@@ -3,7 +3,8 @@
  *
  * file wp-includes\theme.php
 =end
-module Railspress::ThemeHelper
+module Railspress
+  module ThemeHelper
 
   # Gets a WP_Theme object for a theme.
   #
@@ -418,12 +419,12 @@ module Railspress::ThemeHelper
     apply_filters( "current_theme_supports-#{feature}", true, args, _wp_theme_features[ feature ] )
   end
 
- # Whether the site is being previewed in the Customizer.
- #
- # @return bool True if the site is being previewed in the Customizer, false otherwise.
- def is_customize_preview
-   # TS_INFO: Customizer not implemented
-   false
- end
-
+    # Whether the site is being previewed in the Customizer.
+    #
+    # @return bool True if the site is being previewed in the Customizer, false otherwise.
+    def is_customize_preview
+      # TS_INFO: Customizer not implemented
+      false
+    end
+  end
 end

@@ -5,7 +5,8 @@
  *
  * file wp-includes\post-thumbnail-template.php
 =end
-module Railspress::PostThumbnailTemplateHelper
+module Railspress
+  module PostThumbnailTemplateHelper
 
   # Determines whether a post has an image attached.
   def has_post_thumbnail(post = nil )
@@ -70,5 +71,5 @@ module Railspress::PostThumbnailTemplateHelper
     return false if post_thumbnail_id.blank?
     wp_get_attachment_image_url(post_thumbnail_id, size)
   end
-
+  end
 end

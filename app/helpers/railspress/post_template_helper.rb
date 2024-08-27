@@ -5,7 +5,8 @@
  *
  * file wp-includes\post-template.php
 =end
-module Railspress::PostTemplateHelper
+module Railspress
+  module PostTemplateHelper
   include Railspress::PostsHelper
   include Railspress::TaxonomyLib
 
@@ -726,5 +727,6 @@ module Railspress::PostTemplateHelper
     echo += "<ul class='post-revisions hide-if-no-js'>\n"
     echo += rows
     echo += '</ul>'
+  end
   end
 end

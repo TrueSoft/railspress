@@ -1,2 +1,5 @@
-module Railspress::HomeHelper
+module Railspress
+  module HomeHelper
+
+  end
 end

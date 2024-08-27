@@ -3,7 +3,8 @@
  *
  * file wp-includes\link-template.php
 =end
-module Railspress::LinkTemplateHelper
+module Railspress
+  module LinkTemplateHelper
 
   # Displays the permalink for the current post.
   #
@@ -914,6 +915,6 @@ module Railspress::LinkTemplateHelper
     #                                 'login_post', 'admin', 'relative', 'rest', 'rpc', or null.
     apply_filters( 'set_url_scheme', url, scheme, orig_scheme )
   end
-
+  end
 
 end

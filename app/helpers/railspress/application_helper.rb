@@ -1,4 +1,5 @@
-module Railspress::ApplicationHelper
+module Railspress
+  module ApplicationHelper
 
   def wp_url_to_relative_url(wp_url)
     if wp_url.start_with? home_url
@@ -70,4 +71,4 @@ module Railspress::ApplicationHelper
     orig_page
   end
 end
-
+end

@@ -3,8 +3,8 @@
  *
  * file wp-includes\option.php
 =end
-module Railspress::OptionsHelper
-
+module Railspress
+  module OptionsHelper
   def option_is_editable_ts(option_name)
     return true if EDITABLE_OPTIONS.include?(option_name.to_s)
     editable_simple = Railspress.TS_EDITABLE_OPTIONS.reject {|on| on.index('*')}
@@ -213,5 +213,5 @@ module Railspress::OptionsHelper
     Rails.cache.delete 'Railspress::' + 'options' + '/' + option
     true
   end
-
+  end
 end

@@ -11,7 +11,8 @@
  *
  * file wp-includes\shortcodes.php
 =end
-module Railspress::ShortcodesHelper
+module Railspress
+  module ShortcodesHelper
 
 =begin
  * Container for storing shortcode tags and their hook to call for the shortcode
@@ -147,5 +148,5 @@ module Railspress::ShortcodesHelper
 
     output
   end
-
+  end
 end

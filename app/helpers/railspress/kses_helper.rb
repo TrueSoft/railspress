@@ -27,8 +27,8 @@
  *
  * file wp-includes\kses.php
 =end
-module Railspress::KsesHelper
-
+module Railspress
+  module KsesHelper
   # ALLOWED_ENTITY_NAMES Array of KSES allowed HTML entitity names.
   ALLOWED_ENTITY_NAMES = [
       'nbsp',
@@ -396,4 +396,5 @@ module Railspress::KsesHelper
         (i >= 0x10000 && i <= 0x10ffff))
   end
 
+  end
 end

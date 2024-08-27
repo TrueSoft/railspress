@@ -4,7 +4,8 @@
  * file wp-includes\taxonomy.php
 =end
 require 'railspress/functions'
-module Railspress::TaxonomyLib
+module Railspress
+  module TaxonomyLib
 
   include Railspress::OptionsHelper
   include Railspress::Functions
@@ -1109,5 +1110,5 @@ module Railspress::TaxonomyLib
 
   # TODO wp_get_term_taxonomy_parent_id, wp_check_term_hierarchy_for_loops, is_taxonomy_viewable, wp_cache_set_terms_last_changed, wp_check_term_meta_support_prefilter
 
-
+  end
 end

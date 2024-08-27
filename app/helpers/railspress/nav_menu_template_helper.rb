@@ -3,7 +3,8 @@
  *
  * file wp-includes\nav-menu-template.php
 =end
-module Railspress::NavMenuTemplateHelper
+module Railspress
+  module NavMenuTemplateHelper
 
   # Displays a navigation menu.
   #
@@ -376,6 +377,6 @@ module Railspress::NavMenuTemplateHelper
     walker =  r[:walker].blank? ? Railspress::WalkerNavMenu.new : r[:walker]
     walker.walk items, depth, r
   end
-
+  end
 
 end

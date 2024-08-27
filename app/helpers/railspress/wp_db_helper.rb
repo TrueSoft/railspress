@@ -3,7 +3,8 @@
  *
  * file wp-includes\wp-db.php
 =end
-module Railspress::WpDbHelper
+module Railspress
+  module WpDbHelper
 
 # Real escape, using mysqli_real_escape_string() or mysql_real_escape_string()
 #
@@ -57,5 +58,5 @@ module Railspress::WpDbHelper
 
     data
   end
-
+  end
 end

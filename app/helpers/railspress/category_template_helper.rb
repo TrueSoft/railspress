@@ -3,7 +3,8 @@
  *
  * file wp-includes\category-template.php
 =end
-module Railspress::CategoryTemplateHelper
+module Railspress
+  module CategoryTemplateHelper
 
   # Retrieve category link URL.
   #
@@ -255,5 +256,5 @@ module Railspress::CategoryTemplateHelper
 
     list
   end
-
+  end
 end

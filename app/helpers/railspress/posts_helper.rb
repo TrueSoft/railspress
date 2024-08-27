@@ -3,7 +3,8 @@
  *
  * file wp-includes\post.php
 =end
-module Railspress::PostsHelper
+module Railspress
+  module PostsHelper
   include Railspress::Functions
   include Railspress::Plugin
   include Railspress::Load
@@ -1096,4 +1097,5 @@ module Railspress::PostsHelper
         apply_filters( 'wp_mime_type_icon', icon, mime, post_id )
         end
 
+  end
 end

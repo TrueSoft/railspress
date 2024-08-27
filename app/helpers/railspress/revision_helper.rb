@@ -3,7 +3,8 @@
  *
  * file wp-includes\revision.php
 =end
-module Railspress::RevisionHelper
+module Railspress
+  module RevisionHelper
 
  # Determines if the specified post is a revision.
  #
@@ -145,5 +146,5 @@ module Railspress::RevisionHelper
 
 	date
   end
-
+  end
 end

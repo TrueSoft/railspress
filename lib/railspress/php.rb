@@ -1,4 +1,5 @@
-module Railspress::PHP
+module Railspress
+  module PHP
 
   def self.is_array(var)
     var.is_a? Array or var.is_a? Hash
@@ -63,5 +64,5 @@ module Railspress::PHP
     require 'addressable/uri'
     Addressable::URI.parse(string).query_values()
   end
-
+  end
 end

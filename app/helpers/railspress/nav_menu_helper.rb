@@ -3,8 +3,8 @@
  *
  * file wp-includes\nav-menu.php
 =end
-module Railspress::NavMenuHelper
-
+module Railspress
+  module NavMenuHelper
   # Returns a navigation menu object.
   #
   # @param [int|string|WP_Term] menu Menu ID, slug, name, or object.
@@ -461,5 +461,5 @@ module Railspress::NavMenuHelper
     # Filters a navigation menu item object.
     apply_filters( 'wp_setup_nav_menu_item', menu_item )
   end
-
+  end
 end
