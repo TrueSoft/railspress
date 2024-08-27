@@ -4,7 +4,8 @@
  * file wp-includes\template.php
 =end
 module Railspress
-	module PostTemplateHelper
+	module TemplateHelper
+		include Railspress::PostTemplateHelper
 
  # Retrieve path to a template
  #
