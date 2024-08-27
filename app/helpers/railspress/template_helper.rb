@@ -5,7 +5,6 @@
 =end
 module Railspress
 	module PostTemplateHelper
-	include Railspress::PostTemplateHelper
 
  # Retrieve path to a template
  #
