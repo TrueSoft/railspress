@@ -25,7 +25,7 @@ module Railspress
     attr_accessor :filter_str
 
     def self.find_sti_class type_name
-      "railspress/#{type_name}".camelize.constantize
+      "railspress/#{type_name.tr('-', '_')}".camelize.constantize
     end
 
     def self.sti_name
