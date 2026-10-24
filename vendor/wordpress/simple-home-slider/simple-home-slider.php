@@ -1,7 +1,7 @@
 <?php
 /**
  * Plugin Name: Simple Home Slider
- * Plugin URI: https://example.com/simple-home-slider
+ * Plugin URI: https://truesoft.ro/wp-plugins/simple-home-slider
  * Description: Minimal WordPress plugin for homepage slide data. It stores slide information in the admin and exposes it as plain data for the theme or app to render however it wants.
  * Version: 1.0.0
  * Author: Railspress
