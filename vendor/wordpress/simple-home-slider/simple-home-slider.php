@@ -1,7 +1,7 @@
 <?php
 /**
  * Plugin Name: Simple Home Slider
- * Plugin URI: https://truesoft.ro/wp-plugins/simple-home-slider
+ * Plugin URI: https://example.com/simple-home-slider
  * Description: Minimal WordPress plugin for homepage slide data. It stores slide information in the admin and exposes it as plain data for the theme or app to render however it wants.
  * Version: 1.0.0
  * Author: Railspress
@@ -13,8 +13,8 @@ if (!defined('ABSPATH')) {
 }
 
 final class Simple_Home_Slider {
-    public const REQUIRED_WIDTH = 1920;
-    public const REQUIRED_HEIGHT = 600;
+    private const REQUIRED_WIDTH = 1920;
+    private const REQUIRED_HEIGHT = 600;
 
     private static $instance = null;
 
@@ -100,7 +100,7 @@ final class Simple_Home_Slider {
         </p>
 
         <p class="description">
-            Required image size: <?php echo esc_html(self::REQUIRED_WIDTH); ?>x<?php echo esc_html(self::REQUIRED_HEIGHT); ?> pixels.
+            Required image size: <?php echo self::REQUIRED_WIDTH; ?>x<?php echo self::REQUIRED_HEIGHT; ?> pixels.
         </p>
         <?php
     }
@@ -114,7 +114,30 @@ final class Simple_Home_Slider {
             return;
         }
 
-        $this->validate_slide_image($post_id);
+        $image_id = !empty($_POST['_thumbnail_id']) ? absint($_POST['_thumbnail_id']) : get_post_thumbnail_id($post_id);
+
+        if (!$image_id) {
+            return;
+        }
+
+        $meta = wp_get_attachment_metadata($image_id);
+
+        if (!is_array($meta) || empty($meta['width']) || empty($meta['height'])) {
+            return;
+        }
+
+        if ((int) $meta['width'] !== self::REQUIRED_WIDTH || (int) $meta['height'] !== self::REQUIRED_HEIGHT) {
+            delete_post_thumbnail($post_id);
+
+            wp_safe_redirect(
+                add_query_arg(
+                    'simple_home_slider_error',
+                    'size',
+                    admin_url('post.php?post=' . $post_id . '&action=edit')
+                )
+            );
+            exit;
+        }
 
         if (isset($_POST['simple_home_slider_order'])) {
             $order = absint($_POST['simple_home_slider_order']);
@@ -135,43 +158,9 @@ final class Simple_Home_Slider {
     }
 
     public function render_admin_notice() {
-        $screen = get_current_screen();
-        if (!$screen || 'homepage_slide' !== $screen->post_type) {
-            return;
-        }
-
         if (isset($_GET['simple_home_slider_error']) && 'size' === $_GET['simple_home_slider_error']) {
             echo '<div class="notice notice-error is-dismissible"><p><strong>Homepage slide image error:</strong> The featured image must be exactly 1920x600 pixels.</p></div>';
         }
-    }
-
-    private function validate_slide_image($post_id) {
-        $image_id = get_post_thumbnail_id($post_id);
-
-        if (!$image_id) {
-            return;
-        }
-
-        $image_meta = wp_get_attachment_metadata($image_id);
-
-        if (!is_array($image_meta) || empty($image_meta['width']) || empty($image_meta['height'])) {
-            return;
-        }
-
-        $width = (int) $image_meta['width'];
-        $height = (int) $image_meta['height'];
-
-        if ($width === self::REQUIRED_WIDTH && $height === self::REQUIRED_HEIGHT) {
-            delete_post_meta($post_id, '_simple_home_slider_size_error');
-            return;
-        }
-
-        delete_post_thumbnail($post_id);
-        update_post_meta($post_id, '_simple_home_slider_size_error', 'invalid-image-size');
-
-        $redirect = add_query_arg('simple_home_slider_error', 'size', wp_get_referer() ?: admin_url('post.php?post=' . $post_id . '&action=edit'));
-        wp_safe_redirect($redirect);
-        exit;
     }
 
     public static function get_slides($limit = -1) {
