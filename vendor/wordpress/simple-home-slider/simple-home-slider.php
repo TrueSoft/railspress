@@ -31,6 +31,11 @@ final class Simple_Home_Slider {
         add_action('add_meta_boxes', [$this, 'register_meta_boxes']);
         add_action('save_post_homepage_slide', [$this, 'save_slide_meta'], 10, 1);
         add_action('admin_notices', [$this, 'render_admin_notice']);
+
+        add_filter('manage_homepage_slide_posts_columns', [$this, 'add_admin_columns']);
+        add_action('manage_homepage_slide_posts_custom_column', [$this, 'render_admin_column'], 10, 2);
+        add_filter('manage_edit-homepage_slide_sortable_columns', [$this, 'add_sortable_columns']);
+        add_action('pre_get_posts', [$this, 'handle_admin_sorting']);
     }
 
     public function register_post_type() {
@@ -66,6 +71,70 @@ final class Simple_Home_Slider {
             'normal',
             'default'
         );
+    }
+
+    public function add_admin_columns($columns) {
+        $new_columns = [];
+
+        foreach ($columns as $key => $label) {
+            $new_columns[$key] = $label;
+
+            if ('title' === $key) {
+                $new_columns['slide_thumb'] = 'Preview';
+                $new_columns['slide_order'] = 'Order';
+                $new_columns['slide_link'] = 'Link';
+            }
+        }
+
+        return $new_columns;
+    }
+
+    public function render_admin_column($column, $post_id) {
+        if ('slide_thumb' === $column) {
+            $image_id = get_post_thumbnail_id($post_id);
+
+            if ($image_id) {
+                echo wp_get_attachment_image($image_id, [80, 80], false, ['style' => 'max-width:80px;height:auto;display:block;']);
+            } else {
+                echo '—';
+            }
+            return;
+        }
+
+        if ('slide_order' === $column) {
+            $order = get_post_meta($post_id, '_simple_home_slider_order', true);
+            echo '' !== $order ? esc_html($order) : '—';
+        }
+
+        if ('slide_link' === $column) {
+            $link = get_post_meta($post_id, '_simple_home_slider_link', true);
+
+            if (!empty($link)) {
+                echo '<a href="' . esc_url($link) . '" target="_blank" rel="noopener noreferrer">' . esc_html($link) . '</a>';
+            } else {
+                echo '—';
+            }
+        }
+    }
+
+    public function add_sortable_columns($columns) {
+        $columns['slide_order'] = 'slide_order';
+        return $columns;
+    }
+
+    public function handle_admin_sorting($query) {
+        if (!is_admin() || !$query->is_main_query()) {
+            return;
+        }
+
+        if ('homepage_slide' !== $query->get('post_type')) {
+            return;
+        }
+
+        if ('slide_order' === $query->get('orderby')) {
+            $query->set('meta_key', '_simple_home_slider_order');
+            $query->set('orderby', 'meta_value_num');
+        }
     }
 
     public function render_meta_box($post) {
