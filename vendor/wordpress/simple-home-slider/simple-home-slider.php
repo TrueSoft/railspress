@@ -13,6 +13,9 @@ if (!defined('ABSPATH')) {
 }
 
 final class Simple_Home_Slider {
+    public const REQUIRED_WIDTH = 1920;
+    public const REQUIRED_HEIGHT = 600;
+
     private static $instance = null;
 
     public static function instance() {
@@ -27,6 +30,7 @@ final class Simple_Home_Slider {
         add_action('init', [$this, 'register_post_type']);
         add_action('add_meta_boxes', [$this, 'register_meta_boxes']);
         add_action('save_post_homepage_slide', [$this, 'save_slide_meta'], 10, 1);
+        add_action('admin_notices', [$this, 'render_admin_notice']);
     }
 
     public function register_post_type() {
@@ -94,6 +98,10 @@ final class Simple_Home_Slider {
                 class="widefat"
             >
         </p>
+
+        <p class="description">
+            Required image size: <?php echo esc_html(self::REQUIRED_WIDTH); ?>x<?php echo esc_html(self::REQUIRED_HEIGHT); ?> pixels.
+        </p>
         <?php
     }
 
@@ -105,6 +113,8 @@ final class Simple_Home_Slider {
         if (defined('DOING_AUTOSAVE') && DOING_AUTOSAVE) {
             return;
         }
+
+        $this->validate_slide_image($post_id);
 
         if (isset($_POST['simple_home_slider_order'])) {
             $order = absint($_POST['simple_home_slider_order']);
@@ -122,6 +132,46 @@ final class Simple_Home_Slider {
                 update_post_meta($post_id, '_simple_home_slider_link', $link);
             }
         }
+    }
+
+    public function render_admin_notice() {
+        $screen = get_current_screen();
+        if (!$screen || 'homepage_slide' !== $screen->post_type) {
+            return;
+        }
+
+        if (isset($_GET['simple_home_slider_error']) && 'size' === $_GET['simple_home_slider_error']) {
+            echo '<div class="notice notice-error is-dismissible"><p><strong>Homepage slide image error:</strong> The featured image must be exactly 1920x600 pixels.</p></div>';
+        }
+    }
+
+    private function validate_slide_image($post_id) {
+        $image_id = get_post_thumbnail_id($post_id);
+
+        if (!$image_id) {
+            return;
+        }
+
+        $image_meta = wp_get_attachment_metadata($image_id);
+
+        if (!is_array($image_meta) || empty($image_meta['width']) || empty($image_meta['height'])) {
+            return;
+        }
+
+        $width = (int) $image_meta['width'];
+        $height = (int) $image_meta['height'];
+
+        if ($width === self::REQUIRED_WIDTH && $height === self::REQUIRED_HEIGHT) {
+            delete_post_meta($post_id, '_simple_home_slider_size_error');
+            return;
+        }
+
+        delete_post_thumbnail($post_id);
+        update_post_meta($post_id, '_simple_home_slider_size_error', 'invalid-image-size');
+
+        $redirect = add_query_arg('simple_home_slider_error', 'size', wp_get_referer() ?: admin_url('post.php?post=' . $post_id . '&action=edit'));
+        wp_safe_redirect($redirect);
+        exit;
     }
 
     public static function get_slides($limit = -1) {
