@@ -94,7 +94,7 @@ final class Simple_Home_Slider {
             $image_id = get_post_thumbnail_id($post_id);
 
             if ($image_id) {
-                echo wp_get_attachment_image($image_id, [80, 80], false, ['style' => 'max-width:80px;height:auto;display:block;']);
+                echo wp_get_attachment_image($image_id, [300, 94], false, ['style' => 'max-width:300px;height:auto;display:block;']);
             } else {
                 echo '—';
             }
